@@ -5,9 +5,9 @@
 - **Task framing:** "Locate {X}". Scored at whatever output level each model naturally produces (mask, bbox, or point).
 - **Prompts:** P0 to P4, positional wording only, `{X}` swapped per dataset to match the actual target (tumor, infection, polyp, or lesion).
 - **Zero-shot only.**
-- **15 primary models**, all with published or benchmarked grounding capability. Pixel-mask tier (6): CLIPSeg, Moondream2, PaliGemma 2, Florence-2, EVF-SAM, SEEM. Bbox tier (7): Grounding DINO, OWLv2, Kosmos-2, CogVLM-grounding, Qwen2.5-VL-7B, InternVL2.5, DeepSeek-VL2. Point tier (2): Molmo-7B-D, Molmo2-8B.
-- **5 datasets:** LGG (brain), MosMedData+ (lung), Kvasir-SEG (colon), QaTa-COV19 (chest), ISIC 2018 (skin), 40 fixed samples each.
-- **15,000 primary predictions** total (15 models times 5 datasets times 40 images times 5 prompts).
+- **13 primary models**, all with published or benchmarked grounding capability. Pixel-mask tier (4): CLIPSeg, Moondream2, PaliGemma 2, Florence-2. Bbox tier (7): Grounding DINO, OWLv2, Kosmos-2, CogVLM-grounding, Qwen2.5-VL-7B, InternVL2.5, DeepSeek-VL2. Point tier (2): Molmo-7B-D, Molmo2-8B.
+- **5 datasets:** LGG (brain), MosMedData+ (lung), Kvasir-SEG (colon), QaTa-COV19 (chest), ISIC 2018 (skin), 30 fixed samples each.
+- **9,750 primary predictions** total (13 models times 5 datasets times 30 images times 5 prompts).
 
 ## Objective
 Measure positional bias in text-prompted medical VLMs. When only the positional wording of the prompt changes (image and target fixed), does the model's reported location actually shift accordingly, or does it ignore or misinterpret laterality and region cues?
@@ -22,7 +22,7 @@ Measure positional bias in text-prompted medical VLMs. When only the positional 
 
 **Q: Will each model take my text input?**
 
-A: Yes, all 15. Every model in this plan accepts your P0 to P4 sentence, or that sentence adapted into its required syntax, as text, paired with the image, and every one of them returns a location in some form. None require anything other than a text string plus the image.
+A: Yes, all 13. Every model in this plan accepts your P0 to P4 sentence, or that sentence adapted into its required syntax, as text, paired with the image, and every one of them returns a location in some form. None require anything other than a text string plus the image.
 
 **Q: Why are we doing localization instead of segmentation?**
 
@@ -30,13 +30,13 @@ A: Three reasons.
 
 First, the research question itself is about *where*, not about exact boundary shape. A pixel mask answers a harder question than the one this study is actually asking. A point or a box answers "where" just as validly, with less noise from boundary precision, shape, and thresholding, all of which have nothing to do with position.
 
-Second, coverage. When the task was framed as "segment {X}", only 3 of the models could produce a real pixel mask in one step, and most of the rest would have needed a second model (SAM) bolted on just to get a mask at all, which would then measure bias in a combined system rather than in the model itself. Framed as "locate {X}", the task is scoreable at whatever output level each model already produces, mask, box, or point, so all 15 models are usable directly, without a workaround.
+Second, coverage. When the task was framed as "segment {X}", only 3 of the models could produce a real pixel mask in one step, and most of the rest would have needed a second model (SAM) bolted on just to get a mask at all, which would then measure bias in a combined system rather than in the model itself. Framed as "locate {X}", the task is scoreable at whatever output level each model already produces, mask, box, or point, so all 13 models are usable directly, without a workaround.
 
 Third, cleaner attribution. Segmentation shape variation and positional bias are two different things, and mixing them into one Dice score makes it hard to tell which one caused a low score. Localization isolates the position question on its own.
 
 ## Primary Experiment: Positional Prompt to Localization ("Locate" formatting)
 
-The core task is **localization**: the question is *where*, not *exact boundary shape*. This makes the task scoreable at whatever output level a model naturally produces (point, bbox, or mask), and makes 15 models directly usable.
+The core task is **localization**: the question is *where*, not *exact boundary shape*. This makes the task scoreable at whatever output level a model naturally produces (point, bbox, or mask), and makes 13 models directly usable.
 
 **Prompt set (P0 to P4), parameterized by target `{X}`:**
 - P0: "Please locate {X} in this image."
@@ -57,17 +57,17 @@ The core task is **localization**: the question is *where*, not *exact boundary 
 | QaTa-COV19 | Chest | "the infection" | X-ray COVID-19 infection regions, not tumors |
 | ISIC 2018 | Skin | "the lesion" | Standard ISIC terminology |
 
-**Note on per-model calling convention:** "Please locate {X}..." is the *semantic content* kept controlled across all 15 models, not always the literal string sent. Every model listed below does accept a text input, but a few expect their own task syntax rather than free-text chat. See the Input column in the model table.
+**Note on per-model calling convention:** "Please locate {X}..." is the *semantic content* kept controlled across all 13 models, not always the literal string sent. Every model listed below does accept a text input, but a few expect their own task syntax rather than free-text chat. See the Input column in the model table.
 
 ## Zero-Shot Only
 
 No in-context demonstrations, no few-shot conditioning. Each model receives the image and a single P0 to P4 prompt cold. This is the cleanest test of the model's own trained spatial understanding.
 
-## Models: 15 confirmed grounding-capable, zero-shot, Hugging Face, no paid API
+## Models: 13 confirmed grounding-capable, zero-shot, Hugging Face, no paid API
 
-All 15 have **published or benchmarked localization capability** (RefCOCO or equivalent), not general VQA models guessing at position. All are free Hugging Face weight downloads, no API billing. Every one of them takes your text prompt directly, the "Input" column shows exactly what form that text needs to take. Sorted by output type.
+All 13 have **published or benchmarked localization capability** (RefCOCO or equivalent), not general VQA models guessing at position. All are free Hugging Face weight downloads, no API billing. Every one of them takes your text prompt directly, the "Input" column shows exactly what form that text needs to take. Sorted by output type.
 
-### Pixel mask output (6 models)
+### Pixel mask output (4 models)
 
 | # | Model | Input | Output | Params | License | Link |
 |---|-------|-------|--------|--------|---------|------|
@@ -75,35 +75,33 @@ All 15 have **published or benchmarked localization capability** (RefCOCO or equ
 | 2 | Moondream2 | Image + free-text object name, sent to its `/segment` endpoint | Pixel mask (also `/point`, `/detect` available) | 2B | Apache-2.0 | [huggingface.co/vikhyatk/moondream2](https://huggingface.co/vikhyatk/moondream2) |
 | 3 | PaliGemma 2 (3B) | Image + text using the fixed syntax `segment {X}` | Pixel mask, single call | 3B | MIT (weights) | [huggingface.co/google/paligemma2-3b-pt-224](https://huggingface.co/google/paligemma2-3b-pt-224) |
 | 4 | Florence-2 | Image + text using task tokens `<CAPTION_TO_PHRASE_GROUNDING>` then `<REGION_TO_SEGMENTATION>` | Pixel mask, two calls | 0.23B/0.77B | MIT | [huggingface.co/microsoft/Florence-2-large](https://huggingface.co/microsoft/Florence-2-large) |
-| 5 | EVF-SAM | Image + free-text phrase, fused into SAM's prompt embedding | Pixel mask, single call | 1.32B | Not confirmed on HF, verify before use | [huggingface.co/spaces/YxZhang/evf-sam](https://huggingface.co/spaces/YxZhang/evf-sam) |
-| 6 | SEEM | Image + free-text phrase (also accepts point, box, or scribble) | Pixel mask | ~341M (Focal-L) | AFL-3.0 (OSI-approved, permits commercial use) | [huggingface.co/xdecoder/SEEM](https://huggingface.co/xdecoder/SEEM) |
 
 ### Bounding box output (7 models)
 
 | # | Model | Input | Output | Params | License | Link |
 |---|-------|-------|--------|--------|---------|------|
-| 7 | Grounding DINO | Image + free-text query, dedicated detector, not a chat model | Bounding box + confidence score | ~172M (base) | Apache-2.0 | [huggingface.co/IDEA-Research/grounding-dino-base](https://huggingface.co/IDEA-Research/grounding-dino-base) |
-| 8 | OWLv2 | Image + free-text query, dedicated detector, not a chat model | Bounding box + confidence score | ~154M to 350M | Apache-2.0 (weights), MIT (code) | [huggingface.co/google/owlv2-base-patch16-ensemble](https://huggingface.co/google/owlv2-base-patch16-ensemble) |
-| 9 | Kosmos-2 | Image + text wrapped in its `<grounding>` special token | Bounding box | ~1.6B | MIT | [huggingface.co/microsoft/kosmos-2-patch14-224](https://huggingface.co/microsoft/kosmos-2-patch14-224) |
-| 10 | CogVLM-grounding | Image + free-text chat, grounding-specialist checkpoint | Bounding box | 17B (7B vision + language) | Code Apache-2.0, weights under CogVLM Model License (research and commercial use permitted) | [huggingface.co/THUDM/cogvlm-grounding-generalist-hf](https://huggingface.co/THUDM/cogvlm-grounding-generalist-hf) |
-| 11 | Qwen2.5-VL-7B | Image + free-text chat | Bounding box, point, or JSON coordinates | 7B | Apache-2.0 | [huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct) |
-| 12 | InternVL2.5 (1B to 8B) | Image + free-text chat | Bounding box | 1B to 8B | Open-source, verify the exact license on the size you use | [huggingface.co/OpenGVLab/InternVL2_5-8B](https://huggingface.co/OpenGVLab/InternVL2_5-8B) |
-| 13 | DeepSeek-VL2-Tiny/Small | Image + text prefixed with its grounding special token | Bounding box (format can be inconsistent per user reports) | 1.0B/2.8B activated (MoE) | Code MIT, weights under DeepSeek Model License | [huggingface.co/deepseek-ai/deepseek-vl2-small](https://huggingface.co/deepseek-ai/deepseek-vl2-small) |
+| 5 | Grounding DINO | Image + free-text query, dedicated detector, not a chat model | Bounding box + confidence score | ~172M (base) | Apache-2.0 | [huggingface.co/IDEA-Research/grounding-dino-base](https://huggingface.co/IDEA-Research/grounding-dino-base) |
+| 6 | OWLv2 | Image + free-text query, dedicated detector, not a chat model | Bounding box + confidence score | ~154M to 350M | Apache-2.0 (weights), MIT (code) | [huggingface.co/google/owlv2-base-patch16-ensemble](https://huggingface.co/google/owlv2-base-patch16-ensemble) |
+| 7 | Kosmos-2 | Image + text wrapped in its `<grounding>` special token | Bounding box | ~1.6B | MIT | [huggingface.co/microsoft/kosmos-2-patch14-224](https://huggingface.co/microsoft/kosmos-2-patch14-224) |
+| 8 | CogVLM-grounding | Image + free-text chat, grounding-specialist checkpoint | Bounding box | 17B (7B vision + language) | Code Apache-2.0, weights under CogVLM Model License (research and commercial use permitted) | [huggingface.co/THUDM/cogvlm-grounding-generalist-hf](https://huggingface.co/THUDM/cogvlm-grounding-generalist-hf) |
+| 9 | Qwen2.5-VL-7B | Image + free-text chat | Bounding box, point, or JSON coordinates | 7B | Apache-2.0 | [huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct) |
+| 10 | InternVL2.5 (1B to 8B) | Image + free-text chat | Bounding box | 1B to 8B | Open-source, verify the exact license on the size you use | [huggingface.co/OpenGVLab/InternVL2_5-8B](https://huggingface.co/OpenGVLab/InternVL2_5-8B) |
+| 11 | DeepSeek-VL2-Tiny/Small | Image + text prefixed with its grounding special token | Bounding box (format can be inconsistent per user reports) | 1.0B/2.8B activated (MoE) | Code MIT, weights under DeepSeek Model License | [huggingface.co/deepseek-ai/deepseek-vl2-small](https://huggingface.co/deepseek-ai/deepseek-vl2-small) |
 
 ### Point output (2 models)
 
 | # | Model | Input | Output | Params | License | Link |
 |---|-------|-------|--------|--------|---------|------|
-| 14 | Molmo-7B-D | Image + free-text chat, e.g. "point to {X}" | Single (x, y) point | 7B | Apache-2.0 | [huggingface.co/allenai/Molmo-7B-D-0924](https://huggingface.co/allenai/Molmo-7B-D-0924) |
-| 15 | Molmo2-8B | Image + free-text chat | Single (x, y) point, improved pointing architecture | 8B | Apache-2.0 | [huggingface.co/allenai/Molmo2-8B](https://huggingface.co/allenai/Molmo2-8B) |
+| 12 | Molmo-7B-D | Image + free-text chat, e.g. "point to {X}" | Single (x, y) point | 7B | Apache-2.0 | [huggingface.co/allenai/Molmo-7B-D-0924](https://huggingface.co/allenai/Molmo-7B-D-0924) |
+| 13 | Molmo2-8B | Image + free-text chat | Single (x, y) point, improved pointing architecture | 8B | Apache-2.0 | [huggingface.co/allenai/Molmo2-8B](https://huggingface.co/allenai/Molmo2-8B) |
 
-**Hardware note:** all 15 run on Kaggle's free T4, Colab Pro, or CPU without a large GPU, except CogVLM-grounding, which is best run on Colab Pro (its 17B size is tight on Kaggle's 16GB T4 without quantization).
+**Hardware note:** all 13 run on Kaggle's free T4, Colab Pro, or CPU without a large GPU, except CogVLM-grounding, which is best run on Colab Pro (its 17B size is tight on Kaggle's 16GB T4 without quantization).
 
 **Metrics by output type:**
 
 | Output | Metric |
 |---|---|
-| Pixel mask (6 models) | Mask-centroid shift, Dice(P0, Pn) consistency, wrong-side rate |
+| Pixel mask (4 models) | Mask-centroid shift, Dice(P0, Pn) consistency, wrong-side rate |
 | Bbox (7 models) | Box-center shift in the prompted direction, wrong-side rate |
 | Point (2 models) | Point shift in the prompted direction, wrong-side rate. This is the most direct signal, since there is no shape noise at all |
 
@@ -145,9 +143,9 @@ This section specifies exactly what happens between "you give the model an image
 
 ### Dataset to Output-Type Mapping
 
-Every dataset supplies the same kind of ground truth (a mask), so the same 40 images per dataset feed all three model tiers. Only the *comparison representation* changes per tier, not the dataset or the ground truth source.
+Every dataset supplies the same kind of ground truth (a mask), so the same 30 images per dataset feed all three model tiers. Only the *comparison representation* changes per tier, not the dataset or the ground truth source.
 
-| Dataset | Domain | Ground truth source | Compared against mask models (6) | Compared against bbox models (7) | Compared against point models (2) |
+| Dataset | Domain | Ground truth source | Compared against mask models (4) | Compared against bbox models (7) | Compared against point models (2) |
 |---|---|---|---|---|---|
 | LGG Segmentation | Brain | Tumor mask | Full mask, Dice/IoU | Mask converted to bbox (min/max x, y) | Mask centroid |
 | MosMedData+ | Lung | Infection mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
@@ -183,17 +181,17 @@ Once each prediction is reduced to a single (x, y) reference point (its own cent
 
 ## Sampling Protocol
 
-- Fixed set of **40 samples per dataset** (same 40 images across all models and all 5 prompts).
-- Each model runs 5 datasets times 40 images times 5 prompts (P0 to P4) = **1,000 predictions per model**.
-- 15 models times 1,000 = **15,000 predictions total**.
+- Fixed set of **30 samples per dataset** (same 30 images across all models and all 5 prompts).
+- Each model runs 5 datasets times 30 images times 5 prompts (P0 to P4) = **750 predictions per model**.
+- 13 models times 750 = **9,750 predictions total**.
 
 ## Method
 
-1. Derive positional ground truth (centroid, bbox, left/right, upper/lower) for all 200 images from mask annotations.
+1. Derive positional ground truth (centroid, bbox, left/right, upper/lower) for all 150 images from mask annotations.
 2. Generate P0 to P4 for every image, keeping wording strictly controlled per the constraint above.
-3. Run all 15 primary models zero-shot on all 5 prompt variants for the same 40-image, 5-dataset set, each scored at its native output level (mask, box, or point).
+3. Run all 13 primary models zero-shot on all 5 prompt variants for the same 30-image, 5-dataset set, each scored at its native output level (mask, box, or point).
 4. Compute per-model: location shift in the prompted direction, consistency (Dice for mask models, IoU for box models), and wrong-side/failure rate.
-5. Rank all 15 models by lowest positional bias (highest prompt-following accuracy on correct-side cases, lowest wrong-side rate).
+5. Rank all 13 models by lowest positional bias (highest prompt-following accuracy on correct-side cases, lowest wrong-side rate).
 6. Report per-domain and per-model breakdowns.
 
 ## Other Files

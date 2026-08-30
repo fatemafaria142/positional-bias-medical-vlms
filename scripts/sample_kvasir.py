@@ -1,15 +1,22 @@
 """
-Sample 30 image+mask pairs from Kvasir-SEG (Colon).
+Sample 50 image+mask pairs from Kvasir-SEG (Colon).
 
-Usage:
-    1. Download Kvasir-SEG (datasets.simula.no/kvasir-seg) and extract it,
-       e.g. E:/downloads/Kvasir-SEG.
-    2. Set SOURCE_ROOT below to that extracted folder (it should directly
-       contain "images/" and "masks/" subfolders).
-    3. Run: python scripts/sample_kvasir.py
-    4. Output lands in samples/kvasir/ (images/, masks/, manifest_kvasir.csv) --
-       a small, portable folder. Upload samples/kvasir/ to Drive, then delete
-       the original full download to reclaim disk space.
+Usage (same steps whether you're on your own machine, a teammate's machine,
+or Google Colab -- only the repo root's location changes, never these paths):
+    1. Download Kvasir-SEG (datasets.simula.no/kvasir-seg) and extract it so
+       that it sits at data/raw/Kvasir-SEG relative to the repo root (i.e.
+       the "images/" and "masks/" folders end up directly inside
+       <repo_root>/data/raw/Kvasir-SEG/).
+    2. Run: python scripts/sample_kvasir.py   (from anywhere -- path is
+       resolved relative to this script's own location, not your cwd)
+    3. Output lands in <repo_root>/samples/kvasir/ (images/, masks/,
+       manifest_kvasir.csv) -- a small, portable folder. Upload
+       samples/kvasir/ to Drive, then delete data/raw/Kvasir-SEG to reclaim
+       disk space.
+
+On Colab: clone/mount the repo, then extract the downloaded dataset to
+<repo_root>/data/raw/Kvasir-SEG exactly as above -- no path edits needed,
+since everything below is relative to the repo, not to any one machine.
 """
 
 from pathlib import Path
@@ -19,10 +26,9 @@ from PIL import Image
 
 from common import sample_and_export
 
-# EDIT THIS to wherever you extracted Kvasir-SEG
-SOURCE_ROOT = Path("E:/downloads/Kvasir-SEG")
-
-OUT_DIR = Path(__file__).parent.parent / "samples" / "kvasir"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SOURCE_ROOT = REPO_ROOT / "data" / "raw" / "Kvasir-SEG"
+OUT_DIR = REPO_ROOT / "samples" / "kvasir"
 TARGET_NOUN = "the polyp"
 DATASET_NAME = "kvasir"
 

@@ -6,8 +6,8 @@
 - **Prompts:** P0 to P4, positional wording only, `{X}` swapped per dataset to match the actual target (tumor, infection, polyp, or lesion).
 - **Zero-shot only.**
 - **13 primary models**, all with published or benchmarked grounding capability. Pixel-mask tier (4): CLIPSeg, Moondream2, PaliGemma 2, Florence-2. Bbox tier (7): Grounding DINO, OWLv2, Kosmos-2, CogVLM-grounding, Qwen2.5-VL-7B, InternVL2.5, DeepSeek-VL2. Point tier (2): Molmo-7B-D, Molmo2-8B.
-- **3 datasets, all 2D:** LGG Segmentation (brain), Kvasir-SEG/Kvasir-VQA-x1 (colon), QaTa-COV19 (chest), 30 fixed samples each — chosen as the 3 easiest to work with (no registration, simple flat folder structures, well-documented, small-to-moderate size). Ground truth (centroid, bbox, left/right, upper/lower) always comes from each dataset's mask, never from text, so LGG works identically to the other 2 despite having no native text of its own.
-- **5,850 primary predictions** total (13 models times 3 datasets times 30 images times 5 prompts).
+- **3 datasets, all 2D:** LGG Segmentation (brain), Kvasir-SEG/Kvasir-VQA-x1 (colon), ISIC 2018 (skin), 50 fixed samples each — chosen for reliable, direct (no-registration or no-Kaggle-required) download and small size. QaTa-COV19 (originally used for Chest) was dropped: its only Kaggle source is the full 9,258-image, ~4-5GB "Extended" release with no smaller mirror available, too large for this project's disk constraints. Ground truth (centroid, bbox, left/right, upper/lower) always comes from each dataset's mask, never from text, so LGG and ISIC work identically to Kvasir despite having no native text of their own.
+- **9,750 primary predictions** total (13 models times 3 datasets times 50 images times 5 prompts).
 
 ## Objective
 Measure positional bias in text-prompted medical VLMs. When only the positional wording of the prompt changes (image and target fixed), does the model's reported location actually shift accordingly, or does it ignore or misinterpret laterality and region cues?
@@ -53,7 +53,7 @@ The core task is **localization**: the question is *where*, not *exact boundary 
 |---|---|---|---|
 | LGG Segmentation | Brain | "the tumor" | Correct, LGG masks are glioma tumor regions |
 | Kvasir-SEG / Kvasir-VQA-x1 | Colon | "the polyp" | Endoscopic polyp localization |
-| QaTa-COV19 | Chest | "the infection" | X-ray COVID-19 infection regions, not tumors |
+| ISIC 2018 | Skin | "the lesion" | Standard ISIC terminology |
 
 **Note on per-model calling convention:** "Please locate {X}..." is the *semantic content* kept controlled across all 13 models, not always the literal string sent. Every model listed below does accept a text input, but a few expect their own task syntax rather than free-text chat. See the Input column in the model table.
 
@@ -63,11 +63,11 @@ The core task is **localization**: the question is *where*, not *exact boundary 
 |---|---|---|---|---|---|
 | LGG Segmentation | "Please locate the tumor in this image." | "Please locate the tumor on the left side of this image." | "Please locate the tumor on the right side of this image." | "Please locate the tumor in the upper region of this image." | "Please locate the tumor in the lower region of this image." |
 | Kvasir-SEG / -VQA-x1 | "Please locate the polyp in this image." | "Please locate the polyp on the left side of this image." | "Please locate the polyp on the right side of this image." | "Please locate the polyp in the upper region of this image." | "Please locate the polyp in the lower region of this image." |
-| QaTa-COV19 | "Please locate the infection in this image." | "Please locate the infection on the left side of this image." | "Please locate the infection on the right side of this image." | "Please locate the infection in the upper region of this image." | "Please locate the infection in the lower region of this image." |
+| ISIC 2018 | "Please locate the lesion in this image." | "Please locate the lesion on the left side of this image." | "Please locate the lesion on the right side of this image." | "Please locate the lesion in the upper region of this image." | "Please locate the lesion in the lower region of this image." |
 
-**Important — do not use each dataset's native text as the prompt.** QaTa-COV19's `.xlsx` clinical descriptions vary in length, detail, and confidence from case to case. Feeding any of that in as `{X}`'s surrounding context would violate the plan's core constraint (line 48: no prompt variant may be more detailed or informative than another except for positional wording), and it would confound "did the model move because of position wording" with "did the model move because this case's report said something more specific." For the primary P0–P4 experiment, every model receives only the fixed, generated sentence above (or its model-specific syntax equivalent) — nothing from the dataset's own annotation file.
+**Important — do not use each dataset's native text as the prompt.** None of the 3 active datasets have usable free-text native annotations bundled with the images we downloaded (see Dataset Details below), so this caveat is largely moot for the current 3-dataset set, but the rule still holds if native text is ever reintroduced: no prompt variant may be more detailed or informative than another except for positional wording (line 48), so real report text can't just be substituted in as `{X}`'s context without confounding "did the model move because of position wording" with "did the model move because this case's report said something more specific."
 
-Native text's role is limited to two things: (1) it confirms a dataset is genuinely paired multimodal data, useful if you want to cite it as image+text+mask in your write-up; (2) it is available for an *optional* secondary experiment — e.g., replacing P0 with the dataset's real report text once, per image, to see whether realistic clinical phrasing shifts the model's answer differently than your synthetic P0 does. That would be a separate analysis from RQ1–RQ3, not a substitute for the controlled P0–P4 set. Of these 3 datasets, only QaTa-COV19 has this native text; LGG and Kvasir-SEG do not, though Kvasir-VQA-x1 (if you use it instead of plain Kvasir-SEG) adds real location Q&A on top of Kvasir-SEG's images.
+Of these 3 datasets, only Kvasir-VQA-x1 (an optional upgrade over plain Kvasir-SEG) has real native text — its location Q&A pairs. LGG and ISIC 2018 have none.
 
 ## Zero-Shot Only
 
@@ -117,23 +117,25 @@ All 13 have **published or benchmarked localization capability** (RefCOCO or equ
 
 ## Datasets (3)
 
-All 3 are **2D** and chosen specifically as the easiest to work with: no registration required, simple/flat folder structures, small-to-moderate size, and extensively documented (all 3 are among the most-tutorialized medical imaging datasets that exist). A ground-truth mask lets you derive a precise location (centroid, bounding box, left/right, upper/lower) for comparison against each model's answer.
+All 3 are **2D** and chosen for reliable, small, direct-download access. A ground-truth mask lets you derive a precise location (centroid, bounding box, left/right, upper/lower) for comparison against each model's answer.
 
-**LGG has no native text; QaTa-COV19 does (and Kvasir-VQA-x1 adds real location Q&A on top of plain Kvasir-SEG).** This only affects the optional bonus uses of native text (provenance, secondary real-report-text experiment, stratification by clinical severity) — it doesn't affect the core P0–P4 experiment, which never uses native text as input for any of the 3 datasets anyway.
+**None of the 3 active datasets have usable native text.** Kvasir-VQA-x1 is available as an optional upgrade over plain Kvasir-SEG for real location Q&A, but the base Kvasir-SEG/LGG/ISIC files used here do not carry native text. This only affects the optional bonus uses of native text (provenance, secondary real-report-text experiment, stratification by clinical severity) — it doesn't affect the core P0–P4 experiment, which never uses native text as input for any of the 3 datasets anyway.
 
 | # | Domain | Dataset | Dimension | Official / most reliable source | Practical download mirror | Native text? |
 |---|---|---|---|---|---|---|
 | 1 | Brain | **LGG Segmentation Dataset** | **2D** (FLAIR slice PNGs) | [The Cancer Imaging Archive, TCGA-LGG collection](https://www.cancerimagingarchive.net/collection/tcga-lgg/) | [kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation) | No |
-| 2 | Colon | **Kvasir-VQA-x1** (VLQA subtask, built on Kvasir-SEG/HyperKvasir) | **2D** (single endoscopy frames) | [github.com/simula/Kvasir-VQA-x1](https://github.com/Simula/Kvasir-VQA-x1) | [github.com/simula/ImageCLEFmed-MEDVQA-GI-2023](https://github.com/simula/ImageCLEFmed-MEDVQA-GI-2023) | Yes — real location questions ("where is the abnormality?") paired with a segmentation-mask answer |
-| 3 | Chest | QaTa-COV19 | **2D** (single X-ray images) | [qatacov.live](http://qatacov.live/) | [kaggle.com/datasets/aysendegerli/qatacov19-dataset](https://www.kaggle.com/datasets/aysendegerli/qatacov19-dataset), text via [github.com/HUANGLIZI/LViT](https://github.com/HUANGLIZI/LViT) | Yes — `.xlsx` free-text clinical descriptions, paired per image |
+| 2 | Colon | **Kvasir-SEG** (Kvasir-VQA-x1 optional upgrade) | **2D** (single endoscopy frames) | [datasets.simula.no/kvasir-seg](https://datasets.simula.no/kvasir-seg/) | Direct download, no login: [datasets.simula.no/downloads/kvasir-seg.zip](https://datasets.simula.no/downloads/kvasir-seg.zip) | No (base Kvasir-SEG); Yes via Kvasir-VQA-x1 upgrade — real location questions ("where is the abnormality?") paired with a segmentation-mask answer |
+| 3 | Skin | **ISIC 2018** (Task 1, Validation split) | **2D** (dermoscopy images) | [challenge.isic-archive.com/data](https://challenge.isic-archive.com/data/) | Direct download, no login: [Validation Input](https://isic-archive.s3.amazonaws.com/challenges/2018/ISIC2018_Task1-2_Validation_Input.zip) (~240MB) + [Validation GroundTruth](https://isic-archive.s3.amazonaws.com/challenges/2018/ISIC2018_Task1_Validation_GroundTruth.zip) (~0.75MB) | No |
+
+**Important — ISIC 2018 has two tasks; we use Task 1 only.** The ISIC 2018 challenge page describes "2,594 images and 12,970 corresponding ground truth response masks (5 for each image)" — that 5-masks-per-image statistic is **Task 2** (dermoscopic attribute detection: pigment network, negative network, streaks, milia-like cysts, globules — 5 separate binary maps per image). This study uses **Task 1** (lesion boundary segmentation), which has exactly **1 mask per image** (`ISIC_XXXXXXX.jpg` ↔ `ISIC_XXXXXXX_segmentation.png`), matching every other dataset in this plan. Also note we use the **Validation** split (100 images, ~240MB), not the Training split (2,594 images, ~11GB) — the Training Input zip is far larger than this project needs; Validation alone comfortably supplies the 50 samples required, at a fraction of the download size.
 
 ### Dataset Details
 
-**LGG Segmentation (Brain, MRI):** TCGA-LGG collection (TCIA), 110 patients' pre-operative FLAIR MRI slices with manually-drawn glioma tumor masks, popularized via the Kaggle mirror. Already 2D — individual slice PNGs, not volumes. No native text; use your generated P0–P4 only. No registration required; a very widely-tutorialized dataset (common U-Net teaching example).
+**LGG Segmentation (Brain, MRI):** TCGA-LGG collection (TCIA), 110 patients' pre-operative FLAIR MRI slices with manually-drawn glioma tumor masks, popularized via the Kaggle mirror. Already 2D — individual slice PNGs, not volumes. No native text; use your generated P0–P4 only. Requires a Kaggle account/API token to download (no anonymous direct link found).
 
-**Kvasir-SEG / Kvasir-VQA-x1 (Colon, Endoscopy):** Kvasir-SEG is 1,000 GI endoscopy images with manually-verified polyp masks and bounding boxes (Simula Research Lab, widely used polyp-segmentation benchmark). Kvasir-VQA-x1 builds on the same underlying image pool (HyperKvasir/Kvasir-Instrument) and adds 159,549 question-answer pairs, including its VLQA subtask which pairs an explicit location question ("where is the abnormality?") with a segmentation-mask answer — a genuine text+mask pairing, not a caption bolted on afterward.
+**Kvasir-SEG (Colon, Endoscopy):** 1,000 GI endoscopy images with manually-verified polyp masks and bounding boxes (Simula Research Lab, widely used polyp-segmentation benchmark). Has a direct, anonymous download link (no Kaggle/registration needed) — the only one of the 3 datasets with this advantage. Kvasir-VQA-x1 (github.com/simula/Kvasir-VQA-x1) is available as an optional upgrade if you want native location Q&A text on top of the same image pool.
 
-**QaTa-COV19 (Chest, X-ray):** ~2,100 chest X-rays of confirmed COVID-19 cases with pixel-level infection (ground-glass opacity) masks, originally from Qatar University and Tampere University. The LViT project's release adds a `.xlsx` file per split (train/val/test) with a free-text clinical description for every image, used in their text-guided segmentation work — this is real radiologist-style text, not model-generated.
+**ISIC 2018 (Skin, Dermoscopy):** Direct, anonymous download (no Kaggle/registration needed) from the ISIC Challenge archive. We use the Task 1 Validation split (100 dermoscopic images with single-mask lesion boundaries) — see the Task 1 vs Task 2 note above. **Caveat:** ISIC dermoscopy images are often tightly cropped/zoomed on the lesion, so some lesions fill most of the frame with a centroid very close to true center — verified visually (`scripts/visualize_ground_truth.py isic`), where one sampled image's lesion spanned nearly the entire frame, making its left/right and upper/lower label a thin margin rather than a clear-cut side. This doesn't break the pipeline, but wrong-side/correct-side results on near-center ISIC samples should be read with that in mind — they carry a weaker positional signal than a clearly off-center lesion would.
 
 ## Data Requirement
 
@@ -151,26 +153,40 @@ This separates two failure modes:
 This section traces one single (image, prompt) task through the whole pipeline with real numbers, so the moving parts in the Comparison Specification below make sense before you read it in the abstract.
 
 **The three files involved, per dataset:**
-- An **image file** (e.g. `polyp_014.jpg`) — this is the picture you show the model.
-- A **mask file** (e.g. `polyp_014_mask.jpg`) — a black-and-white image, same size as the picture, where white pixels mark exactly where the tumor/lesion/polyp/mass is. This is your ground truth. You never send the mask to the model — it's answer key, not input.
+- An **image file** (e.g. `cju6yywx1whbb0871ksgfgf9f.jpg`) — this is the picture you show the model.
+- A **mask file** (e.g. `cju6yywx1whbb0871ksgfgf9f_mask.png`) — a black-and-white image, same size as the picture, where white pixels mark exactly where the tumor/lesion/polyp/mass is. This is your ground truth. You never send the mask to the model — it's answer key, not input.
 - Your **prompt text** (one of the 5 P0–P4 sentences) — generated from the plan, not from the dataset.
 
 **Step 1 — Turn the mask into 5 numbers (this is "deriving ground truth"):**
 
-Say `polyp_014_mask.jpg` is 256×256 pixels, and the white (polyp) pixels are clustered around x=180, y=60. The code (`mask_ground_truth()` in `scripts/common.py`) does:
-1. Find every white pixel's (x, y) coordinate.
-2. Average them → **centroid** = (180, 60). This one point stands in for "where the polyp is."
-3. Find the min/max x and y among white pixels → **bounding box**, e.g. (150, 40, 210, 80).
-4. Compare centroid x (180) to half the image width (256/2 = 128): 180 > 128, so **side_lr = "right"**.
-5. Compare centroid y (60) to half the image height (128): 60 < 128, so **side_ud = "upper"**.
+This is a real, verified example — not a hypothetical — taken directly from `samples/kvasir/manifest_kvasir.csv`, sample `cju6yywx1whbb0871ksgfgf9f`. Its image is 622×530 pixels (width × height), and its mask (the polyp region) has 27,645 white pixels. The code (`mask_ground_truth()` in `scripts/common.py`) does:
 
-So this one mask file becomes 5 plain numbers/labels: `centroid=(180,60)`, `bbox=(150,40,210,80)`, `side_lr=right`, `side_ud=upper`. That's your ground truth for this image — computed once, reused for every model and every prompt on this image.
+1. **Find every white pixel's (x, y) coordinate** in the mask — all 27,645 of them.
+2. **Average them** → **centroid** = (402.37, 164.05). This one point stands in for "where the polyp is."
+3. **Find the min/max x and y among white pixels** → **bounding box** = (300, 74, 503, 254).
+4. **Compare centroid x (402.37) to half the image width** (622 / 2 = 311): 402.37 > 311, so **side_lr = "right"**.
+5. **Compare centroid y (164.05) to half the image height** (530 / 2 = 265): 164.05 < 265, so **side_ud = "upper"**.
 
-**Step 2 — each dataset's own `manifest_<dataset>.csv` pairs that ground truth with a prompt.** Each of the 3 sampling scripts (`scripts/sample_lgg.py`, `scripts/sample_kvasir.py`, `scripts/sample_qata.py`) copies its own 30 sampled images and masks into a small `samples/<dataset>/` folder — small enough to upload to Google Drive on its own, so you can delete the full original dataset download afterward and only keep this folder. One row of `samples/kvasir/manifest_kvasir.csv` looks like:
+So this one mask file becomes 5 plain numbers/labels: `centroid=(402.37, 164.05)`, `bbox=(300, 74, 503, 254)`, `side_lr=right`, `side_ud=upper`. That's your ground truth for this image — computed once, reused for every model and every prompt on this image. (You can verify this yourself: `python scripts/visualize_ground_truth.py kvasir`, then open `samples/kvasir/visual_check/cju6yywx1whbb0871ksgfgf9f.png` — the red dot and box will sit exactly here, clearly right of and above the image's yellow midline/midheight crosshair.)
+
+**Ground-truth computation table (shareable summary of the above):**
+
+| Step | What we compute | Formula | Real value (this example) |
+|---|---|---|---|
+| 0 | Image size | width × height, from the actual image file | 622 × 530 px |
+| 1 | Mask pixel coordinates | every white (foreground) pixel's (x, y) in the mask | 27,645 pixels |
+| 2 | Centroid | mean of all pixel x's, mean of all pixel y's | (402.37, 164.05) |
+| 3 | Bounding box | (min x, min y, max x, max y) among mask pixels | (300, 74, 503, 254) |
+| 4 | Left/right threshold | width / 2 | 622 / 2 = 311 |
+| 5 | `gt_side_lr` | "right" if centroid_x > width/2, else "left" | 402.37 > 311 → **right** |
+| 6 | Upper/lower threshold | height / 2 | 530 / 2 = 265 |
+| 7 | `gt_side_ud` | "upper" if centroid_y < height/2, else "lower" | 164.05 < 265 → **upper** |
+
+**Step 2 — each dataset's own `manifest_<dataset>.csv` pairs that ground truth with a prompt.** Each of the 3 sampling scripts (`scripts/sample_lgg.py`, `scripts/sample_kvasir.py`, `scripts/sample_isic.py`) copies its own 50 sampled images and masks into a small `samples/<dataset>/` folder — small enough to upload to Google Drive on its own, so you can delete the full original dataset download afterward and only keep this folder. One row of `samples/kvasir/manifest_kvasir.csv` looks like:
 
 | dataset | sample_id | image_path | mask_path | gt_centroid_x | gt_centroid_y | gt_side_lr | gt_side_ud | prompt_id | prompt_text |
 |---|---|---|---|---|---|---|---|---|---|
-| kvasir | polyp_014 | images/polyp_014.jpg | masks/polyp_014_mask.png | 180 | 60 | right | upper | P2 | "Please locate the polyp on the right side of this image." |
+| kvasir | cju6yywx1whbb0871ksgfgf9f | images/cju6yywx1whbb0871ksgfgf9f.jpg | masks/cju6yywx1whbb0871ksgfgf9f_mask.png | 402.37 | 164.05 | right | upper | P2 | "Please locate the polyp on the right side of this image." |
 
 Note `image_path` is relative to `samples/kvasir/` itself, not the original full-dataset download — the image file was physically copied there, so the manifest stays valid even after you delete the original download. This row is one complete task: "send this image, with this text, to a model." There are 5 such rows per image (one per P0–P4), all sharing the same ground truth columns since the ground truth doesn't change — only the prompt does.
 
@@ -192,14 +208,14 @@ Note `image_path` is relative to `samples/kvasir/` itself, not the original full
 - A bbox-tier model (e.g. Grounding DINO) returns 4 numbers, e.g. `(30, 45, 90, 85)`.
 - A point-tier model (e.g. Molmo) returns one (x, y) pair directly, e.g. `(60, 65)`.
 
-**Step 4 — Reduce the model's raw answer to one point, the same way you reduced the ground-truth mask.** If it returned a mask, average its white pixels → predicted centroid. If it returned a bbox, take the box center: `((30+90)/2, (45+85)/2) = (60, 65)`. If it returned a point already, use it as-is. Either way, you now have one predicted (x, y), directly comparable to the ground-truth centroid (180, 60) from Step 1.
+**Step 4 — Reduce the model's raw answer to one point, the same way you reduced the ground-truth mask.** If it returned a mask, average its white pixels → predicted centroid. If it returned a bbox, take the box center: `((30+90)/2, (45+85)/2) = (60, 65)`. If it returned a point already, use it as-is. Either way, you now have one predicted (x, y), directly comparable to the ground-truth centroid (402.37, 164.05) from Step 1.
 
 **Step 5 — Compare the predicted point to the ground truth, three ways:**
-1. **Side check:** is predicted x (60) > 128? No → predicted side_lr = "left". The prompt asked for "right" (P2). Predicted "left" ≠ prompted "right" → this is a **wrong-side** result — the model pointed the opposite way from what the text asked.
+1. **Side check:** is predicted x (60) > 311 (half the image's 622px width)? No → predicted side_lr = "left". The prompt asked for "right" (P2, per the real ground truth side_lr computed in Step 1). Predicted "left" ≠ prompted "right" → this is a **wrong-side** result — the model pointed the opposite way from what the text asked.
 2. **Shift check:** compare this P2 prediction (60, 65) to the *same model's* P0 prediction on the *same image* (its answer with no positional wording at all). If P0's answer was also near (60, 65), the model didn't move at all when told to go right — a **prompt-following failure**, a different failure mode from wrong-side.
-3. **Distance/overlap:** Euclidean distance between predicted (60,65) and ground truth (180,60), normalized by the image diagonal — a magnitude, not just a right/wrong label. (For mask/bbox models you also compute Dice/IoU here, a separate shape-quality number, not a position number.)
+3. **Distance/overlap:** Euclidean distance between predicted (60, 65) and ground truth (402.37, 164.05), normalized by the image diagonal — a magnitude, not just a right/wrong label. (For mask/bbox models you also compute Dice/IoU here, a separate shape-quality number, not a position number.)
 
-**Step 6 — Record and repeat.** Each comparison becomes one row in your results file: `model, dataset, image, prompt, predicted_point, gt_point, correct_or_wrong_side, shifted_or_not, distance`. Do this for every (model × dataset × image × prompt) combination — 13 × 3 × 30 × 5 = 5,850 rows total — then group and average those rows by model, by dataset, and by prompt to answer RQ1–RQ3 (e.g. "what % of Grounding DINO's answers on Kvasir-SEG were wrong-side when the prompt said 'right'?").
+**Step 6 — Record and repeat.** Each comparison becomes one row in your results file: `model, dataset, image, prompt, predicted_point, gt_point, correct_or_wrong_side, shifted_or_not, distance`. Do this for every (model × dataset × image × prompt) combination — 13 × 3 × 50 × 5 = 9,750 rows total — then group and average those rows by model, by dataset, and by prompt to answer RQ1–RQ3 (e.g. "what % of Grounding DINO's answers on Kvasir-SEG were wrong-side when the prompt said 'right'?").
 
 The Comparison Specification below formalizes exactly this same walkthrough for all three model tiers at once.
 
@@ -218,13 +234,13 @@ This section specifies exactly what happens between "you give the model an image
 
 ### Dataset to Output-Type Mapping
 
-Every dataset supplies the same kind of ground truth (a mask), so the same 30 images per dataset feed all three model tiers. Only the *comparison representation* changes per tier, not the dataset or the ground truth source.
+Every dataset supplies the same kind of ground truth (a mask), so the same 50 images per dataset feed all three model tiers. Only the *comparison representation* changes per tier, not the dataset or the ground truth source.
 
 | Dataset | Domain | Ground truth source | Compared against mask models (4) | Compared against bbox models (7) | Compared against point models (2) |
 |---|---|---|---|---|---|
 | LGG Segmentation | Brain | Tumor mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
 | Kvasir-SEG / Kvasir-VQA-x1 | Colon | Polyp mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
-| QaTa-COV19 | Chest | Infection mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
+| ISIC 2018 | Skin | Lesion mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
 
 ### Metric by Tier
 
@@ -249,24 +265,25 @@ Once each prediction is reduced to a single (x, y) reference point (its own cent
 | Model | Dataset | Prompt | Raw output | Parsed | Ground truth | Metric result |
 |---|---|---|---|---|---|---|
 | CLIPSeg (mask) | Kvasir-SEG | P1: locate the polyp, left | Binary mask | Mask + its centroid | Polyp mask + its centroid | Dice = 0.71; predicted centroid on the left; correct-side |
-| Grounding DINO (bbox) | QaTa-COV19 | P2: locate the infection, right | (120, 80, 210, 160) | Box + its center | Infection mask converted to box | IoU = 0.44; predicted center on the left; wrong-side |
+| Grounding DINO (bbox) | ISIC 2018 | P2: locate the lesion, right | (120, 80, 210, 160) | Box + its center | Lesion mask converted to box | IoU = 0.44; predicted center on the left; wrong-side |
 | Molmo-7B-D (point) | LGG Segmentation | P0: locate the tumor | (134, 97) | Point | Mask centroid at (140, 101) | Distance = 7.4 px normalized; same side as P0; no ground-truth mismatch to check at P0 |
 
 ## Sampling Protocol
 
-- Fixed set of **30 samples per dataset** (same 30 images across all models and all 5 prompts).
-- Each model runs 3 datasets times 30 images times 5 prompts (P0 to P4) = **450 predictions per model**.
-- 13 models times 450 = **5,850 predictions total**.
+- Fixed set of **50 samples per dataset** (same 50 images across all models and all 5 prompts).
+- Each model runs 3 datasets times 50 images times 5 prompts (P0 to P4) = **750 predictions per model**.
+- 13 models times 750 = **9,750 predictions total**.
 
 ## Method
 
-1. Derive positional ground truth (centroid, bbox, left/right, upper/lower) for all 90 images from mask annotations.
+1. Derive positional ground truth (centroid, bbox, left/right, upper/lower) for all 150 images from mask annotations.
 2. Generate P0 to P4 for every image, keeping wording strictly controlled per the constraint above.
-3. Run all 13 primary models zero-shot on all 5 prompt variants for the same 30-image, 3-dataset set, each scored at its native output level (mask, box, or point).
+3. Run all 13 primary models zero-shot on all 5 prompt variants for the same 50-image, 3-dataset set, each scored at its native output level (mask, box, or point).
 4. Compute per-model: location shift in the prompted direction, consistency (Dice for mask models, IoU for box models), and wrong-side/failure rate.
 5. Rank all 13 models by lowest positional bias (highest prompt-following accuracy on correct-side cases, lowest wrong-side rate).
 6. Report per-domain and per-model breakdowns.
 
 ## Other Files
 
+- `HOW_TO_RUN.md` — the practical, do-this-in-order runbook: build the dataset, run all 13 models, compare to ground truth, phase by phase. Share this with teammates who need to execute the study, not just understand its design.
 - `archived_segmentation_models_table.md`, archived reference table of published segmentation architectures. Kept for reference/comparison only, not part of this active plan.

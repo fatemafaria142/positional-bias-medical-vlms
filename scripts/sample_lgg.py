@@ -1,14 +1,22 @@
 """
-Sample 30 image+mask pairs from LGG Segmentation (Brain).
+Sample 50 image+mask pairs from LGG Segmentation (Brain).
 
-Usage:
+Usage (same steps whether you're on your own machine, a teammate's machine,
+or Google Colab -- only the repo root's location changes, never these paths):
     1. Download the dataset (Kaggle mirror: mateuszbuda/lgg-mri-segmentation)
-       and extract it somewhere, e.g. E:/downloads/lgg-mri-segmentation.
-    2. Set SOURCE_ROOT below to the "kaggle_3m" folder inside that extraction.
-    3. Run: python scripts/sample_lgg.py
-    4. Output lands in samples/lgg/ (images/, masks/, manifest_lgg.csv) --
-       a small, portable folder. Upload samples/lgg/ to Drive, then delete
-       the original full download to reclaim disk space.
+       and extract it so the "kaggle_3m" folder ends up at
+       data/raw/lgg-mri-segmentation/kaggle_3m relative to the repo root.
+    2. Run: python scripts/sample_lgg.py   (from anywhere -- path is
+       resolved relative to this script's own location, not your cwd)
+    3. Output lands in <repo_root>/samples/lgg/ (images/, masks/,
+       manifest_lgg.csv) -- a small, portable folder. Upload samples/lgg/
+       to Drive, then delete data/raw/lgg-mri-segmentation to reclaim disk
+       space.
+
+On Colab: clone/mount the repo, then extract the downloaded dataset to
+<repo_root>/data/raw/lgg-mri-segmentation exactly as above -- no path edits
+needed, since everything below is relative to the repo, not to any one
+machine.
 """
 
 from pathlib import Path
@@ -18,10 +26,9 @@ from PIL import Image
 
 from common import sample_and_export
 
-# EDIT THIS to wherever you extracted the LGG dataset
-SOURCE_ROOT = Path("E:/downloads/lgg-mri-segmentation/kaggle_3m")
-
-OUT_DIR = Path(__file__).parent.parent / "samples" / "lgg"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SOURCE_ROOT = REPO_ROOT / "data" / "raw" / "lgg-mri-segmentation" / "kaggle_3m"
+OUT_DIR = REPO_ROOT / "samples" / "lgg"
 TARGET_NOUN = "the tumor"
 DATASET_NAME = "lgg"
 

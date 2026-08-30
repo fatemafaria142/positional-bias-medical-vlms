@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 
 SEED = 42
-N_SAMPLES = 30
+N_SAMPLES = 50
 
 PROMPTS = {
     "P0": "Please locate {x} in this image.",

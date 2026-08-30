@@ -6,7 +6,7 @@
 - **Prompts:** P0 to P4, positional wording only, `{X}` swapped per dataset to match the actual target (tumor, infection, polyp, or lesion).
 - **Zero-shot only.**
 - **13 primary models**, all with published or benchmarked grounding capability. Pixel-mask tier (4): CLIPSeg, Moondream2, PaliGemma 2, Florence-2. Bbox tier (7): Grounding DINO, OWLv2, Kosmos-2, CogVLM-grounding, Qwen2.5-VL-7B, InternVL2.5, DeepSeek-VL2. Point tier (2): Molmo-7B-D, Molmo2-8B.
-- **5 datasets:** LGG (brain), MosMedData+ (lung), Kvasir-SEG (colon), QaTa-COV19 (chest), ISIC 2018 (skin), 30 fixed samples each.
+- **5 datasets:** LGG/TextBraTS (brain), Stanford Thyroid Cine-clip (thyroid), Kvasir-SEG/Kvasir-VQA-x1 (colon), QaTa-COV19 (chest), PI-CAI (prostate), 30 fixed samples each.
 - **9,750 primary predictions** total (13 models times 5 datasets times 30 images times 5 prompts).
 
 ## Objective
@@ -51,13 +51,27 @@ The core task is **localization**: the question is *where*, not *exact boundary 
 
 | Dataset | Domain | `{X}` | Why |
 |---|---|---|---|
-| LGG Segmentation | Brain | "the tumor" | Correct, LGG masks are glioma tumor regions |
-| MosMedData+ | Lung | "the infection" | CT ground-glass opacities are infection findings, not tumors |
-| Kvasir-SEG | Colon | "the polyp" | Endoscopic polyp localization |
+| LGG Segmentation / TextBraTS | Brain | "the tumor" | Correct, glioma tumor regions |
+| Stanford Thyroid Cine-clip | Thyroid | "the nodule" | Ultrasound-visible thyroid nodule regions |
+| Kvasir-SEG / Kvasir-VQA-x1 | Colon | "the polyp" | Endoscopic polyp localization |
 | QaTa-COV19 | Chest | "the infection" | X-ray COVID-19 infection regions, not tumors |
-| ISIC 2018 | Skin | "the lesion" | Standard ISIC terminology |
+| PI-CAI | Prostate | "the lesion" | MRI-visible PI-RADS-scored prostate lesion regions |
 
 **Note on per-model calling convention:** "Please locate {X}..." is the *semantic content* kept controlled across all 13 models, not always the literal string sent. Every model listed below does accept a text input, but a few expect their own task syntax rather than free-text chat. See the Input column in the model table.
+
+**Worked P0–P4 prompt strings, one per dataset:**
+
+| Dataset | P0 | P1 (left) | P2 (right) | P3 (upper) | P4 (lower) |
+|---|---|---|---|---|---|
+| LGG / TextBraTS | "Please locate the tumor in this image." | "Please locate the tumor on the left side of this image." | "Please locate the tumor on the right side of this image." | "Please locate the tumor in the upper region of this image." | "Please locate the tumor in the lower region of this image." |
+| Stanford Thyroid | "Please locate the nodule in this image." | "Please locate the nodule on the left side of this image." | "Please locate the nodule on the right side of this image." | "Please locate the nodule in the upper region of this image." | "Please locate the nodule in the lower region of this image." |
+| Kvasir-SEG / -VQA-x1 | "Please locate the polyp in this image." | "Please locate the polyp on the left side of this image." | "Please locate the polyp on the right side of this image." | "Please locate the polyp in the upper region of this image." | "Please locate the polyp in the lower region of this image." |
+| QaTa-COV19 | "Please locate the infection in this image." | "Please locate the infection on the left side of this image." | "Please locate the infection on the right side of this image." | "Please locate the infection in the upper region of this image." | "Please locate the infection in the lower region of this image." |
+| PI-CAI | "Please locate the lesion in this image." | "Please locate the lesion on the left side of this image." | "Please locate the lesion on the right side of this image." | "Please locate the lesion in the upper region of this image." | "Please locate the lesion in the lower region of this image." |
+
+**Important — do not use each dataset's native text as the prompt.** TextBraTS's radiology-style annotations, the Stanford Thyroid TI-RADS/diagnosis fields, QaTa-COV19's `.xlsx` clinical descriptions, and PI-CAI's PI-RADS/PSAd report fields all vary in length, detail, and confidence from case to case. Feeding any of that in as `{X}`'s surrounding context would violate the plan's core constraint (line 48: no prompt variant may be more detailed or informative than another except for positional wording), and it would confound "did the model move because of position wording" with "did the model move because this case's report said something more specific." For the primary P0–P4 experiment, every model receives only the fixed, generated sentence above (or its model-specific syntax equivalent) — nothing from the dataset's own annotation file.
+
+Native text's role is limited to two things: (1) it confirms each dataset is genuinely paired multimodal data, useful if you want to cite the dataset as image+text+mask in your write-up; (2) it is available for an *optional* secondary experiment — e.g., replacing P0 with the dataset's real report text once, per image, to see whether realistic clinical phrasing shifts the model's answer differently than your synthetic P0 does. That would be a separate analysis from RQ1–RQ3, not a substitute for the controlled P0–P4 set.
 
 ## Zero-Shot Only
 
@@ -109,13 +123,25 @@ All 13 have **published or benchmarked localization capability** (RefCOCO or equ
 
 All 5 work directly for localization: a ground-truth mask lets you derive a precise location (centroid, bounding box) for comparison against each model's answer. No dataset changes needed.
 
-| # | Domain | Dataset | Official / most reliable source | Practical download mirror | Text prompts included |
-|---|---|---|---|---|---|
-| 1 | Brain | LGG Segmentation Dataset | [The Cancer Imaging Archive, TCGA-LGG collection](https://www.cancerimagingarchive.net/collection/tcga-lgg/) | [kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation) | No, must generate |
-| 2 | Lung | MosMedData+ | [mosmed.ai/datasets/covid19_1110](https://mosmed.ai/datasets/covid19_1110) (CC BY-NC-ND 3.0) | [github.com/HUANGLIZI/LViT](https://github.com/HUANGLIZI/LViT) | Yes, via LViT's release |
-| 3 | Colon | Kvasir-SEG | [datasets.simula.no/kvasir-seg](https://datasets.simula.no/kvasir-seg/) | Same as official | No, must generate |
-| 4 | Chest | QaTa-COV19 | [qatacov.live](http://qatacov.live/) | [kaggle.com/datasets/aysendegerli/qatacov19-dataset](https://www.kaggle.com/datasets/aysendegerli/qatacov19-dataset) | Yes |
-| 5 | Skin | ISIC 2018 | [isic-archive.com](https://www.isic-archive.com/), "Challenge 2018, Task 1: Segmentation" split | Same as official | No, must generate |
+| # | Domain | Dataset | Official / most reliable source | Practical download mirror | Text prompts included | Native text type |
+|---|---|---|---|---|---|---|
+| 1 | Brain | **TextBraTS** (built on BraTS2020) | [arxiv.org/abs/2506.16784](https://arxiv.org/html/2506.16784v2) | Released alongside the paper, derived from BraTS2020 training set (369 volumes) | Yes | Expert-written free-text radiology-style annotations, paired per MRI volume |
+| 2 | Thyroid | **Stanford AIMI Thyroid Ultrasound Cine-clip** | [stanfordaimi.azurewebsites.net/datasets/a72f2b02-7b53-4c5d-963c-d7253220bfd5](https://stanfordaimi.azurewebsites.net/datasets/a72f2b02-7b53-4c5d-963c-d7253220bfd5) | Same as official (registration required) | Yes (structured, not free-text) | TI-RADS descriptors, lesion size/location, and histopathological diagnosis, per nodule, alongside pixel-level masks (192 cine-clips, 17,412 images) |
+| 3 | Colon | **Kvasir-VQA-x1** (VLQA subtask, built on Kvasir-SEG/HyperKvasir) | [github.com/simula/Kvasir-VQA-x1](https://github.com/Simula/Kvasir-VQA-x1) | [github.com/simula/ImageCLEFmed-MEDVQA-GI-2023](https://github.com/simula/ImageCLEFmed-MEDVQA-GI-2023) | Yes | Real location questions ("where is the abnormality?") paired with a segmentation-mask answer |
+| 4 | Chest | QaTa-COV19 | [qatacov.live](http://qatacov.live/) | [kaggle.com/datasets/aysendegerli/qatacov19-dataset](https://www.kaggle.com/datasets/aysendegerli/qatacov19-dataset), text via [github.com/HUANGLIZI/LViT](https://github.com/HUANGLIZI/LViT) | Yes | `.xlsx` free-text clinical descriptions, paired per image |
+| 5 | Prostate | **PI-CAI** + `picai_labels` | [pi-cai.grand-challenge.org](https://pi-cai.grand-challenge.org/) | [github.com/DIAGNijmegen/picai_labels](https://github.com/DIAGNijmegen/picai_labels) | Yes (structured, not free-text) | PI-RADS score, PSA density, and radiology-report-derived lesion location, per case, alongside lesion masks (~1,500 public cases, T2W/DWI/ADC) |
+
+### Dataset Details
+
+**LGG Segmentation / TextBraTS (Brain, MRI):** LGG Segmentation (TCGA-LGG collection, TCIA) is 110 patients' pre-operative FLAIR MRI slices with manually-drawn glioma tumor masks, popularized via the Kaggle mirror. TextBraTS pairs the same style of scan (BraTS2020's 369 multimodal MRI volumes: T1, T1ce, T2, FLAIR) with per-volume tumor segmentation masks *and* expert-written free-text radiology-style descriptions of tumor location, size, and appearance — released alongside its 2025 paper specifically to support text-guided segmentation research. Use TextBraTS's images if you want native text; LGG's Kaggle mirror is the easier download if you only need image+mask and plan to generate your own prompts.
+
+**Stanford AIMI Thyroid Ultrasound Cine-clip (Thyroid, Ultrasound):** 192 cine-clip (video) ultrasound exams from 167 patients, 17,412 individual frames total, each with a pixel-level nodule segmentation mask. Alongside the mask, every nodule carries structured clinical text: TI-RADS descriptors (composition, echogenicity, shape, margin, echogenic foci), lesion size and location, and the histopathological diagnosis (benign/malignant) from biopsy. Released by Stanford's AIMI Center; download requires free registration (data use agreement, no cost) at the Stanford AIMI portal.
+
+**Kvasir-SEG / Kvasir-VQA-x1 (Colon, Endoscopy):** Kvasir-SEG is 1,000 GI endoscopy images with manually-verified polyp masks and bounding boxes (Simula Research Lab, widely used polyp-segmentation benchmark). Kvasir-VQA-x1 builds on the same underlying image pool (HyperKvasir/Kvasir-Instrument) and adds 159,549 question-answer pairs, including its VLQA subtask which pairs an explicit location question ("where is the abnormality?") with a segmentation-mask answer — a genuine text+mask pairing, not a caption bolted on afterward.
+
+**QaTa-COV19 (Chest, X-ray):** ~2,100 chest X-rays of confirmed COVID-19 cases with pixel-level infection (ground-glass opacity) masks, originally from Qatar University and Tampere University. The LViT project's release adds a `.xlsx` file per split (train/val/test) with a free-text clinical description for every image, used in their text-guided segmentation work — this is real radiologist-style text, not model-generated.
+
+**PI-CAI + picai_labels (Prostate, MRI):** PI-CAI (Prostate Imaging: Cancer AI) is a multi-center public dataset of ~1,500 biparametric prostate MRI cases (T2W, DWI, ADC sequences) from Dutch and Norwegian hospitals, built for the PI-CAI Grand Challenge. The companion `picai_labels` repo provides expert-verified lesion segmentation masks, and each case's radiology report carries structured text: PI-RADS score (1–5 cancer-suspicion rating), PSA density, and lesion location as read by the radiologist.
 
 ## Data Requirement
 
@@ -147,11 +173,11 @@ Every dataset supplies the same kind of ground truth (a mask), so the same 30 im
 
 | Dataset | Domain | Ground truth source | Compared against mask models (4) | Compared against bbox models (7) | Compared against point models (2) |
 |---|---|---|---|---|---|
-| LGG Segmentation | Brain | Tumor mask | Full mask, Dice/IoU | Mask converted to bbox (min/max x, y) | Mask centroid |
-| MosMedData+ | Lung | Infection mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
-| Kvasir-SEG | Colon | Polyp mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
+| LGG Segmentation / TextBraTS | Brain | Tumor mask | Full mask, Dice/IoU | Mask converted to bbox (min/max x, y) | Mask centroid |
+| Stanford Thyroid Cine-clip | Thyroid | Nodule mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
+| Kvasir-SEG / Kvasir-VQA-x1 | Colon | Polyp mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
 | QaTa-COV19 | Chest | Infection mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
-| ISIC 2018 | Skin | Lesion mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
+| PI-CAI | Prostate | Lesion mask | Full mask, Dice/IoU | Mask converted to bbox | Mask centroid |
 
 ### Metric by Tier
 

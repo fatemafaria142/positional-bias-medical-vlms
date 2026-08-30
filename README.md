@@ -1,1 +1,1 @@
-# -positional-bias-medical-vlms
+# positional-bias-medical-vlms

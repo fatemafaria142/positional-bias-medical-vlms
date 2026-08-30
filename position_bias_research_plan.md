@@ -157,7 +157,7 @@ This section traces one single (image, prompt) task through the whole pipeline w
 
 **Step 1 — Turn the mask into 5 numbers (this is "deriving ground truth"):**
 
-Say `polyp_014_mask.jpg` is 256×256 pixels, and the white (polyp) pixels are clustered around x=180, y=60. The code (`mask_ground_truth()` in `scripts/build_sample_manifest.py`) does:
+Say `polyp_014_mask.jpg` is 256×256 pixels, and the white (polyp) pixels are clustered around x=180, y=60. The code (`mask_ground_truth()` in `scripts/common.py`) does:
 1. Find every white pixel's (x, y) coordinate.
 2. Average them → **centroid** = (180, 60). This one point stands in for "where the polyp is."
 3. Find the min/max x and y among white pixels → **bounding box**, e.g. (150, 40, 210, 80).
@@ -166,13 +166,26 @@ Say `polyp_014_mask.jpg` is 256×256 pixels, and the white (polyp) pixels are cl
 
 So this one mask file becomes 5 plain numbers/labels: `centroid=(180,60)`, `bbox=(150,40,210,80)`, `side_lr=right`, `side_ud=upper`. That's your ground truth for this image — computed once, reused for every model and every prompt on this image.
 
-**Step 2 — `manifest.csv` pairs that ground truth with a prompt.** One row of the manifest the script builds looks like:
+**Step 2 — each dataset's own `manifest_<dataset>.csv` pairs that ground truth with a prompt.** Each of the 3 sampling scripts (`scripts/sample_lgg.py`, `scripts/sample_kvasir.py`, `scripts/sample_qata.py`) copies its own 30 sampled images and masks into a small `samples/<dataset>/` folder — small enough to upload to Google Drive on its own, so you can delete the full original dataset download afterward and only keep this folder. One row of `samples/kvasir/manifest_kvasir.csv` looks like:
 
-| dataset | sample_id | image_path | gt_centroid_x | gt_centroid_y | gt_side_lr | gt_side_ud | prompt_id | prompt_text |
-|---|---|---|---|---|---|---|---|---|
-| kvasir | polyp_014 | data/Kvasir-SEG/images/polyp_014.jpg | 180 | 60 | right | upper | P2 | "Please locate the polyp on the right side of this image." |
+| dataset | sample_id | image_path | mask_path | gt_centroid_x | gt_centroid_y | gt_side_lr | gt_side_ud | prompt_id | prompt_text |
+|---|---|---|---|---|---|---|---|---|---|
+| kvasir | polyp_014 | images/polyp_014.jpg | masks/polyp_014_mask.png | 180 | 60 | right | upper | P2 | "Please locate the polyp on the right side of this image." |
 
-This row is one complete task: "send this image, with this text, to a model." There are 5 such rows per image (one per P0–P4), all sharing the same ground truth columns since the ground truth doesn't change — only the prompt does.
+Note `image_path` is relative to `samples/kvasir/` itself, not the original full-dataset download — the image file was physically copied there, so the manifest stays valid even after you delete the original download. This row is one complete task: "send this image, with this text, to a model." There are 5 such rows per image (one per P0–P4), all sharing the same ground truth columns since the ground truth doesn't change — only the prompt does.
+
+**Manifest column reference.** Every row already carries the ground truth needed for all three model tiers (mask, bbox, point) at once — you don't need a separate manifest per tier, you just read whichever column matches the model you're scoring:
+
+| Column | What it is | Which tier uses it |
+|---|---|---|
+| `image_path` | The actual image to send to the model | All tiers — this is the model input |
+| `mask_path` | The full ground-truth mask file | Mask-tier — Dice/IoU against the whole shape |
+| `gt_bbox_xmin`, `gt_bbox_ymin`, `gt_bbox_xmax`, `gt_bbox_ymax` | Ground-truth bounding box, derived from the mask | Bbox-tier — IoU + box-center comparison |
+| `gt_centroid_x`, `gt_centroid_y` | Ground-truth center point, derived from the mask | Point-tier — distance comparison |
+| `gt_side_lr`, `gt_side_ud` | left/right and upper/lower labels, derived from the centroid | All tiers — wrong-side classification (RQ1–RQ3) |
+| `sample_id`, `original_filename` | The dataset's own real identifier and literal source filename | Traceability back to the source dataset, not used in scoring |
+| `dataset` | Which of the 3 datasets this row belongs to | Grouping/aggregation |
+| `prompt_id`, `prompt_text` | Which of P0–P4 this row is, and the exact sentence sent | All tiers — this is the other model input |
 
 **Step 3 — Send image + prompt_text to a model, get a raw answer back.** You never send anything from the `gt_*` columns to the model — only `image_path` (loaded as pixels) and `prompt_text`. The model's raw answer depends on its tier:
 - A mask-tier model (e.g. CLIPSeg) returns its own black-and-white mask of where *it* thinks the polyp is.

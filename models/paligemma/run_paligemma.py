@@ -1,5 +1,5 @@
 """
-End-to-end runner for PaliGemma 2 (3B) against all 3 sampled datasets
+End-to-end runner for PaliGemma 2 (3B) against the 3 sampled datasets
 (samples/lgg, samples/kvasir, samples/isic).
 
 What this does, per row of each dataset's manifest_<dataset>.csv:
@@ -10,7 +10,10 @@ What this does, per row of each dataset's manifest_<dataset>.csv:
      around the segmented object) into pixel coordinates.
   4. Reduce that bbox to a center point, and classify its left/right and
      upper/lower side, exactly like mask_ground_truth() does for ground truth.
-  5. Write one row per (image, prompt) into results/paligemma/results_paligemma.csv.
+  5. Write one row per (image, prompt) into
+     results/paligemma/results_paligemma_<dataset>.csv -- one file per
+     dataset (not one combined file), so each dataset's run can be resumed
+     independently (see the resume note below).
 
 Note on prompt syntax: PaliGemma 2's segmentation task is normally invoked
 as the fixed "segment {noun}" instruction (see position_bias_research_plan.md
@@ -30,19 +33,34 @@ into a full mask -- it scores PaliGemma at the bbox/centroid level only
 for the core positional-bias RQ1-RQ3 (side/shift/distance), but means no
 Dice/IoU shape-quality score for this model.
 
+Note on resuming: each row is flushed to disk immediately after being
+written, and on startup this script skips any (sample_id, prompt_id) pairs
+already present in that dataset's output file. This means an interrupted or
+disconnected run (e.g. a Colab timeout) loses at most the one row in
+progress, and simply re-running the same command picks up where it left off
+instead of starting over or duplicating rows.
+
 Setup:
-    1. pip install transformers accelerate torch pillow
+    1. pip install -r requirements.txt
     2. Accept the PaliGemma 2 license at
        https://huggingface.co/google/paligemma2-3b-pt-224
     3. Put your HF token in a `.env` file at the repo root (already done,
        see .env -- never commit this file, it's in .gitignore):
            HF_TOKEN=hf_...
+       On Colab, prefer Secrets (userdata.get("HF_TOKEN")) over a .env file.
+
+Note on CPU-only use: this is zero-shot inference, no training, so a GPU
+isn't required -- it'll just be slow. On a CPU this script uses all
+available cores (see load_model()) and falls back to float32 automatically.
+Use --limit N to smoke-test on a handful of rows before committing to a
+full run (LGG alone is 50 images x 5 prompts = 250 generations).
 
 Usage:
     python models/paligemma/run_paligemma.py lgg
     python models/paligemma/run_paligemma.py kvasir
     python models/paligemma/run_paligemma.py isic
     python models/paligemma/run_paligemma.py all
+    python models/paligemma/run_paligemma.py lgg --limit 5
 """
 
 import csv
@@ -57,6 +75,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 MODEL_ID = "google/paligemma2-3b-pt-224"
 DATASETS = ("lgg", "kvasir", "isic")
 LOC_RE = re.compile(r"<loc(\d{4})>")
+
+FIELDNAMES = [
+    "model", "dataset", "sample_id", "prompt_id", "prompt_text", "model_prompt",
+    "raw_output", "pred_bbox_xmin", "pred_bbox_ymin", "pred_bbox_xmax", "pred_bbox_ymax",
+    "pred_centroid_x", "pred_centroid_y", "pred_side_lr", "pred_side_ud",
+    "gt_centroid_x", "gt_centroid_y", "gt_side_lr", "gt_side_ud",
+]
 
 
 def load_env():
@@ -107,12 +132,27 @@ def load_model():
     import torch
     from transformers import AutoProcessor, PaliGemmaForConditionalGeneration
 
+    # bf16 needs Ampere+ (A100, RTX 30xx+) tensor cores for full speed/support.
+    # Turing GPUs (e.g. Colab's T4) lack native bf16 -- use fp16 there instead.
+    if torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 8:
+        dtype = torch.bfloat16
+        print("[info] GPU supports bf16 -- using torch.bfloat16")
+    elif torch.cuda.is_available():
+        dtype = torch.float16
+        print(f"[info] using torch.float16 on {torch.cuda.get_device_name(0)}")
+    else:
+        dtype = torch.float32  # CPU: no half-precision benefit, avoid dtype issues
+        n_threads = os.cpu_count() or 1
+        torch.set_num_threads(n_threads)
+        print(f"[info] no GPU detected -- running on CPU with {n_threads} threads "
+              f"(this will be slow: expect roughly tens of seconds per prompt)")
+
     token = os.environ.get("HF_TOKEN")
     processor = AutoProcessor.from_pretrained(MODEL_ID, token=token)
     model = PaliGemmaForConditionalGeneration.from_pretrained(
         MODEL_ID,
         token=token,
-        torch_dtype=torch.bfloat16,
+        torch_dtype=dtype,
         device_map="auto",
     )
     model.eval()
@@ -122,14 +162,17 @@ def load_model():
 def run_one(processor, model, image: Image.Image, prompt: str) -> str:
     import torch
 
-    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
+    # Explicit <image> token instead of relying on the processor's auto-inference
+    # (silences the "we will infer... and add special tokens" warning; behavior
+    # is identical for this single-image/single-text case, just made explicit).
+    inputs = processor(text=f"<image>{prompt}", images=image, return_tensors="pt").to(model.device)
     input_len = inputs["input_ids"].shape[-1]
     with torch.no_grad():
         output = model.generate(**inputs, max_new_tokens=100, do_sample=False)
     return processor.decode(output[0][input_len:], skip_special_tokens=False)
 
 
-def run_dataset(dataset_name: str, processor, model, writer: csv.DictWriter):
+def run_dataset(dataset_name: str, processor, model, limit: int | None = None) -> Path:
     sample_dir = REPO_ROOT / "samples" / dataset_name
     manifest_path = sample_dir / f"manifest_{dataset_name}.csv"
     if not manifest_path.exists():
@@ -137,75 +180,99 @@ def run_dataset(dataset_name: str, processor, model, writer: csv.DictWriter):
 
     with manifest_path.open() as f:
         rows = list(csv.DictReader(f))
+    if limit:
+        rows = rows[:limit]
 
-    for i, row in enumerate(rows, 1):
-        img_path = sample_dir / row["image_path"]
-        image = Image.open(img_path).convert("RGB")
-        img_w, img_h = image.size
+    out_dir = REPO_ROOT / "results" / "paligemma"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"results_paligemma_{dataset_name}.csv"
 
-        pg_prompt = to_paligemma_prompt(row["prompt_text"])
-        raw_output = run_one(processor, model, image, pg_prompt)
-        bbox = parse_bbox_from_loc_tokens(raw_output, img_w, img_h)
+    # Resume support: skip (sample_id, prompt_id) pairs already saved from a
+    # previous run of this dataset, instead of overwriting from scratch.
+    done = set()
+    file_exists = out_path.exists() and out_path.stat().st_size > 0
+    if file_exists:
+        with out_path.open() as f:
+            for r in csv.DictReader(f):
+                done.add((r["sample_id"], r["prompt_id"]))
+        print(f"[resume] found {len(done)} already-completed rows in {out_path.name}")
 
-        if bbox is None:
-            pred_cx = pred_cy = pred_side_lr = pred_side_ud = ""
-        else:
-            pred_cx, pred_cy, pred_side_lr, pred_side_ud = bbox_center_and_side(bbox, img_w, img_h)
+    rows_to_run = [r for r in rows if (r["sample_id"], r["prompt_id"]) not in done]
+    print(f"Dataset: {dataset_name}")
+    print(f"Total rows: {len(rows)} | already done: {len(done)} | remaining: {len(rows_to_run)}")
 
-        writer.writerow({
-            "model": "paligemma2-3b",
-            "dataset": dataset_name,
-            "sample_id": row["sample_id"],
-            "prompt_id": row["prompt_id"],
-            "prompt_text": row["prompt_text"],
-            "model_prompt": pg_prompt,
-            "raw_output": raw_output,
-            "pred_bbox_xmin": bbox[0] if bbox else "",
-            "pred_bbox_ymin": bbox[1] if bbox else "",
-            "pred_bbox_xmax": bbox[2] if bbox else "",
-            "pred_bbox_ymax": bbox[3] if bbox else "",
-            "pred_centroid_x": pred_cx,
-            "pred_centroid_y": pred_cy,
-            "pred_side_lr": pred_side_lr,
-            "pred_side_ud": pred_side_ud,
-            "gt_centroid_x": row["gt_centroid_x"],
-            "gt_centroid_y": row["gt_centroid_y"],
-            "gt_side_lr": row["gt_side_lr"],
-            "gt_side_ud": row["gt_side_ud"],
-        })
-        print(f"[{dataset_name}] {i}/{len(rows)} {row['sample_id']} {row['prompt_id']} -> "
-              f"{'no-detection' if bbox is None else f'{pred_side_lr}/{pred_side_ud}'}")
+    mode = "a" if file_exists else "w"
+    with out_path.open(mode, newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        if not file_exists:
+            writer.writeheader()
+            f.flush()
+
+        for i, row in enumerate(rows_to_run, 1):
+            img_path = sample_dir / row["image_path"]
+            image = Image.open(img_path).convert("RGB")
+            img_w, img_h = image.size
+
+            pg_prompt = to_paligemma_prompt(row["prompt_text"])
+            raw_output = run_one(processor, model, image, pg_prompt)
+            bbox = parse_bbox_from_loc_tokens(raw_output, img_w, img_h)
+
+            if bbox is None:
+                pred_cx = pred_cy = pred_side_lr = pred_side_ud = ""
+            else:
+                pred_cx, pred_cy, pred_side_lr, pred_side_ud = bbox_center_and_side(bbox, img_w, img_h)
+
+            writer.writerow({
+                "model": "paligemma2-3b",
+                "dataset": dataset_name,
+                "sample_id": row["sample_id"],
+                "prompt_id": row["prompt_id"],
+                "prompt_text": row["prompt_text"],
+                "model_prompt": pg_prompt,
+                "raw_output": raw_output,
+                "pred_bbox_xmin": bbox[0] if bbox else "",
+                "pred_bbox_ymin": bbox[1] if bbox else "",
+                "pred_bbox_xmax": bbox[2] if bbox else "",
+                "pred_bbox_ymax": bbox[3] if bbox else "",
+                "pred_centroid_x": pred_cx,
+                "pred_centroid_y": pred_cy,
+                "pred_side_lr": pred_side_lr,
+                "pred_side_ud": pred_side_ud,
+                "gt_centroid_x": row["gt_centroid_x"],
+                "gt_centroid_y": row["gt_centroid_y"],
+                "gt_side_lr": row["gt_side_lr"],
+                "gt_side_ud": row["gt_side_ud"],
+            })
+            f.flush()  # ensures this row survives a disconnect/interrupt
+
+            status = "no-detection" if bbox is None else f"{pred_side_lr}/{pred_side_ud}"
+            print(f"[{dataset_name}] {i}/{len(rows_to_run)} | {row['sample_id']} | {row['prompt_id']} -> {status}")
+
+    print(f"[done] {dataset_name}: results -> {out_path}")
+    return out_path
 
 
 def main():
-    if len(sys.argv) != 2 or sys.argv[1] not in (*DATASETS, "all"):
-        raise SystemExit(f"Usage: python {sys.argv[0]} [{'|'.join(DATASETS)}|all]")
+    args = sys.argv[1:]
+    limit = None
+    if "--limit" in args:
+        i = args.index("--limit")
+        limit = int(args[i + 1])
+        del args[i:i + 2]
+
+    if len(args) != 1 or args[0] not in (*DATASETS, "all"):
+        raise SystemExit(f"Usage: python {sys.argv[0]} [{'|'.join(DATASETS)}|all] [--limit N]")
 
     load_env()
     if not os.environ.get("HF_TOKEN"):
         raise SystemExit("HF_TOKEN not set. Add it to .env at the repo root.")
 
-    targets = DATASETS if sys.argv[1] == "all" else (sys.argv[1],)
+    targets = DATASETS if args[0] == "all" else (args[0],)
 
     processor, model = load_model()
 
-    out_dir = REPO_ROOT / "results" / "paligemma"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / "results_paligemma.csv"
-
-    fieldnames = [
-        "model", "dataset", "sample_id", "prompt_id", "prompt_text", "model_prompt",
-        "raw_output", "pred_bbox_xmin", "pred_bbox_ymin", "pred_bbox_xmax", "pred_bbox_ymax",
-        "pred_centroid_x", "pred_centroid_y", "pred_side_lr", "pred_side_ud",
-        "gt_centroid_x", "gt_centroid_y", "gt_side_lr", "gt_side_ud",
-    ]
-    with out_path.open("w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
-        writer.writeheader()
-        for dataset_name in targets:
-            run_dataset(dataset_name, processor, model, writer)
-
-    print(f"[done] wrote predictions -> {out_path}")
+    for dataset_name in targets:
+        run_dataset(dataset_name, processor, model, limit=limit)
 
 
 if __name__ == "__main__":

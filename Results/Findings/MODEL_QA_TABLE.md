@@ -46,7 +46,7 @@ scored by the exact same method (see Table 5).
 
 *Each row is one model, answering all 6 questions above, on the LGG brain scan dataset only. Sorted by Bias Category first (Responsive models rank above Weakly Responsive, which rank above Position-Blind), then by correct-side accuracy within each category.*
 
-| Bias Category | Model | Q1: Usable answer to Prompt P0? | Q2: Moves when told a position? | Q3: Correct on left/right prompts? | Q4: Correct on upper/lower prompts? | Q5: Distance from true target (0 is perfect, 1.4 is worst) | Q6: Likely reason for its mistakes |
+| Bias Category | Model | Q1: Usable answer to Prompt P0? | Q2: Moves on Prompts P1-P4? | Q3: Correct on Prompts P1/P2 (left/right)? | Q4: Correct on Prompts P3/P4 (upper/lower)? | Q5: Distance from true target (0 is perfect, 1.4 is worst) | Q6: Likely reason for its mistakes |
 |---|---|---|---|---|---|---|---|
 | Responsive | Molmo2-8B | Yes, 88% of the time | Yes, 54% of the time | 87% correct | 99% correct | 0.11 | Very few mistakes; occasionally leaves its answer unchanged rather than moving it the wrong way |
 | Responsive | NorthMicroVision | Yes, 100% of the time | Yes, 78% of the time | 93% correct | 72% correct | 0.11 | Noticeably weaker on upper/lower prompts than left/right prompts |
@@ -64,7 +64,7 @@ scored by the exact same method (see Table 5).
 
 *Each row is one model, answering all 6 questions above, on the Kvasir endoscopy dataset only. Sorted by Bias Category first (Responsive models rank above Weakly Responsive, which rank above Position-Blind), then by correct-side accuracy within each category.*
 
-| Bias Category | Model | Q1: Usable answer to Prompt P0? | Q2: Moves when told a position? | Q3: Correct on left/right prompts? | Q4: Correct on upper/lower prompts? | Q5: Distance from true target (0 is perfect, 1.4 is worst) | Q6: Likely reason for its mistakes |
+| Bias Category | Model | Q1: Usable answer to Prompt P0? | Q2: Moves on Prompts P1-P4? | Q3: Correct on Prompts P1/P2 (left/right)? | Q4: Correct on Prompts P3/P4 (upper/lower)? | Q5: Distance from true target (0 is perfect, 1.4 is worst) | Q6: Likely reason for its mistakes |
 |---|---|---|---|---|---|---|---|
 | Responsive | Moondream2 | Only 8% of the time, see note below | Yes, 58% of the time (on the rare answers it gives) | 92% correct | 85% correct | 0.09 | Almost always fails to return an answer at all on this dataset |
 | Responsive | NorthMicroVision | Yes, 100% of the time | Yes, 63% of the time | 77% correct | 80% correct | 0.12 (after excluding a few broken outliers, see note below) | A small number of garbled, out-of-image answers appear on this dataset |
@@ -82,7 +82,7 @@ scored by the exact same method (see Table 5).
 
 *Each row is one model, answering all 6 questions above, on the ISIC dermoscopy dataset only. Sorted by Bias Category first (Responsive models rank above Weakly Responsive, which rank above Position-Blind), then by correct-side accuracy within each category.*
 
-| Bias Category | Model | Q1: Usable answer to Prompt P0? | Q2: Moves when told a position? | Q3: Correct on left/right prompts? | Q4: Correct on upper/lower prompts? | Q5: Distance from true target (0 is perfect, 1.4 is worst) | Q6: Likely reason for its mistakes |
+| Bias Category | Model | Q1: Usable answer to Prompt P0? | Q2: Moves on Prompts P1-P4? | Q3: Correct on Prompts P1/P2 (left/right)? | Q4: Correct on Prompts P3/P4 (upper/lower)? | Q5: Distance from true target (0 is perfect, 1.4 is worst) | Q6: Likely reason for its mistakes |
 |---|---|---|---|---|---|---|---|
 | Responsive | Molmo2-8B | Yes, 100% of the time | Yes, 82% of the time | 95% correct | 95% correct | 0.16 | Very few mistakes on this dataset |
 | Responsive | NorthMicroVision | Yes, 100% of the time | Yes, 64% of the time | 95% correct | 70% correct | 0.09 | Noticeably weaker on upper/lower prompts than left/right prompts |

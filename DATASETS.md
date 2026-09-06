@@ -14,9 +14,9 @@ for this study:
 
 | Dataset | General description | Source link |
 |---|---|---|
-| ACDC | Automated Cardiac Diagnosis Challenge (MICCAI 2017): a public cardiac cine-MRI benchmark of 150 patients across 5 diagnostic groups (normal, myocardial infarction, dilated cardiomyopathy, hypertrophic cardiomyopathy, abnormal right ventricle), with expert ground truth for the right ventricle, myocardium, and left ventricle at the end-diastolic and end-systolic phases. | [humanheart-project.creatis.insa-lyon.fr](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb) |
-| ISIC 2018 Task 2 | Part of the ISIC Archive, the largest public repository of dermoscopic skin lesion images. Task 2 (Lesion Attribute Detection) annotates dermoscopic images with 5 clinically relevant attributes — pigment network, negative network, streaks, milia-like cysts, globules — patterns dermatologists use to assess melanoma risk. | [challenge.isic-archive.com](https://challenge.isic-archive.com/data/) |
-| CHAOS | Combined (CT-MR) Healthy Abdominal Organ Segmentation (ISBI 2019 challenge): a public abdominal CT and MRI benchmark of healthy subjects, with expert ground truth for the liver, right kidney, left kidney, and spleen. | [Zenodo mirror](https://zenodo.org/records/3431873/files/CHAOS_Train_Sets.zip) (official challenge site: [chaos.grand-challenge.org](https://chaos.grand-challenge.org/)) |
+| ACDC | Public cardiac cine-MRI benchmark (MICCAI 2017), 150 patients across 5 diagnostic groups. | [humanheart-project.creatis.insa-lyon.fr](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb) |
+| ISIC 2018 Task 2 | Part of the ISIC Archive; dermoscopic skin lesion images annotated with clinically relevant attributes used to assess melanoma risk. | [challenge.isic-archive.com](https://challenge.isic-archive.com/data/) |
+| CHAOS | Public abdominal CT/MRI benchmark (ISBI 2019) of healthy subjects, with expert organ ground truth. | [Zenodo mirror](https://zenodo.org/records/3431873/files/CHAOS_Train_Sets.zip) (official: [chaos.grand-challenge.org](https://chaos.grand-challenge.org/)) |
 
 ## What we actually used — already-built dataset summary
 
@@ -24,23 +24,11 @@ Below is what was specifically taken from each dataset for this study (not the f
 original dataset — see "What was taken to segment" under each dataset for the exact
 selection logic):
 
-- **ACDC**
-  - Domain: Cardiac (cardiomyopathy)
-  - Modality: MRI
-  - Samples: 20
-  - Region segmentation: Right ventricle (RV), Myocardium, Left ventricle (LV)
-
-- **ISIC 2018 Task 2**
-  - Domain: Skin lesion (melanoma/nevus)
-  - Modality: Dermoscopy
-  - Samples: 20
-  - Region segmentation: Pigment network, Negative network, Streaks, Milia-like cyst, Globules
-
-- **CHAOS (MR)**
-  - Domain: Abdominal organs
-  - Modality: MRI
-  - Samples: 20
-  - Region segmentation: Liver, Right kidney, Left kidney, Spleen
+| Dataset | Domain | Modality | Samples | Region segmentation |
+|---|---|---|---|---|
+| ACDC | Cardiac (cardiomyopathy) | MRI | 20 | Right ventricle (RV), Myocardium, Left ventricle (LV) |
+| ISIC 2018 Task 2 | Skin lesion (melanoma/nevus) | Dermoscopy | 20 | Pigment network, Negative network, Streaks, Milia-like cyst, Globules |
+| CHAOS (MR) | Abdominal organs | MRI | 20 | Liver, Right kidney, Left kidney, Spleen |
 
 Note: not every region appears in every image of a dataset — see "What was taken to
 segment" under each dataset below for exactly how many of a dataset's images contain

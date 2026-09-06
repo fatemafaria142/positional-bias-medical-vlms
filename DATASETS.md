@@ -7,7 +7,22 @@ target when prompted, but whether it can find the *correct* one among several, a
 whether its answer moves in the right direction when the prompt's positional wording
 changes (left/right/upper/lower).
 
-## Common summary — every dataset at a glance
+## General dataset description
+
+What each dataset is, in general — independent of what we specifically took from it
+for this study:
+
+| Dataset | General description | Source link |
+|---|---|---|
+| ACDC | Automated Cardiac Diagnosis Challenge (MICCAI 2017): a public cardiac cine-MRI benchmark of 150 patients across 5 diagnostic groups (normal, myocardial infarction, dilated cardiomyopathy, hypertrophic cardiomyopathy, abnormal right ventricle), with expert ground truth for the right ventricle, myocardium, and left ventricle at the end-diastolic and end-systolic phases. | [humanheart-project.creatis.insa-lyon.fr](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb) |
+| ISIC 2018 Task 2 | Part of the ISIC Archive, the largest public repository of dermoscopic skin lesion images. Task 2 (Lesion Attribute Detection) annotates dermoscopic images with 5 clinically relevant attributes — pigment network, negative network, streaks, milia-like cysts, globules — patterns dermatologists use to assess melanoma risk. | [challenge.isic-archive.com](https://challenge.isic-archive.com/data/) |
+| CHAOS | Combined (CT-MR) Healthy Abdominal Organ Segmentation (ISBI 2019 challenge): a public abdominal CT and MRI benchmark of healthy subjects, with expert ground truth for the liver, right kidney, left kidney, and spleen. | [Zenodo mirror](https://zenodo.org/records/3431873/files/CHAOS_Train_Sets.zip) (official challenge site: [chaos.grand-challenge.org](https://chaos.grand-challenge.org/)) |
+
+## What we actually used — already-built dataset summary
+
+Below is what was specifically taken from each dataset for this study (not the full
+original dataset — see "What was taken to segment" under each dataset for the exact
+selection logic):
 
 - **ACDC**
   - Domain: Cardiac (cardiomyopathy)

@@ -4,3 +4,6 @@ __pycache__/
 .env
 *.env
 samples.zip
+models/
+Results/medclip_samv2/*/pred_masks/
+Results/medclip_samv2/*/visual_check/

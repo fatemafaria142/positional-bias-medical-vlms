@@ -7,28 +7,17 @@ target when prompted, but whether it can find the *correct* one among several, a
 whether its answer moves in the right direction when the prompt's positional wording
 changes (left/right/upper/lower).
 
-## General dataset description
+## Dataset overview
 
-What each dataset is, in general — independent of what we specifically took from it
-for this study:
+General description of each dataset alongside what was specifically taken from it for
+this study (not the full original dataset — see "What was taken to segment" under each
+dataset for the exact selection logic):
 
-| Dataset | General description | Source link |
-|---|---|---|
-| ACDC | Public cardiac cine-MRI benchmark (MICCAI 2017), 150 patients across 5 diagnostic groups. | [humanheart-project.creatis.insa-lyon.fr](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb) |
-| ISIC 2018 Task 2 | Part of the ISIC Archive; dermoscopic skin lesion images annotated with clinically relevant attributes used to assess melanoma risk. | [challenge.isic-archive.com](https://challenge.isic-archive.com/data/) |
-| CHAOS | Public abdominal CT/MRI benchmark (ISBI 2019) of healthy subjects, with expert organ ground truth. | [Zenodo mirror](https://zenodo.org/records/3431873/files/CHAOS_Train_Sets.zip) (official: [chaos.grand-challenge.org](https://chaos.grand-challenge.org/)) |
-
-## What we actually used — already-built dataset summary
-
-Below is what was specifically taken from each dataset for this study (not the full
-original dataset — see "What was taken to segment" under each dataset for the exact
-selection logic):
-
-| Dataset | Domain | Modality | Samples | Region segmentation |
-|---|---|---|---|---|
-| ACDC | Cardiac (cardiomyopathy) | MRI | 20 | Right ventricle (RV), Myocardium, Left ventricle (LV) |
-| ISIC 2018 Task 2 | Skin lesion (melanoma/nevus) | Dermoscopy | 20 | Pigment network, Negative network, Streaks, Milia-like cyst, Globules |
-| CHAOS (MR) | Abdominal organs | MRI | 20 | Liver, Right kidney, Left kidney, Spleen |
+| Dataset | General description | Source link | Domain | Modality | Samples | Region segmentation |
+|---|---|---|---|---|---|---|
+| ACDC | Public cardiac cine-MRI benchmark (MICCAI 2017), 150 patients across 5 diagnostic groups. | [humanheart-project.creatis.insa-lyon.fr](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb) | Cardiac (cardiomyopathy) | MRI | 20 | Right ventricle (RV), Myocardium, Left ventricle (LV) |
+| ISIC 2018 Task 2 | Part of the ISIC Archive; dermoscopic skin lesion images annotated with clinically relevant attributes used to assess melanoma risk. | [challenge.isic-archive.com](https://challenge.isic-archive.com/data/) | Skin lesion (melanoma/nevus) | Dermoscopy | 20 | Pigment network, Negative network, Streaks, Milia-like cyst, Globules |
+| CHAOS | Public abdominal CT/MRI benchmark (ISBI 2019) of healthy subjects, with expert organ ground truth. | [Zenodo mirror](https://zenodo.org/records/3431873/files/CHAOS_Train_Sets.zip) (official: [chaos.grand-challenge.org](https://chaos.grand-challenge.org/)) | Abdominal organs | MRI | 20 | Liver, Right kidney, Left kidney, Spleen |
 
 Note: not every region appears in every image of a dataset — see "What was taken to
 segment" under each dataset below for exactly how many of a dataset's images contain

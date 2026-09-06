@@ -41,7 +41,7 @@ segmenter across all 3 data types — see the Recommendation at the end.
 ## Detailed notes per model
 
 ### 1. MedCLIPSeg
-- **What it is**: UniMedCLIP ViT-B/16-based adapter checkpoints, one trained set of weights *per named benchmark* (`BUSI`, `BTMRI`, `Covid19`, `EUS`, `ISIC`, `Kvasir`, each with `_10/_25/_50` data-efficiency variants).
+- **What it is**: UniMedCLIP ViT-B/16-based adapter checkpoints, one trained set of weights *per named benchmark* (breast ultrasound, brain-tumor MRI, chest X-ray/CT COVID, endoscopic ultrasound, skin lesion, GI-polyp endoscopy, each with `_10/_25/_50` data-efficiency variants).
 - **Why it doesn't fit**: There is no cardiac-MRI or abdominal-organ-MRI checkpoint anywhere in the released set — those two data types are simply not covered. The skin-lesion checkpoint that does exist was trained for single-lesion-boundary segmentation (whole-lesion style), not the 5 fine-grained dermoscopic attributes (pigment network, streaks, milia-like cyst, negative network, globules) our dermoscopy data requires.
 - **Integration cost**: Full GitHub repo clone, `INSTALL.md`/`DATASETS.md`/`RUN.md`, not a plug-and-play `transformers.AutoModel`. Total checkpoint set is 33GB.
 
@@ -82,7 +82,7 @@ segmenter across all 3 data types — see the Recommendation at the end.
 
 ### 9. MedCLIP-SAMv2
 - **What it is**: Fine-tuned BiomedCLIP (with a DHN-NCE loss) generates a saliency map (via M2IB) → converted into visual prompts (boxes/points) → fed into a separately-downloaded raw **SAM** checkpoint (ViT-H/L/B) to produce the final mask.
-- **Why it doesn't fit**: Evaluated only on breast tumor ultrasound, brain tumor MRI, lung X-ray, lung CT — no cardiac MRI, no abdominal-organ MRI, no dermoscopy. Brain-tumor-MRI is at least the same *modality* as ACDC/CHAOS but a different anatomical region/pathology entirely.
+- **Why it doesn't fit**: Evaluated only on breast tumor ultrasound, brain tumor MRI, lung X-ray, lung CT — no cardiac MRI, no abdominal-organ MRI, no dermoscopy. Brain-tumor MRI is at least the same *modality* as our cardiac/abdominal-organ MRI data but a different anatomical region/pathology entirely.
 - **Integration cost**: The heaviest pipeline reviewed — one conda env + 3 vendored sub-repos (`open_clip` fork, `segment-anything`, `nnUNet`) + 2 separate checkpoint downloads + curated (not free-form) `text_prompts.py` per dataset.
 
 ### 10. SAT

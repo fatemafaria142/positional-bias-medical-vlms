@@ -7,11 +7,29 @@ target when prompted, but whether it can find the *correct* one among several, a
 whether its answer moves in the right direction when the prompt's positional wording
 changes (left/right/upper/lower).
 
-| Dataset | Disease / Domain | Modality | Samples | Regions per image |
-|---|---|---|---|---|
-| ACDC | Cardiac (cardiomyopathy) | MRI | 20 | 3 |
-| ISIC 2018 Task 2 | Skin lesion (melanoma/nevus) | Dermoscopy | 20 | 2–3 |
-| CHAOS (MR) | Abdominal organs | MRI | 20 | 3–4 |
+## Common summary — every dataset at a glance
+
+- **ACDC**
+  - Domain: Cardiac (cardiomyopathy)
+  - Modality: MRI
+  - Samples: 20
+  - Region segmentation: Right ventricle (RV), Myocardium, Left ventricle (LV)
+
+- **ISIC 2018 Task 2**
+  - Domain: Skin lesion (melanoma/nevus)
+  - Modality: Dermoscopy
+  - Samples: 20
+  - Region segmentation: Pigment network, Negative network, Streaks, Milia-like cyst, Globules
+
+- **CHAOS (MR)**
+  - Domain: Abdominal organs
+  - Modality: MRI
+  - Samples: 20
+  - Region segmentation: Liver, Right kidney, Left kidney, Spleen
+
+Note: not every region appears in every image of a dataset — see "What was taken to
+segment" under each dataset below for exactly how many of a dataset's images contain
+each region.
 
 ---
 
@@ -31,14 +49,10 @@ targets in the same image.
 **Samples used:** 20 patients (`patient001`–`patient020`), one 2D slice per patient
 (chosen so all 3 structures are visible in that slice).
 
-**Regions per image (3):**
-| Region | Ground-truth label | Description |
-|---|---|---|
-| Right ventricle (RV) | 1 | Right heart chamber cavity |
-| Myocardium | 2 | Heart muscle wall |
-| Left ventricle (LV) | 3 | Left heart chamber cavity |
-
-**Coverage achieved:** 20/20 sample images have all 3 regions present.
+**What was taken to segment:** ACDC's ground truth only ever labels 3 structures per
+slice (RV, myocardium, LV) — there is no larger pool to choose from, so all 3 were
+taken, for every patient. 20/20 sample images have all 3 regions present (60
+region-groups total: 20 patients × 3 regions).
 
 **Ground truth format:** One combined label-map mask per slice (multi-class), split
 here into one binary PNG mask per region for scoring.
@@ -61,21 +75,16 @@ anonymous download, no login required.
 - Images: `ISIC2018_Task1-2_Validation_Input.zip`
 - Ground truth: `ISIC2018_Task2_Validation_GroundTruth.zip`
 
-**Samples used:** 20 lesion images, selected as the 20 images (out of the 100-image
-validation set) with the most non-empty attribute masks, so every sample has at least 2
-usable regions. (Attribute coverage is naturally sparse and uneven across the full
-100-image set — only 26 of the 100 images have 2+ non-empty attributes at all.)
-
-**Regions per image (up to 5, whichever are present):**
-| Region | Description |
-|---|---|
-| Pigment network | Network-like pigmented lines across the lesion |
-| Negative network | Inverse (light) network pattern |
-| Streaks | Radial linear projections at the lesion border |
-| Milia-like cyst | Small white/yellow round structures |
-| Globules | Round to oval pigmented structures |
-
-**Coverage achieved:** 16/20 images have 2 regions, 4/20 images have 3 regions.
+**What was taken to segment:** Task 2 defines 5 possible attributes, but coverage per
+image is sparse and uneven across the full 100-image validation set — pigment_network
+is non-empty in 73/100 images, globules in 19/100, negative_network in 9/100, streaks
+in 6/100, milia_like_cyst in 6/100, and only 26/100 images have 2 or more non-empty
+attributes at all. Rather than fixing one attribute (which would drop most images to a
+single region) or sampling randomly (which would mostly pull in single-region images),
+**the 20 images with the most non-empty attributes were selected**, and for each,
+*every* attribute that is actually non-empty in that image was taken as a region — not
+a fixed subset. Result: 16/20 images contributed 2 regions, 4/20 contributed 3 regions
+(44 region-groups total, out of the 5 possible attributes per image).
 
 **Ground truth format:** One separate binary PNG mask file per attribute per image.
 
@@ -92,18 +101,13 @@ collection, same patients, but with 4 organs labeled per slice.
 
 **Source:** [CHAOS dataset, Zenodo mirror](https://zenodo.org/records/3431873/files/CHAOS_Train_Sets.zip) — public, no login (the official grand-challenge.org host requires account registration; this mirror doesn't).
 
-**Samples used:** 20 patients (all MR patients available in the Train_Sets release),
-one 2D slice per patient — the InPhase slice with the most organ labels present.
-
-**Regions per image (up to 4):**
-| Region | Ground-truth grayscale label |
-|---|---|
-| Liver | 63 |
-| Right kidney | 126 |
-| Left kidney | 189 |
-| Spleen | 252 |
-
-**Coverage achieved:** 18/20 images have all 4 organs, 2/20 have 3 organs.
+**What was taken to segment:** CHAOS-MR labels 4 organs per slice (liver, right
+kidney, left kidney, spleen) — all 4 were taken as regions, for every one of the 20 MR
+patients available in the Train_Sets release. For each patient, the one InPhase slice
+with the most organ labels present was chosen (not a fixed slice index), so patients
+whose scan range didn't fully cover all 4 organs still contribute whichever organs are
+visible rather than being dropped. Result: 18/20 images have all 4 organs, 2/20 have 3
+(78 region-groups total, out of the 4 possible organs per image).
 
 **Ground truth format:** One combined grayscale label-map mask per slice, split here
 into one binary PNG mask per organ.
@@ -126,20 +130,29 @@ into one binary PNG mask per organ.
   | P2 | "Please segment {X} on the right side of this image." |
   | P3 | "Please segment {X} in the upper region of this image." |
   | P4 | "Please segment {X} in the lower region of this image." |
+  | P_ALL | "Please segment {region 1}, {region 2}, ... in this image." (all regions present in that image, named in one sentence) |
+
+  P0–P4 test *positional steering* on one named target at a time. P_ALL is a separate,
+  additional condition per image testing *multi-target completeness* — can the model
+  find all N regions in a single call — since positional wording doesn't cleanly apply
+  to a multi-target ask (see `target_regions`/`mask_paths` below).
 
 - **Same manifest schema** (`manifest_<dataset>.csv`): one row per (image, region,
   prompt), carrying `image_path`, `mask_path`, ground-truth centroid/bbox/side, and the
   exact `prompt_text` to send to the model — so scoring code is identical across all 3
-  datasets.
+  datasets. `P_ALL` rows instead carry `target_regions` and `mask_paths` (semicolon-
+  separated lists), since they name several regions at once rather than one.
 
 ## File layout
 
 ```
 dataset/
-  acdc/manifest_acdc.csv            (300 rows: 60 region-groups x 5 prompts)
-  isic_task2/manifest_isic_task2.csv (220 rows: 44 region-groups x 5 prompts)
-  chaos/manifest_chaos.csv          (390 rows: 78 region-groups x 5 prompts)
+  acdc/manifest_acdc.csv             (320 rows: 60 region-groups x 5 prompts + 20 P_ALL)
+  isic_task2/manifest_isic_task2.csv (240 rows: 44 region-groups x 5 prompts + 20 P_ALL)
+  chaos/manifest_chaos.csv           (410 rows: 78 region-groups x 5 prompts + 20 P_ALL)
 ```
 
 Each dataset folder also contains one subfolder per sample, holding the 2D image PNG
-and one binary mask PNG per region present in that sample.
+and one binary mask PNG per region present in that sample, plus a `visual_check/`
+folder with one presentation-ready ground-truth overlay PNG per sample (all regions
+color-coded on the image, with a legend) for visual comparison against model output.

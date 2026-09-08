@@ -12,19 +12,29 @@ Why this differs from scripts/common.py (2D, single-target datasets):
     organs per volume), so the "pool" here is (subject, organ) pairs, not
     one item per subject.
 
+This is testing *cross-organ* positional bias, not prompt-phrasing bias:
+one plain segmentation prompt per organ ("Segment the liver.") -- the
+question is whether the model's predicted mask lands on the organ that was
+actually asked for, or drifts toward wherever a *different* organ usually
+sits (e.g. asked for the spleen, but the model paints something that looks
+suspiciously like where the liver usually is). So there is exactly one
+prompt per (subject, organ), not multiple directional phrasings.
+
 Pipeline, end to end:
   1. best_slice_for_label() -- for one label id in one label volume, find
      the axial slice index with the most voxels of that label, and return
      the binary 2D mask at that slice.
   2. normalize_to_uint8() -- percentile-clip + rescale a raw MRI slice to a
      viewable 8-bit grayscale image (raw intensities are not 0-255).
-  3. mask_ground_truth() -- identical to scripts/common.py: centroid, bbox,
-     left/right + upper/lower side labels, but computed in image-space
-     (array) coordinates -- this is what's being tested for positional
-     bias, not true anatomical laterality.
-  4. export_subject() -- for one subject's (image_vol, label_vol): for every
-     organ id present, save the chosen slice's image+mask as PNGs and
-     append one manifest row per (organ, prompt) combination.
+  3. mask_ground_truth() -- centroid, bbox, left/right + upper/lower side
+     labels, computed in image-space (array) coordinates. Recorded so that,
+     after a model predicts a mask, you can check whether the prediction's
+     centroid lands near *this* organ's ground truth or near some other
+     organ's ground truth in the same subject (the cross-organ drift a
+     positional bias would produce).
+  4. export_subject() -- for one subject's (image_vol, label_vol): for
+     every organ id present, save the chosen slice's image+mask as PNGs
+     and append one manifest row with that organ's single prompt.
 """
 
 import csv
@@ -36,13 +46,7 @@ from PIL import Image
 SEED = 42
 N_SUBJECTS = 10
 
-PROMPTS = {
-    "P0": "Please locate {x} in this image.",
-    "P1": "Please locate {x} on the left side of this image.",
-    "P2": "Please locate {x} on the right side of this image.",
-    "P3": "Please locate {x} in the upper region of this image.",
-    "P4": "Please locate {x} in the lower region of this image.",
-}
+PROMPT_TEMPLATE = "Segment the {x} in this image."
 
 
 def best_slice_for_label(label_vol: np.ndarray, label_id: int, axis: int = 2):
@@ -99,7 +103,7 @@ def export_subject(
 ):
     """For one subject: for every organ id in `organ_map` present in
     label_vol, save that organ's best slice (image + mask PNG) and return
-    one manifest row per (organ, prompt) combination."""
+    one manifest row per organ (single segmentation prompt each)."""
     img_out = out_dir / "images"
     mask_out = out_dir / "masks"
     img_out.mkdir(parents=True, exist_ok=True)
@@ -127,28 +131,26 @@ def export_subject(
         Image.fromarray(img_uint8).save(dst_img)
         Image.fromarray((mask2d.astype("uint8")) * 255).save(dst_mask)
 
-        for prompt_id, template in PROMPTS.items():
-            rows.append({
-                "dataset": dataset_name,
-                "subject_id": subject_id,
-                "split": split,
-                "organ": organ_name,
-                "label_id": label_id,
-                "slice_index": slice_idx,
-                "volume_shape": "x".join(str(s) for s in label_vol.shape),
-                "image_path": f"images/{dst_img.name}",
-                "mask_path": f"masks/{dst_mask.name}",
-                "gt_centroid_x": cx,
-                "gt_centroid_y": cy,
-                "gt_bbox_xmin": bbox[0],
-                "gt_bbox_ymin": bbox[1],
-                "gt_bbox_xmax": bbox[2],
-                "gt_bbox_ymax": bbox[3],
-                "gt_side_lr": side_lr,
-                "gt_side_ud": side_ud,
-                "prompt_id": prompt_id,
-                "prompt_text": template.format(x=f"the {organ_name}"),
-            })
+        rows.append({
+            "dataset": dataset_name,
+            "subject_id": subject_id,
+            "split": split,
+            "organ": organ_name,
+            "label_id": label_id,
+            "slice_index": slice_idx,
+            "volume_shape": "x".join(str(s) for s in label_vol.shape),
+            "image_path": f"images/{dst_img.name}",
+            "mask_path": f"masks/{dst_mask.name}",
+            "gt_centroid_x": cx,
+            "gt_centroid_y": cy,
+            "gt_bbox_xmin": bbox[0],
+            "gt_bbox_ymin": bbox[1],
+            "gt_bbox_xmax": bbox[2],
+            "gt_bbox_ymax": bbox[3],
+            "gt_side_lr": side_lr,
+            "gt_side_ud": side_ud,
+            "prompt_text": PROMPT_TEMPLATE.format(x=organ_name),
+        })
     return rows
 
 

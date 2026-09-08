@@ -13,10 +13,14 @@ files actually needed, not the full 786 MB dataset), then writes:
     samples/amos22_mri/masks/<subject>_<organ>_mask.png
     samples/amos22_mri/manifest_amos22_mri.csv
 
-Each row in the manifest is one (subject, organ, prompt-variant) triple --
-10 subjects x up to 15 organs x 5 prompts, minus any organ not annotated in
-a given subject. See scripts/common3d.py for the slice-selection and
-prompt logic shared with other 3D datasets.
+Each row in the manifest is one (subject, organ) pair with a single plain
+segmentation prompt for that organ -- 10 subjects x up to 15 organs, minus
+any organ not annotated in a given subject. The point is to test
+*cross-organ* positional bias (asked for organ X, does the model's output
+drift toward where a different organ usually sits?), not prompt-phrasing
+bias, so there is exactly one prompt per organ, not directional variants.
+See scripts/common3d.py for the slice-selection and prompt logic shared
+with other 3D datasets.
 """
 
 import random
@@ -109,8 +113,8 @@ if __name__ == "__main__":
             dataset_name=DATASET_NAME,
             split=split,
         )
-        print(f"[ok] {patient_id} ({split}): {len(rows) // len(set(r['prompt_id'] for r in rows) or {1})} "
-              f"organ(s) exported" if rows else f"[warn] {patient_id}: no organs found")
+        print(f"[ok] {patient_id} ({split}): {len(rows)} organ(s) exported"
+              if rows else f"[warn] {patient_id}: no organs found")
         all_rows.extend(rows)
 
     if not all_rows:

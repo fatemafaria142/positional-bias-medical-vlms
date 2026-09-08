@@ -1,135 +1,112 @@
 """
-Shared logic for turning 3D (volume, multi-organ label map) datasets into the
-same kind of positional-bias manifest the 2D scripts (sample_lgg.py, etc.)
-produce -- reused by sample_amos22_mri.py and (later) sample_neurite_oasis.py.
+Shared logic for turning 3D (volume, multi-organ label map) datasets into a
+text-guided *volumetric* segmentation manifest -- reused by
+sample_amos22_mri.py and (later) sample_neurite_oasis.py.
 
-Why this differs from scripts/common.py (2D, single-target datasets):
-  - A 3D volume has no single "the image" to prompt against -- a model can
-    only be shown one 2D slice at a time. So for each organ/structure we
-    pick that organ's *best* axial slice (the one with the most labeled
-    voxels) and treat that slice as if it were a standalone 2D sample.
-  - One subject contributes multiple labels (e.g. AMOS22 MRI has up to 15
-    organs per volume), so the "pool" here is (subject, organ) pairs, not
-    one item per subject.
+These datasets are meant for 3D models (Text3DSAM, MedSAM3, ...) that take
+a whole volume + a text prompt and return a whole predicted mask volume --
+not 2D slice models. So, unlike scripts/common.py (2D single-target
+datasets), nothing here slices a volume down to a single 2D image: each
+subject's full image + label NIfTI volumes are kept as-is, and "ground
+truth" is a full 3D description (voxel-space centroid + bounding box, plus
+true anatomical side labels).
 
 This is testing *cross-organ* positional bias, not prompt-phrasing bias:
 one plain segmentation prompt per organ ("Segment the liver.") -- the
 question is whether the model's predicted mask lands on the organ that was
 actually asked for, or drifts toward wherever a *different* organ usually
-sits (e.g. asked for the spleen, but the model paints something that looks
-suspiciously like where the liver usually is). So there is exactly one
-prompt per (subject, organ), not multiple directional phrasings.
+sits. So there is exactly one prompt per (subject, organ).
 
 Pipeline, end to end:
-  1. best_slice_for_label() -- for one label id in one label volume, find
-     the axial slice index with the most voxels of that label, and return
-     the binary 2D mask at that slice.
-  2. normalize_to_uint8() -- percentile-clip + rescale a raw MRI slice to a
-     viewable 8-bit grayscale image (raw intensities are not 0-255).
-  3. mask_ground_truth() -- centroid, bbox, left/right + upper/lower side
-     labels, computed in image-space (array) coordinates. Recorded so that,
-     after a model predicts a mask, you can check whether the prediction's
-     centroid lands near *this* organ's ground truth or near some other
-     organ's ground truth in the same subject (the cross-organ drift a
-     positional bias would produce).
-  4. export_subject() -- for one subject's (image_vol, label_vol): for
-     every organ id present, save the chosen slice's image+mask as PNGs
-     and append one manifest row with that organ's single prompt.
+  1. axcodes_for() -- read a volume's NIfTI affine to find which array axis
+     maps to which true anatomical direction (e.g. axis 0 -> Right,
+     axis 1 -> Anterior, axis 2 -> Superior). This varies per file (even
+     which axis is the thin/through-plane one differs between subjects in
+     AMOS22 MRI), so it must be read per volume, never assumed fixed.
+  2. mask_ground_truth_3d() -- for one label id's binary 3D mask: voxel
+     centroid (x, y, z), voxel bounding box, and anatomical side labels
+     (L/R, A/P, S/I) per axis, derived from axcodes_for().
+  3. export_subject() -- copies one subject's image+label volumes into
+     out_dir/volumes/ once (shared across all its organs -- a 3D model
+     predicts against the same input volume per organ prompt), then
+     appends one manifest row per organ with that organ's single prompt
+     and 3D ground truth.
 """
 
 import csv
+import shutil
 from pathlib import Path
 
+import nibabel as nib
 import numpy as np
-from PIL import Image
 
 SEED = 42
 N_SUBJECTS = 10
 
 PROMPT_TEMPLATE = "Segment the {x} in this image."
 
+# Anatomical opposites, for labeling the "low index" half of each axis
+# given the axcode (which names the "high index" direction).
+_OPPOSITE = {"R": "L", "L": "R", "A": "P", "P": "A", "S": "I", "I": "S"}
 
-def best_slice_for_label(label_vol: np.ndarray, label_id: int, axis: int = 2):
-    """Return (slice_index, mask2d) for the axial slice with the most voxels
-    of `label_id`, or None if the label never appears in this volume.
 
-    axis=2 assumes the volume is (X, Y, Z) with Z as the slice axis -- true
-    for both AMOS22 MRI and Neurite OASIS as distributed (their Z spacing
-    is coarser than X/Y, i.e. Z is the through-plane/slice axis).
+def axcodes_for(nifti_path) -> tuple:
+    """Return e.g. ('R', 'A', 'S'): the true anatomical direction that
+    increasing each array axis (0, 1, 2) moves toward, read from this
+    volume's own affine (NOT assumed -- it can differ between subjects)."""
+    return nib.aff2axcodes(nib.load(str(nifti_path)).affine)
+
+
+def mask_ground_truth_3d(mask: np.ndarray, axcodes: tuple):
+    """Given a 3D binary mask and this volume's axcodes, return:
+    (centroid_x, centroid_y, centroid_z, bbox, side_0, side_1, side_2)
+    where bbox = (xmin, ymin, zmin, xmax, ymax, zmax) in voxel indices,
+    and side_i is the true anatomical half ('R'/'L', 'A'/'P', or 'S'/'I')
+    the mask's centroid falls in along array axis i.
     """
-    is_label = label_vol == label_id
-    other_axes = tuple(a for a in range(label_vol.ndim) if a != axis)
-    counts_per_slice = is_label.sum(axis=other_axes)
-    if counts_per_slice.max() == 0:
-        return None  # label not present anywhere in this volume
-    best_idx = int(counts_per_slice.argmax())
-    mask2d = np.take(is_label, best_idx, axis=axis)
-    return best_idx, mask2d
-
-
-def normalize_to_uint8(slice2d: np.ndarray) -> np.ndarray:
-    """Percentile-clip (1st/99th) + rescale a raw intensity slice to uint8
-    so it's viewable as a normal grayscale PNG."""
-    lo, hi = np.percentile(slice2d, [1, 99])
-    if hi <= lo:
-        return np.zeros_like(slice2d, dtype=np.uint8)
-    clipped = np.clip(slice2d, lo, hi)
-    return (((clipped - lo) / (hi - lo)) * 255).astype(np.uint8)
-
-
-def mask_ground_truth(mask: np.ndarray):
-    """Same contract as scripts/common.py's mask_ground_truth: given a 2D
-    binary mask, return (centroid_x, centroid_y, bbox, side_lr, side_ud)."""
-    ys, xs = np.nonzero(mask)
-    if len(xs) == 0:
+    coords = np.nonzero(mask)
+    if len(coords[0]) == 0:
         return None
-    cx, cy = xs.mean(), ys.mean()
-    bbox = (xs.min(), ys.min(), xs.max(), ys.max())
-    h, w = mask.shape
-    side_lr = "left" if cx < w / 2 else "right"
-    side_ud = "upper" if cy < h / 2 else "lower"
-    return cx, cy, bbox, side_lr, side_ud
+    centroid = tuple(float(c.mean()) for c in coords)
+    bbox = tuple(int(c.min()) for c in coords) + tuple(int(c.max()) for c in coords)
+
+    sides = []
+    for axis, (code, centroid_val) in enumerate(zip(axcodes, centroid)):
+        size = mask.shape[axis]
+        sides.append(code if centroid_val > size / 2 else _OPPOSITE[code])
+    return centroid, bbox, tuple(sides)
 
 
 def export_subject(
     subject_id: str,
-    image_vol: np.ndarray,
-    label_vol: np.ndarray,
+    image_path: str,
+    label_path: str,
     organ_map: dict,
     out_dir: Path,
     dataset_name: str,
     split: str,
-    axis: int = 2,
 ):
-    """For one subject: for every organ id in `organ_map` present in
-    label_vol, save that organ's best slice (image + mask PNG) and return
-    one manifest row per organ (single segmentation prompt each)."""
-    img_out = out_dir / "images"
-    mask_out = out_dir / "masks"
-    img_out.mkdir(parents=True, exist_ok=True)
-    mask_out.mkdir(parents=True, exist_ok=True)
+    """For one subject: copy its image+label volumes once into
+    out_dir/volumes/, then return one manifest row per organ id in
+    `organ_map` that's actually present in the label volume."""
+    vol_out = out_dir / "volumes"
+    vol_out.mkdir(parents=True, exist_ok=True)
+
+    dst_image = vol_out / f"{subject_id}_image.nii.gz"
+    dst_label = vol_out / f"{subject_id}_label.nii.gz"
+    shutil.copy2(image_path, dst_image)
+    shutil.copy2(label_path, dst_label)
+
+    label_vol = nib.load(str(dst_label)).get_fdata().astype(int)
+    axcodes = axcodes_for(dst_label)
+    zooms = nib.load(str(dst_label)).header.get_zooms()
 
     rows = []
     for label_id, organ_name in organ_map.items():
-        found = best_slice_for_label(label_vol, label_id, axis=axis)
-        if found is None:
-            continue  # this organ isn't annotated in this subject's volume
-        slice_idx, mask2d = found
-
-        gt = mask_ground_truth(mask2d)
+        gt = mask_ground_truth_3d(label_vol == label_id, axcodes)
         if gt is None:
-            continue
-        cx, cy, bbox, side_lr, side_ud = gt
-
-        img2d = np.take(image_vol, slice_idx, axis=axis)
-        img_uint8 = normalize_to_uint8(img2d)
-
-        organ_slug = organ_name.replace(" ", "_").replace("/", "_")
-        base_name = f"{subject_id}_{organ_slug}"
-        dst_img = img_out / f"{base_name}.png"
-        dst_mask = mask_out / f"{base_name}_mask.png"
-        Image.fromarray(img_uint8).save(dst_img)
-        Image.fromarray((mask2d.astype("uint8")) * 255).save(dst_mask)
+            continue  # this organ isn't annotated in this subject's volume
+        (cx, cy, cz), bbox, (side0, side1, side2) = gt
 
         rows.append({
             "dataset": dataset_name,
@@ -137,18 +114,23 @@ def export_subject(
             "split": split,
             "organ": organ_name,
             "label_id": label_id,
-            "slice_index": slice_idx,
+            "image_path": f"volumes/{dst_image.name}",
+            "label_path": f"volumes/{dst_label.name}",
             "volume_shape": "x".join(str(s) for s in label_vol.shape),
-            "image_path": f"images/{dst_img.name}",
-            "mask_path": f"masks/{dst_mask.name}",
-            "gt_centroid_x": cx,
-            "gt_centroid_y": cy,
-            "gt_bbox_xmin": bbox[0],
-            "gt_bbox_ymin": bbox[1],
-            "gt_bbox_xmax": bbox[2],
-            "gt_bbox_ymax": bbox[3],
-            "gt_side_lr": side_lr,
-            "gt_side_ud": side_ud,
+            "voxel_spacing_mm": "x".join(f"{z:.3f}" for z in zooms),
+            "axcodes": "".join(axcodes),
+            "gt_centroid_vox_0": cx,
+            "gt_centroid_vox_1": cy,
+            "gt_centroid_vox_2": cz,
+            "gt_bbox_vox_0min": bbox[0],
+            "gt_bbox_vox_1min": bbox[1],
+            "gt_bbox_vox_2min": bbox[2],
+            "gt_bbox_vox_0max": bbox[3],
+            "gt_bbox_vox_1max": bbox[4],
+            "gt_bbox_vox_2max": bbox[5],
+            "gt_side_axis0": side0,
+            "gt_side_axis1": side1,
+            "gt_side_axis2": side2,
             "prompt_text": PROMPT_TEMPLATE.format(x=organ_name),
         })
     return rows

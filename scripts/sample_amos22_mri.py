@@ -1,7 +1,9 @@
 """
-Sample 10 subjects from AMOS22 MRI (abdominal, 15-organ segmentation) for
-positional-bias probing, and export one representative axial slice per
-organ per subject as a text-guided-segmentation manifest.
+Sample 10 subjects from AMOS22 MRI (abdominal, 13-organ segmentation) for
+positional-bias probing, and export full 3D image+label volumes plus a
+text-guided volumetric-segmentation manifest -- for 3D models (Text3DSAM,
+MedSAM3, ...) that take a whole volume + text prompt and predict a whole
+mask volume, not a 2D slice model.
 
 Usage:
     python scripts/sample_amos22_mri.py
@@ -9,24 +11,25 @@ Usage:
 Downloads the 10 sampled subjects' NIfTI volumes from Hugging Face
 (MedOtter/amos22-mri-dataset) into data/raw/amos22-mri-dataset/ (only the
 files actually needed, not the full 786 MB dataset), then writes:
-    samples/amos22_mri/images/<subject>_<organ>.png
-    samples/amos22_mri/masks/<subject>_<organ>_mask.png
+    samples/amos22_mri/volumes/<subject>_image.nii.gz
+    samples/amos22_mri/volumes/<subject>_label.nii.gz
     samples/amos22_mri/manifest_amos22_mri.csv
 
 Each row in the manifest is one (subject, organ) pair with a single plain
-segmentation prompt for that organ -- 10 subjects x up to 15 organs, minus
-any organ not annotated in a given subject. The point is to test
-*cross-organ* positional bias (asked for organ X, does the model's output
-drift toward where a different organ usually sits?), not prompt-phrasing
-bias, so there is exactly one prompt per organ, not directional variants.
-See scripts/common3d.py for the slice-selection and prompt logic shared
-with other 3D datasets.
+segmentation prompt for that organ -- 10 subjects x 13 organs (every organ
+this dataset actually annotates; verified directly against the label
+volumes, not assumed). The point is to test *cross-organ* positional bias
+(asked for organ X, does the model's predicted mask drift toward where a
+different organ usually sits?), not prompt-phrasing bias, so there is
+exactly one prompt per organ, not directional variants. Ground truth
+(voxel centroid, voxel bbox, true anatomical L/R + A/P + S/I side per
+axis, read from each volume's own NIfTI affine) is 3D, matching a 3D
+model's predicted mask. See scripts/common3d.py for the shared logic.
 """
 
 import random
 from pathlib import Path
 
-import nibabel as nib
 from huggingface_hub import hf_hub_download
 
 from common3d import N_SUBJECTS, SEED, export_subject, write_manifest
@@ -101,13 +104,10 @@ if __name__ == "__main__":
         img_path = hf_hub_download(HF_REPO_ID, img_rel, repo_type="dataset", local_dir=RAW_DIR)
         lbl_path = hf_hub_download(HF_REPO_ID, lbl_rel, repo_type="dataset", local_dir=RAW_DIR)
 
-        image_vol = nib.load(img_path).get_fdata()
-        label_vol = nib.load(lbl_path).get_fdata().astype(int)
-
         rows = export_subject(
             subject_id=patient_id,
-            image_vol=image_vol,
-            label_vol=label_vol,
+            image_path=img_path,
+            label_path=lbl_path,
             organ_map=ORGAN_MAP,
             out_dir=OUT_DIR,
             dataset_name=DATASET_NAME,

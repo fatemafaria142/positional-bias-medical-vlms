@@ -12,7 +12,7 @@ one plain prompt per structure, not directional variants.
 
 | Dataset | General description | Source link | Domain | Modality | Samples | Region segmentation |
 |---|---|---|---|---|---|---|
-| Neurite OASIS | Brain MRI collection (414 subjects) from OASIS, processed with FreeSurfer + SAMSEG by the Neurite/HyperMorph team. | [surfer.nmr.mgh.harvard.edu/ftp/data/neurite](http://surfer.nmr.mgh.harvard.edu/ftp/data/neurite/data/neurite-oasis.v1.0.tar) (paper: [adalca/medical-datasets](https://github.com/adalca/medical-datasets/blob/master/neurite-oasis.md)) | Neuroimaging (brain) | T1 MRI | 10 subjects (of 414) | 35 anatomical brain structures (17 pairs of left/right + brain stem) |
+| Neurite OASIS | Brain MRI collection (414 subjects) from OASIS, processed with FreeSurfer + SAMSEG by the Neurite/HyperMorph team. | [surfer.nmr.mgh.harvard.edu/ftp/data/neurite](http://surfer.nmr.mgh.harvard.edu/ftp/data/neurite/data/neurite-oasis.v1.0.tar) (paper: [adalca/medical-datasets](https://github.com/adalca/medical-datasets/blob/master/neurite-oasis.md)) | Neuroimaging (brain) | T1 MRI | 10 subjects (of 414) | 35 anatomical brain structures (16 left/right pairs + 3 unpaired: brain stem, 3rd/4th ventricle) |
 
 ---
 
@@ -22,9 +22,9 @@ one plain prompt per structure, not directional variants.
 
 **Why this dataset:** Unlike AMOS22 (abdominal organs, mostly unpaired), Neurite
 OASIS's 35-label segmentation is dominated by explicit **left/right structure
-pairs** (17 pairs — e.g. `Left-Hippocampus`/`Right-Hippocampus`,
-`Left-Thalamus`/`Right-Thalamus`, `Left-Amygdala`/`Right-Amygdala` — plus
-`Brain-Stem`, `3rd-Ventricle`, `4th-Ventricle` unpaired). This is a sharper test
+pairs** (16 pairs = 32 labels — e.g. `Left-Hippocampus`/`Right-Hippocampus`,
+`Left-Thalamus`/`Right-Thalamus`, `Left-Amygdala`/`Right-Amygdala` — plus 3
+unpaired: `Brain-Stem`, `3rd-Ventricle`, `4th-Ventricle`). This is a sharper test
 of lateral (left/right) positional bias specifically: if a model confuses
 `Left-Hippocampus` for `Right-Hippocampus`, that's a clean, unambiguous failure
 mode to detect, distinct from the AMOS22 organ-to-organ confusion case.
@@ -79,32 +79,54 @@ in the tar, extracted and verified directly — not assumed):
                                                                      35 Right-Choroid-Plexus
 ```
 
-10 subjects will be sampled deterministically (`random.Random(seed=42)`, same
+10 subjects sampled deterministically (`random.Random(seed=42)`, same
 convention as `scripts/sample_amos22_mri.py`) from the 414 in `subjects.txt`
-(also embedded in the tar). Not every subject is guaranteed to have every one
-of the 35 labels present with nonzero voxels (small structures like
-`Left-Vessel`/`Right-Vessel` can occasionally be empty in an individual
-automated segmentation) — the sampling script skips any label absent in a
-given subject, same as the AMOS22 pipeline.
+(also embedded in the tar): `OASIS_OAS1_0014_MR1, OASIS_OAS1_0057_MR1,
+OASIS_OAS1_0062_MR1, OASIS_OAS1_0076_MR1, OASIS_OAS1_0123_MR1,
+OASIS_OAS1_0135_MR1, OASIS_OAS1_0151_MR1, OASIS_OAS1_0363_MR1,
+OASIS_OAS1_0419_MR1, OASIS_OAS1_0421_MR1`. Neurite OASIS has no official
+train/valid split, unlike AMOS22 (`split` column is `all` for every row).
+Not every subject is guaranteed to have every one of the 35 labels present
+with nonzero voxels (small structures like `Left-Vessel`/`Right-Vessel` can
+occasionally be empty in an individual automated segmentation) — the
+sampling script skips any label absent in a given subject, same as the
+AMOS22 pipeline. In practice, all 10 sampled subjects have all 35 structures
+present — verified directly against the label volumes, not assumed —
+**350 region-groups total (10 subjects × 35 structures)**.
 
 **Ground truth format:** Full 3D, per structure — same scheme as AMOS22:
 voxel-space centroid `(x, y, z)`, voxel bounding box, and true anatomical side
-per axis (L/R, A/P/or similar, S/I), read from each volume's own NIfTI affine
-via `nib.aff2axcodes()`, never assumed.
+per axis (read from each volume's own NIfTI affine via `nib.aff2axcodes()`,
+never assumed — for these `aligned_*` volumes it is `LIA`: axis 0 → L,
+axis 1 → I (inferior), axis 2 → A (anterior)).
 
-## Status
-
-Description only, at this point — samples not yet generated. Next step:
-`scripts/sample_neurite_oasis.py` (reusing `scripts/common3d.py`, the same
-volumetric export logic as AMOS22) will extract the 10 sampled subjects'
-`aligned_norm.nii.gz` + `aligned_seg35.nii.gz` from the local tar and write:
+## File layout
 
 ```
 samples/neurite_oasis/
-├── DATASETS.md                      # this file
-├── manifest_neurite_oasis.csv       # 10 subjects x up to 35 structures
+├── DATASETS.md                        # this file
+├── manifest_neurite_oasis.csv         # 350 rows: 10 subjects x 35 structures
 └── volumes/
-    ├── OASIS_OAS1_XXXX_MR1_image.nii.gz
-    ├── OASIS_OAS1_XXXX_MR1_label.nii.gz
-    └── ...
+    ├── OASIS_OAS1_0014_MR1_image.nii.gz   # aligned_norm.nii.gz, renamed
+    ├── OASIS_OAS1_0014_MR1_label.nii.gz   # aligned_seg35.nii.gz, renamed
+    └── ...                                 # (20 files: 10 subjects x 2)
 ```
+
+## Manifest columns (`manifest_neurite_oasis.csv`)
+
+Same schema as `samples/amos22_mri/manifest_amos22_mri.csv` — see that file's
+`DATASETS.md` for the full column reference. Differences here: `organ` holds
+a brain structure name (e.g. `left hippocampus`) instead of an abdominal
+organ, `label_id` is 1–35 per `seg35_labels.txt` above, and `split` is always
+`all` (no train/valid distinction in this dataset).
+
+## Reproducing / regenerating
+
+```bash
+python scripts/sample_neurite_oasis.py
+```
+Extracts only the 10 sampled subjects' volumes from the local tar into
+`data/raw/neurite-oasis-extracted/` (gitignored — safe to delete after
+running; `samples/neurite_oasis/` is self-contained and is what's tracked in
+git). The original `data/raw/neurite-oasis.v1.0.tar` (6.6 GB, gitignored) is
+left untouched.

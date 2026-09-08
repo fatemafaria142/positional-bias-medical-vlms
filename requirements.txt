@@ -3,3 +3,7 @@ Pillow
 torch
 transformers
 accelerate
+opencv-python
+loguru
+ftfy
+regex

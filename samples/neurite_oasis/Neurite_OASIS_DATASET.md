@@ -2,7 +2,7 @@
 
 One public 3D medical imaging dataset is used here, for the same **volumetric**
 (not 2D-slice) text-guided segmentation positional-bias study as
-`samples/amos22_mri/DATASETS.md`: given a full 3D volume and a plain
+`samples/amos22_mri/AMOS22_DATASET.md`: given a full 3D volume and a plain
 structure-name prompt, does a 3D model (Text3DSAM, MedSAM3) predict a mask that
 actually lands on the requested structure, or drift toward where a *different*
 structure typically sits? Same cross-organ (here, cross-structure) framing —
@@ -104,7 +104,7 @@ axis 1 → I (inferior), axis 2 → A (anterior)).
 
 ```
 samples/neurite_oasis/
-├── DATASETS.md                        # this file
+├── Neurite_OASIS_DATASET.md           # this file
 ├── manifest_neurite_oasis.csv         # 350 rows: 10 subjects x 35 structures
 └── volumes/
     ├── OASIS_OAS1_0014_MR1_image.nii.gz   # aligned_norm.nii.gz, renamed
@@ -114,11 +114,12 @@ samples/neurite_oasis/
 
 ## Manifest columns (`manifest_neurite_oasis.csv`)
 
-Same schema as `samples/amos22_mri/manifest_amos22_mri.csv` — see that file's
-`DATASETS.md` for the full column reference. Differences here: `organ` holds
-a brain structure name (e.g. `left hippocampus`) instead of an abdominal
-organ, `label_id` is 1–35 per `seg35_labels.txt` above, and `split` is always
-`all` (no train/valid distinction in this dataset).
+Same schema as `samples/amos22_mri/manifest_amos22_mri.csv` — see
+`samples/amos22_mri/AMOS22_DATASET.md` for the full column reference.
+Differences here: `organ` holds a brain structure name (e.g.
+`left hippocampus`) instead of an abdominal organ, `label_id` is 1–35 per
+`seg35_labels.txt` above, and `split` is always `all` (no train/valid
+distinction in this dataset).
 
 ## Reproducing / regenerating
 
@@ -130,3 +131,21 @@ Extracts only the 10 sampled subjects' volumes from the local tar into
 running; `samples/neurite_oasis/` is self-contained and is what's tracked in
 git). The original `data/raw/neurite-oasis.v1.0.tar` (6.6 GB, gitignored) is
 left untouched.
+
+## Verification
+
+Checked before pushing (all passed): every manifest `image_path`/`label_path`
+exists; per-subject image/label shape and affine match; no NaNs or constant
+(corrupt) images; label volumes integer-valued 0–35; every manifest
+ground-truth row (centroid, bbox) independently recomputed from the raw
+volumes and matched exactly; no duplicate `(subject, organ)` rows; all 10
+subjects have all 35 structures; `axcodes`/`voxel_spacing_mm`/`volume_shape`
+identical across all 10 subjects (`LIA`, `1×1×1mm`, `160×192×224` — confirms
+the common-template alignment actually holds); **every left/right structure
+pair has the correct opposite anatomical side** (`gt_side_axis0 = L` for
+every `left *` row, `R` for every `right *` row, across all 16 pairs × 10
+subjects — 0 mismatches); image intensity range matches the dataset's stated
+0–1 normalization; extracted volumes byte-identical to the source tar
+(catches extraction truncation); volumes byte-identical between disk and the
+git-committed blob; a fresh clone of this branch loads all 20 volumes
+correctly with nibabel.

@@ -57,7 +57,7 @@ No 2D slice extraction — the full image + label volumes are kept as-is, since 
 
 ```
 samples/amos22_mri/
-├── DATASETS.md                    # this file
+├── AMOS22_DATASET.md              # this file
 ├── manifest_amos22_mri.csv        # 130 rows: 10 subjects x 13 organs
 └── volumes/
     ├── amos_0508_image.nii.gz     # one image+label pair per subject,
@@ -88,3 +88,16 @@ python scripts/sample_amos22_mri.py
 Downloads only the 10 sampled subjects' volumes from Hugging Face into
 `data/raw/amos22-mri-dataset/` (gitignored — safe to delete after running;
 `samples/amos22_mri/` is self-contained and is what's tracked in git).
+
+## Verification
+
+Checked before pushing (all passed): every manifest `image_path`/`label_path`
+exists; per-subject image/label shape and affine match; no NaNs or constant
+(corrupt) images; label volumes integer-valued in range; every manifest
+ground-truth row (centroid, bbox) independently recomputed from the raw
+volumes and matched exactly; no duplicate `(subject, organ)` rows; all 10
+subjects have all 13 organs; volumes byte-identical between disk and the
+git-committed blob; a fresh clone of this branch loads all 20 volumes
+correctly with nibabel. `.gitattributes` (repo root) marks `.nii.gz`/`.png`
+`-text` so no clone can line-ending-corrupt them regardless of local Git
+config.

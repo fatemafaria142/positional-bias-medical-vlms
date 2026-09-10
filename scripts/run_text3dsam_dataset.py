@@ -43,7 +43,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from src.model.modeling import Med3DSeg  # noqa: E402
 from transformers import BertTokenizer  # noqa: E402
-from common3d import axcodes_for, mask_ground_truth_3d  # noqa: E402
+from common3d import (  # noqa: E402
+    axcodes_for,
+    inverse_order,
+    mask_ground_truth_3d,
+    thin_axis_first_order,
+)
 
 MODEL_PATH = TEXT3DSAM_ROOT / "checkpoints" / "Text3DSAM"
 THRESHOLD = 0.5
@@ -181,7 +186,24 @@ def main():
         origin_shape = image_np.shape
         slice_axis = int(np.argmin(origin_shape))
 
-        preprocessed = pre_transforms(image_np).unsqueeze(0)
+        # Reorder axes so the physically thinnest axis lands at position 0,
+        # matching the model's fixed (128, 256, 256) resize target (see
+        # common3d.thin_axis_first_order for why). Model output is
+        # transposed back before scoring/plotting so everything downstream
+        # still lives in the original array space that the manifest's
+        # ground-truth columns were computed in.
+        #
+        # NOTE: intensity normalization (percentile-clip to [0,1]) was also
+        # tried here and made results dramatically worse (ablated liver
+        # case: dice 0.21 -> 0.00, predicted probabilities never exceeded
+        # ~0.33) -- the checkpoint apparently expects roughly raw-scale
+        # intensities, not [0,1]-normalized ones. Left un-normalized.
+        model_axis_order = thin_axis_first_order(origin_shape)
+        model_axis_restore = inverse_order(model_axis_order)
+        image_for_model = np.transpose(image_np, model_axis_order)
+        model_input_shape = image_for_model.shape
+
+        preprocessed = pre_transforms(image_for_model).unsqueeze(0)
         subject_dir = viz_dir / subject_id
         subject_dir.mkdir(parents=True, exist_ok=True)
 
@@ -205,8 +227,9 @@ def main():
                     input_ids=prompt_tokens["input_ids"],
                     attention_mask=prompt_tokens["attention_mask"],
                 )
-                logits = F.interpolate(logits, size=origin_shape, mode="trilinear")
+                logits = F.interpolate(logits, size=model_input_shape, mode="trilinear")
                 pred_prob = torch.sigmoid(logits).squeeze(0).squeeze(0).numpy()
+                pred_prob = np.transpose(pred_prob, model_axis_restore)
             elapsed = time.time() - t0
 
             pred_mask = pred_prob > THRESHOLD

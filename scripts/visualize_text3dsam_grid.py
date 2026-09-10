@@ -32,9 +32,11 @@ import torch.nn.functional as F
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TEXT3DSAM_ROOT = REPO_ROOT / "Text3DSAM"
 sys.path.insert(0, str(TEXT3DSAM_ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from src.model.modeling import Med3DSeg  # noqa: E402
 from transformers import BertTokenizer  # noqa: E402
+from common3d import inverse_order, thin_axis_first_order  # noqa: E402
 
 MODEL_PATH = TEXT3DSAM_ROOT / "checkpoints" / "Text3DSAM"
 DATA_DIR = REPO_ROOT / "samples" / "amos22_mri"
@@ -84,7 +86,11 @@ def render_subject(subject_id, rows, model, tokenizer):
             mtf.ToTensor(dtype=torch.float32),
         ]
     )
-    preprocessed = pre_transforms(image_np).unsqueeze(0)
+    model_axis_order = thin_axis_first_order(origin_shape)
+    model_axis_restore = inverse_order(model_axis_order)
+    image_for_model = np.transpose(image_np, model_axis_order)
+    model_input_shape = image_for_model.shape
+    preprocessed = pre_transforms(image_for_model).unsqueeze(0)
 
     subject_dir = OUT_DIR / subject_id
     subject_dir.mkdir(parents=True, exist_ok=True)
@@ -107,8 +113,9 @@ def render_subject(subject_id, rows, model, tokenizer):
                 input_ids=prompt_tokens["input_ids"],
                 attention_mask=prompt_tokens["attention_mask"],
             )
-            logits = F.interpolate(logits, size=origin_shape, mode="trilinear")
+            logits = F.interpolate(logits, size=model_input_shape, mode="trilinear")
             pred_prob = torch.sigmoid(logits).squeeze(0).squeeze(0).numpy()
+            pred_prob = np.transpose(pred_prob, model_axis_restore)
         pred_mask = pred_prob > THRESHOLD
         gt_mask = label_vol == label_id
 

@@ -136,6 +136,33 @@ def export_subject(
     return rows
 
 
+def thin_axis_first_order(shape: tuple) -> tuple:
+    """Return an axis permutation that moves the physically thinnest
+    (smallest-extent) axis to position 0, keeping the other two in their
+    original relative order.
+
+    Text3DSAM resizes every volume to a fixed (128, 256, 256), i.e. it
+    always treats array axis 0 as the coarse/through-plane axis. Real scans
+    are acquired in different planes (axial/coronal/sagittal), so which
+    array axis is actually thinnest varies per subject even when all
+    volumes share the same RAS axcodes -- e.g. in samples/amos22_mri,
+    amos_0508 (260x80x320) has its thin axis at position 1, while amos_0544
+    (576x468x72) has it at position 2. Without this reordering, Resize
+    silently stretches/squashes the wrong axis into the model's fixed 128
+    slot for any subject whose thin axis isn't already axis 0.
+    """
+    thin_axis = int(np.argmin(shape))
+    return (thin_axis,) + tuple(ax for ax in range(len(shape)) if ax != thin_axis)
+
+
+def inverse_order(order: tuple) -> tuple:
+    """Permutation that undoes np.transpose(volume, order)."""
+    inv = [0] * len(order)
+    for new_pos, old_pos in enumerate(order):
+        inv[old_pos] = new_pos
+    return tuple(inv)
+
+
 def write_manifest(rows: list, out_dir: Path, dataset_name: str):
     manifest_path = out_dir / f"manifest_{dataset_name}.csv"
     with manifest_path.open("w", newline="") as f:

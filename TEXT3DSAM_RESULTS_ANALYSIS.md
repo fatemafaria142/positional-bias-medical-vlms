@@ -1,12 +1,52 @@
 # Why Text3DSAM performs the way it does on AMOS22 MRI and Neurite OASIS
 
+> **Update:** an earlier version of this pipeline had a real bug — see
+> "Pipeline fix (axis ordering)" in §0 below. After fixing it, AMOS22 MRI
+> mean Dice went from 0.035 to **0.1025** (3x), with right/left kidney
+> moving from 0.000 to ~0.20 and liver improving from 0.24 to 0.26. The
+> numbers and organ-level detail below are the **current, corrected**
+> results in `samples/amos22_mri/predictions_text3dsam.csv`. Neurite OASIS
+> is unaffected by the fix (explained in §0) and its 0.000/0/350 result
+> stands.
+
 This documents the likely causes behind the results in
-`samples/amos22_mri/predictions_text3dsam.csv` (mean Dice 0.035, liver best
-at ~0.24) and `samples/neurite_oasis/predictions_text3dsam.csv` (mean Dice
-0.000, 0/350 nonzero). Both are consequences of what the model was trained
-on, not bugs in this pipeline — the input images and masks were verified
-correctly aligned (see `results_text3d_oasis/.../left_cerebral_cortex.png`:
-real predicted voxels exist, they just never overlap ground truth).
+`samples/amos22_mri/predictions_text3dsam.csv` (mean Dice 0.1025, liver
+best at ~0.26, 76/130 rows nonzero) and
+`samples/neurite_oasis/predictions_text3dsam.csv` (mean Dice 0.000, 0/350
+nonzero). Both are consequences of what the model was trained on, not bugs
+in this pipeline — the input images and masks were verified correctly
+aligned (see `results_text3d_oasis/.../left_cerebral_cortex.png`: real
+predicted voxels exist, they just never overlap ground truth).
+
+## 0. Pipeline fix (axis ordering)
+
+`Text3DSAM` resizes every volume to a fixed `(128, 256, 256)` and always
+treats array axis 0 as the coarse/through-plane axis. AMOS22 MRI subjects
+are scanned in different planes (axial/coronal/sagittal), so which array
+axis is physically thinnest varies per subject even though every volume's
+NIfTI affine reports the same `RAS` axcodes — e.g. `amos_0508`
+(260x**80**x320) has its thin axis at position 1, while `amos_0544`
+(576x468x**72**) has its thin axis at position 2.
+The original pipeline fed volumes straight into `Resize` without
+correcting for this, so for most subjects the wrong axis got forced into
+the model's fixed 128-slot, and the real thin axis got stretched into a
+256-slot instead — an extra, subject-dependent distortion on top of the
+resize itself. `scripts/common3d.py:thin_axis_first_order()` now permutes
+each volume so its thinnest axis is always at position 0 before resizing,
+and the prediction is permuted back before scoring. Ablation on
+`amos_0508`/liver: Dice 0.21 → 0.32 from this fix alone.
+
+A second fix (percentile-clip intensity normalization to `[0,1]`, on the
+theory that the model expects normalized inputs like its training data)
+was tried and **made results catastrophically worse** — predicted
+probabilities never exceeded ~0.33, below the 0.5 threshold, collapsing
+Dice to ~0 everywhere. This was reverted; the model apparently expects
+close to raw-scale MRI intensities, not `[0,1]`-normalized ones. Kept only
+the axis-ordering fix.
+
+Neurite OASIS is unaffected by either fix: all 10 sampled subjects share
+the identical `160x192x224` shape with axis 0 already the thinnest, so the
+reordering is a no-op there.
 
 ## 1. What the model actually is
 
@@ -28,7 +68,7 @@ explain most of what we see:
   **MRI** arm (which `samples/amos22_mri/` uses) is a different,
   much less-represented modality for the same anatomy.
 
-## 2. Why AMOS22 MRI is weak but not zero (mean Dice 0.035, liver 0.24)
+## 2. Why AMOS22 MRI is weak but not zero (mean Dice 0.1025, liver 0.26)
 
 **a. Modality gap: trained mostly on CT, evaluated on MRI.**
 CT intensities are standardized (Hounsfield units); MRI intensities are
@@ -47,13 +87,16 @@ coarse internal feature grid (patch size 64³ → a handful of tokens per
 axis before upsampling), **small structures lose most of their spatial
 signal** by the time the mask decoder sees them.
 
-**c. Organ size/frequency correlates almost exactly with Dice.**
-Liver (the largest organ, present and dominant in nearly every abdominal
-dataset in training) is the clear best performer. Spleen, pancreas, and
-adrenal glands — small, thin, or highly variable in shape — score exactly
-0 across all 10 subjects. This is the expected failure mode of a model
-whose spatial resolution and training exposure both favor large,
-high-contrast structures.
+**c. Organ size/frequency still correlates strongly with Dice.**
+Liver, right/left kidney, aorta, and spleen (large, high-contrast, dominant
+in abdominal training data) form a clear top tier at 0.16-0.26 mean Dice.
+Gallbladder, pancreas, duodenum, IVC, stomach, and esophagus — small, thin,
+or highly variable in shape — sit lower (0.04-0.07) but are no longer
+uniformly zero. Only the adrenal glands (tiny, low-contrast) remain
+essentially undetected (0.02 and 0.0005). This is the expected gradient for
+a model whose spatial resolution and training exposure both favor large,
+high-contrast structures — it's just a gradient now, not a cliff, once the
+axis-ordering bug (§0) stopped adding noise on top of it.
 
 **d. Small text encoder.** The prompt encoder is
 `nlpie/tiny-clinicalbert`, a distilled/tiny BERT variant chosen for speed,

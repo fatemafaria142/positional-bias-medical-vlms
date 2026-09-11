@@ -12,9 +12,14 @@ Design:
     adjacent pairs), never reused across categories, never re-cycled to
     encode magnitude -- magnitude lives in the bar height + direct label
     only, per the "color follows the entity, not its rank" rule.
-  - A light tinted background band per category group with a bold category
-    header centered above it, thin std-dev error bars, and a subtle
-    hairline separator between groups.
+  - Neurite OASIS (35 structures) is split into one chart PER category
+    (white matter / cortex / subcortical gray / ventricles-CSF /
+    brainstem-vascular) instead of one crowded 35-column chart -- each
+    chart gets to run at a readable text size. AMOS22 MRI (13 organs)
+    stays as a single chart across its 4 categories.
+  - Direct value labels and axis/tick labels in near-black ink for
+    readability; only the muted chart chrome (gridlines, ref-line ticks,
+    error whiskers) stays gray.
   - Complete-failure organs (mean Dice == 0.000 across all subjects) are
     marked with a small status-red "0.000" tag rotated up the axis instead
     of an invisible sliver bar, so the failure reads immediately.
@@ -43,18 +48,17 @@ CAT_COLORS = {
     "violet": "#4a3aa7",
 }
 STATUS_CRITICAL = "#d03b3b"
-INK_PRIMARY = "#0b0b0b"
-INK_SECONDARY = "#3d3c39"
-INK_MUTED = "#898781"
+INK_LABEL = "#000000"     # value labels, axis labels, tick labels -- near-black, readable
+INK_MUTED = "#8a8880"     # chart chrome only: gridlines, ref-line ticks, error whiskers
 GRIDLINE = "#e5e4dd"
-BASELINE = "#c3c2b7"
+BASELINE = "#b9b8b0"
 SURFACE = "#fcfcfb"
 PAGE = "#f6f5f2"
 
 plt.rcParams.update({
     "font.family": "sans-serif",
     "font.sans-serif": ["DejaVu Sans", "Arial", "Helvetica"],
-    "text.color": INK_PRIMARY,
+    "text.color": INK_LABEL,
     "figure.facecolor": PAGE,
     "axes.facecolor": SURFACE,
     "savefig.facecolor": PAGE,
@@ -93,22 +97,9 @@ OASIS_CATEGORIES = [
      ["brain stem", "left vessel", "right vessel"]),
 ]
 
-DATASETS = {
-    "amos22_mri": {
-        "csv": REPO_ROOT / "predictions_voxtell_amos22_mri.csv",
-        "categories": AMOS_CATEGORIES,
-        "title": "VoxTell per-organ Dice — AMOS22 MRI",
-        "out": REPO_ROOT / "voxtell_dice_amos.png",
-        "col_w": 0.62,
-    },
-    "neurite_oasis": {
-        "csv": REPO_ROOT / "predictions_voxtell_neurite_oasis.csv",
-        "categories": OASIS_CATEGORIES,
-        "title": "VoxTell per-structure Dice — Neurite OASIS",
-        "out": REPO_ROOT / "voxtell_dice_oasis.png",
-        "col_w": 0.46,
-    },
-}
+
+def slugify(label: str) -> str:
+    return label.lower().replace(" / ", "_").replace(" ", "_")
 
 
 def organ_label(name: str) -> str:
@@ -134,81 +125,98 @@ def build_cols(df: pd.DataFrame, categories):
     return cols, spans
 
 
-def plot_dataset(name: str, cfg: dict):
-    df = pd.read_csv(cfg["csv"])
+def render_chart(df: pd.DataFrame, categories, title: str, subtitle: str,
+                  out_path: Path, col_w: float, show_category_headers: bool):
     n_subjects = df["subject_id"].nunique()
-    cols, spans = build_cols(df, cfg["categories"])
+    cols, spans = build_cols(df, categories)
     n = len(cols)
 
-    fig_w = max(7.5, cfg["col_w"] * n + 2.2)
-    fig, ax = plt.subplots(figsize=(fig_w, 6.6))
+    fig_w = max(6.5, col_w * n + 2.4)
+    fig, ax = plt.subplots(figsize=(fig_w, 7.0))
 
     x = np.arange(n)
-    bar_w = 0.64
+    bar_w = 0.62
 
-    # category background bands + centered header above each group
     for lbl, color, start, end in spans:
-        ax.axvspan(start - 0.5, end - 0.5, color=color, alpha=0.055, zorder=0)
+        ax.axvspan(start - 0.5, end - 0.5, color=color, alpha=0.06, zorder=0)
         if start > 0:
             ax.axvline(start - 0.5, color="white", linewidth=2.6, zorder=1)
-        mid = (start + end - 1) / 2
-        ax.text(mid, 1.10, lbl, ha="center", va="bottom", fontsize=9.8,
-                 fontweight="bold", color=color, zorder=3, clip_on=False)
+        if show_category_headers:
+            mid = (start + end - 1) / 2
+            ax.text(mid, 1.10, lbl, ha="center", va="bottom", fontsize=13,
+                     fontweight="bold", color=color, zorder=3, clip_on=False)
 
     for xi, col in zip(x, cols):
         m, s, color = col["mean"], col["std"], col["color"]
         is_fail = m == 0.0
 
         if is_fail:
-            ax.text(xi, 0.012, "0.000", rotation=90, va="bottom", ha="center",
-                     fontsize=8.3, color=STATUS_CRITICAL, style="italic", zorder=4)
+            ax.text(xi, 0.015, "0.000", rotation=90, va="bottom", ha="center",
+                     fontsize=10.5, fontweight="bold", color=STATUS_CRITICAL, zorder=4)
             continue
 
         w = bar_w / 2
         ax.add_patch(Rectangle((xi - w, 0), bar_w, m, facecolor=color,
                                 edgecolor="none", zorder=2))
         if s > 0:
-            ax.plot([xi, xi], [max(m - s, 0), m + s], color=INK_MUTED, linewidth=1.3,
-                     alpha=0.75, zorder=3, solid_capstyle="round")
-            ax.plot([xi - 0.07, xi + 0.07], [m + s, m + s], color=INK_MUTED,
-                     linewidth=1.3, alpha=0.75, zorder=3)
-        ax.text(xi, m + s + 0.018, f"{m:.3f}", rotation=90, va="bottom", ha="center",
-                 fontsize=8.3, color=INK_SECONDARY, zorder=4)
+            ax.plot([xi, xi], [max(m - s, 0), m + s], color=INK_MUTED, linewidth=1.4,
+                     alpha=0.8, zorder=3, solid_capstyle="round")
+            ax.plot([xi - 0.08, xi + 0.08], [m + s, m + s], color=INK_MUTED,
+                     linewidth=1.4, alpha=0.8, zorder=3)
+        ax.text(xi, m + s + 0.02, f"{m:.3f}", rotation=90, va="bottom", ha="center",
+                 fontsize=10.5, fontweight="bold", color=INK_LABEL, zorder=4)
 
     labels = [organ_label(c["organ"]) for c in cols]
     ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=9, rotation=60, ha="right", rotation_mode="anchor")
-    ax.set_ylim(0, 1.18)
+    ax.set_xticklabels(labels, fontsize=11.5, rotation=55, ha="right",
+                        rotation_mode="anchor", color=INK_LABEL)
+    ax.set_ylim(0, 1.20)
     ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.set_xlim(-0.7, n - 0.3)
 
     for ref in (0.5, 0.7):
-        ax.axhline(ref, color=BASELINE, linewidth=1.0, linestyle=(0, (3, 3)), zorder=1)
-        ax.text(n - 0.35, ref, f"{ref:.1f}", ha="left", va="center", fontsize=8,
+        ax.axhline(ref, color=BASELINE, linewidth=1.1, linestyle=(0, (3, 3)), zorder=1)
+        ax.text(n - 0.35, ref, f"{ref:.1f}", ha="left", va="center", fontsize=10,
                  color=INK_MUTED, clip_on=False)
 
-    ax.set_ylabel(f"Mean Dice ± std across {n_subjects} subjects", fontsize=10,
-                   color=INK_SECONDARY)
+    ax.set_ylabel(f"Mean Dice ± std across {n_subjects} subjects", fontsize=12.5,
+                   color=INK_LABEL)
     for spine in ("top", "right", "bottom"):
         ax.spines[spine].set_visible(False)
     ax.spines["left"].set_color(BASELINE)
     ax.tick_params(axis="x", length=0)
-    ax.tick_params(axis="y", length=3, color=BASELINE, labelsize=9, colors=INK_MUTED)
+    ax.tick_params(axis="y", length=3, color=BASELINE, labelsize=11, colors=INK_LABEL)
     ax.yaxis.grid(True, color=GRIDLINE, linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
 
     fig.tight_layout(rect=[0, 0, 1, 0.86])
-    fig.text(0.02, 0.975, cfg["title"], fontsize=15, fontweight="bold", ha="left", va="top")
-    fig.text(0.02, 0.925, "Grouped by anatomical category · sorted by mean Dice within each group",
-              fontsize=9.5, color=INK_MUTED, ha="left", va="top")
-    fig.savefig(cfg["out"], dpi=200, bbox_inches="tight", pad_inches=0.3)
+    fig.text(0.02, 0.975, title, fontsize=18, fontweight="bold", ha="left", va="top",
+              color=INK_LABEL)
+    fig.text(0.02, 0.925, subtitle, fontsize=12, color=INK_MUTED, ha="left", va="top")
+    fig.savefig(out_path, dpi=200, bbox_inches="tight", pad_inches=0.3)
     plt.close(fig)
-    print(f"[ok] wrote {cfg['out']}")
+    print(f"[ok] wrote {out_path}")
 
 
 def main():
-    for name, cfg in DATASETS.items():
-        plot_dataset(name, cfg)
+    amos_df = pd.read_csv(REPO_ROOT / "predictions_voxtell_amos22_mri.csv")
+    render_chart(
+        amos_df, AMOS_CATEGORIES,
+        title="VoxTell per-organ Dice — AMOS22 MRI",
+        subtitle="Grouped by anatomical category · sorted by mean Dice within each group",
+        out_path=REPO_ROOT / "voxtell_dice_amos.png",
+        col_w=0.75, show_category_headers=True,
+    )
+
+    oasis_df = pd.read_csv(REPO_ROOT / "predictions_voxtell_neurite_oasis.csv")
+    for cat_label, color, organs in OASIS_CATEGORIES:
+        render_chart(
+            oasis_df, [(cat_label, color, organs)],
+            title=f"VoxTell per-structure Dice — Neurite OASIS",
+            subtitle=f"{cat_label} · sorted by mean Dice",
+            out_path=REPO_ROOT / f"voxtell_dice_oasis_{slugify(cat_label)}.png",
+            col_w=0.85, show_category_headers=False,
+        )
 
 
 if __name__ == "__main__":

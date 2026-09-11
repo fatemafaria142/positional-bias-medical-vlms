@@ -1,4 +1,4 @@
-# Related Work Comparison Table — CVPR / ECCV Only
+# Text-Guided Medical Segmentation & Positional Reasoning: A CVPR/ECCV Related Work Comparison
 
 Filtered to papers with a **confirmed CVPR or ECCV venue** that match this repo's research (text/VLM-driven medical segmentation and/or positional reasoning). Everything else found during the broader search — Text3DSAM (OpenReview, venue unconfirmed), Medical SAM3 (arXiv, venue unconfirmed), ESICA (arXiv, venue unconfirmed), "Your other Left!" (MICCAI 2025), and Localization Lens (MICCAI 2025) — is excluded here because none of them have a confirmed CVPR/ECCV venue, even though two of them (Text3DSAM, Medical SAM3) are the models this repo actually runs, and "Your other Left!" is the closest match to this repo's exact research question found anywhere. They remain fully documented in `RELATED_WORK_DEEP_DIVE.md` and the older `RELATED_WORK_COMPARISON_TABLE.md`-equivalent content if you need them again.
 

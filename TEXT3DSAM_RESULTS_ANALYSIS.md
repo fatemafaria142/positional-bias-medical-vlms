@@ -68,6 +68,35 @@ explain most of what we see:
   **MRI** arm (which `samples/amos22_mri/` uses) is a different,
   much less-represented modality for the same anatomy.
 
+### 1a. Where the model comes from (code vs. weights)
+
+The `Text3DSAM/` directory is **not** committed to this repo (`.gitignore:6`) —
+it is set up separately on each machine, and the prediction pipeline pulls
+from two different sources:
+
+- **Model code → GitHub.** The scripts add the Text3DSAM checkout to
+  `sys.path` and import the architecture from its source tree:
+  ```python
+  sys.path.insert(0, str(TEXT3DSAM_ROOT))          # repo_root/Text3DSAM
+  from src.model.modeling import Med3DSeg
+  ```
+  `src/model/modeling.py`, `pred.py`, etc. are the cloned Text3DSAM
+  repository, not a `pip`/`transformers` package.
+- **Weights + tokenizer → Hugging Face (`MagicXin/Text3DSAM`).** Loaded from
+  a local folder populated by downloading that HF repo:
+  ```python
+  MODEL_PATH = TEXT3DSAM_ROOT / "checkpoints" / "Text3DSAM"
+  model = Med3DSeg.from_pretrained(str(MODEL_PATH))            # HF checkpoint weights
+  tokenizer = BertTokenizer.from_pretrained(str(MODEL_PATH))  # HF tokenizer files
+  ```
+  See `scripts/run_text3dsam_amos22_mri.py:2,17`.
+
+So prediction runs the **Hugging Face `MagicXin/Text3DSAM` weights** through
+the **GitHub model code**, zero-shot — no fine-tuning is done in this repo.
+All Text3DSAM scripts (`run_text3dsam_dataset.py`,
+`run_text3dsam_amos22_mri.py`, `visualize_text3dsam_predictions.py`,
+`visualize_text3dsam_grid.py`) load the checkpoint this same way.
+
 ## 2. Why AMOS22 MRI is weak but not zero (mean Dice 0.1025, liver 0.26)
 
 **a. Modality gap: trained mostly on CT, evaluated on MRI.**

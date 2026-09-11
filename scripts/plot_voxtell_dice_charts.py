@@ -150,7 +150,7 @@ def plot_dataset(name: str, cfg: dict):
         if start > 0:
             ax.axvline(start - 0.5, color=BASELINE, linewidth=1.0, zorder=1)
         mid = (start + end - 1) / 2
-        ax.text(mid, 1.16, lbl, ha="center", va="bottom", fontsize=13,
+        ax.text(mid, 1.26, lbl, ha="center", va="bottom", fontsize=13,
                  fontweight="bold", color=color, zorder=3, clip_on=False)
 
     for xi, col in zip(x, cols):
@@ -177,7 +177,7 @@ def plot_dataset(name: str, cfg: dict):
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=11.5, rotation=60, ha="right",
                         rotation_mode="anchor", color=INK_LABEL)
-    ax.set_ylim(0, 1.28)
+    ax.set_ylim(0, 1.40)
     ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.set_xlim(-0.7, n - 0.3)
 

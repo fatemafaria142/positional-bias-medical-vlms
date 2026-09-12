@@ -130,6 +130,14 @@ also share the results zip, the raw `.npz` masks, or clone the repo.
         "'--branch', 'faria/voxtell3d-medical-segmentation'",
         f"'--branch', '{BRANCH}'",
     )
+    # This branch has no top-level samples/ dir (data lives under
+    # <person>/samples/<dataset>/) -- the template's post-clone sanity check
+    # listed samples/, which no longer exists here.
+    clone_src = clone_src.replace(
+        "print('samples:', os.listdir(RESEARCH_REPO / 'samples'))",
+        "print('repo root:', os.listdir(RESEARCH_REPO))\n"
+        "print('annotator folders present:', [p for p in ('faria', 'nipu', 'hridoy') if (RESEARCH_REPO / p).is_dir()])",
+    )
     set_source(clone_cell, clone_src)
 
     # Cell 16: dataset config markdown

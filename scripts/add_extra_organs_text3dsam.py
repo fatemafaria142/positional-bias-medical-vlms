@@ -82,7 +82,17 @@ def main():
                     gt0 = mask_ground_truth_3d(base_label_arr == side_label_id, axcodes)
                     if gt0 is None:
                         continue
-                    fixed_sides[side_label_id] = gt0[2]  # (side0, side1, side2), fixed across angles
+                    side0, side1, _side2_geometric = gt0[2]
+                    # axis2 is this data's true L/R axis for every subject checked, but
+                    # mask_ground_truth_3d's "centroid vs array-center" heuristic is
+                    # unreliable on tightly-cropped ROI volumes (common here) whenever
+                    # the crop isn't centered on the true body midline -- e.g. it
+                    # mislabeled MR_totalseg_mr_s0171's right iliac artery as "L".
+                    # The organ id itself already tells us the true side with
+                    # certainty (that's how CVPR-BiomedSegFM's class scheme works),
+                    # so axis2 is taken directly from side_name instead of computed.
+                    side2 = "L" if side_name == "left" else "R"
+                    fixed_sides[side_label_id] = (side0, side1, side2)  # fixed across angles
 
                 for angle in ANGLES_DEG:
                     lbl_path = rot_dir / f"{subject_id}_rot{angle:03d}_label.nii.gz"

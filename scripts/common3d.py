@@ -52,6 +52,18 @@ def mask_ground_truth_3d(mask: np.ndarray, axcodes: tuple):
     bbox = (xmin, ymin, zmin, xmax, ymax, zmax) in voxel indices,
     and side_i is the true anatomical half ('R'/'L', 'A'/'P', or 'S'/'I')
     the mask's centroid falls in along array axis i.
+
+    CAVEAT: "which half" is decided by comparing the centroid to the
+    array's geometric center (shape[axis] / 2), which silently assumes
+    the volume is cropped symmetrically around the true body midline.
+    On a whole-body-ish volume that's fine, but on a tightly-cropped ROI
+    (common in CVPR-BiomedSegFM's per-organ sub-datasets) an off-center
+    crop can flip this for a specific organ/subject even when the axis
+    is genuinely the right one -- e.g. this mislabeled one subject's
+    "right iliac artery" as 'L' in samples/text3dsam. Whenever the caller
+    already knows an axis's true side some other way (e.g. the dataset's
+    class scheme already splits an organ into separate left/right label
+    ids), prefer that over this function's geometric guess for that axis.
     """
     coords = np.nonzero(mask)
     if len(coords[0]) == 0:

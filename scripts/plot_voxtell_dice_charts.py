@@ -107,6 +107,20 @@ DATASETS = {
         "out": REPO_ROOT / "voxtell_dice_oasis.png",
         "col_w": 0.46,
     },
+    "amos22_mri_mirrored": {
+        "csv": REPO_ROOT / "predictions_voxtell_amos22_mri_mirrored.csv",
+        "categories": AMOS_CATEGORIES,
+        "title": "VoxTell per-organ Dice — AMOS22 MRI (Mirror-Flipped)",
+        "out": REPO_ROOT / "voxtell_dice_amos_mirrored.png",
+        "col_w": 0.62,
+    },
+    "neurite_oasis_mirrored": {
+        "csv": REPO_ROOT / "predictions_voxtell_neurite_oasis_mirrored.csv",
+        "categories": OASIS_CATEGORIES,
+        "title": "VoxTell per-structure Dice — Neurite OASIS (Mirror-Flipped)",
+        "out": REPO_ROOT / "voxtell_dice_oasis_mirrored.png",
+        "col_w": 0.46,
+    },
 }
 
 

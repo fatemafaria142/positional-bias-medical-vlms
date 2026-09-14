@@ -1,4 +1,4 @@
-# Positional-Bias Model Roster: Localization + Segmentation (2D & 3D)
+# Positional-Bias Benchmark Plan: Localization + Segmentation (2D & 3D)
 ---
 
 ## 1. Segmentation models (3D): text-prompted, active in this repo
@@ -14,6 +14,9 @@
 "Ready now" means the metric can be computed today, either the full rotation sweep already ran,
 or the metric only needs existing result files with no new inference. "Pending" means the
 rotation sweep for that model hasn't run yet, so that metric can't be computed until it does.
+
+**Table 1.** Positional-bias analyses for the 3D segmentation models, and their readiness status
+per model.
 
 | No. | Analysis | What it is | VoxTell | Medical-SAM3 | Text3DSAM |
 |---|---|---|---|---|---|
@@ -32,6 +35,9 @@ rotation sweep for that model hasn't run yet, so that metric can't be computed u
 Why does VoxTell degrade at certain rotation angles, and does it show a real positional bias
 rather than a resampling artifact? Five steps, in order, each building on the last.
 
+**Table 2.** Five-step diagnostic plan for identifying why VoxTell shows rotation-related
+positional bias.
+
 | No. | Step | Question it answers | What to do | Status |
 |---|---|---|---|---|
 | 1 | **Rule out the resampling confound** | Is the Dice drop caused by rotation resampling/field-of-view loss, not by the model itself? | For each rotated volume, compute the fraction of ground-truth mask voxels that fall outside the resampled volume's valid region. Regress Dice-drop against this fraction. A strong correlation means part of the "bias" is a preprocessing artifact, not a model failure. | Ready now, from existing sweep data |
@@ -41,6 +47,8 @@ rather than a resampling artifact? Five steps, in order, each building on the la
 | 5 | **Confirm the cause in the model itself** | Which of the above hypotheses is actually true, not just consistent with the data? | Read VoxTell's backbone architecture (standard CNN/U-Net vs. any rotation-equivariant components), its training augmentation config (rotation range and probability actually used), and whether its fusion/decoder uses absolute positional embeddings. | Pending, needs source/config review, not new inference |
 
 ### Aggregate views
+
+**Table 3.** Aggregate visualizations already produced, or pending, per 3D model.
 
 | No. | Aggregate view | VoxTell | Medical-SAM3 | Text3DSAM |
 |---|---|---|---|---|
@@ -53,6 +61,8 @@ name prompts. "Left X" / "right X" is itself a relational expression, relative t
 so this is a relational-grounding test scoped to bilateral structures only: for each bilateral
 organ pair, does the model correctly ground "left X" vs. "right X" to the correct side. Ground
 truth side comes from the anatomical mask, not the prompt.
+
+**Table 4.** Bilateral left/right structures and subjects to check, per 3D model and dataset.
 
 | No. | Model | Dataset | Bilateral structures to check | Subjects to check |
 |---|---|---|---|---|
@@ -88,6 +98,8 @@ One example per row, so the experiment is concrete rather than abstract.
 Reuses the metrics already defined earlier in Section 1, applied specifically to this
 left/right-only prompt pair, per structure, per subject.
 
+**Table 5.** Metrics for scoring the 3D bilateral left/right grounding experiment.
+
 | No. | Metric | How it's used for this experiment |
 |---|---|---|
 | 1 | **Wrong-Side Rate** | For each (subject, structure) pair, send both the "left X" and "right X" prompts, take the predicted mask's centroid side, and compare to the prompted side. Count how often the predicted side is the *opposite* of what was asked for. This is the core pass/fail signal for relational grounding. |
@@ -112,6 +124,9 @@ Molmo2-8B, North-Micro-Vision-Instruct) ran on all 3 datasets:
 ISIC) for these 8 models. "Ready now" means computable today from the existing result CSVs, no
 new inference needed.
 
+**Table 6.** Positional-bias metrics for the 2D localization models, and which are already
+computed vs. ready to compute.
+
 | No. | Metric | Definition | Models | Status |
 |---|---|---|---|---|
 | 1 | Detect Rate | Share of P0–P4 calls that returned any usable prediction | All 8 (Grounding DINO, OWLv2, Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, Molmo2-8B, North-Micro-Vision-Instruct) | Already computed |
@@ -129,6 +144,9 @@ new inference needed.
 Not all 8 localization models can generate free text, so not all of them can be used for a
 spatial-VQA or answer-position-bias experiment. Split by actual capability, not by architecture
 family alone.
+
+**Table 7.** Which of the 8 localization models can be used for VQA and Multiple-Choice
+experiments.
 
 | No. | Model | Usable for VQA | Usable for Multiple-Choice (answer-position bias) | Why |
 |---|---|---|---|---|
@@ -162,7 +180,9 @@ Reusing these datasets, rather than CHAOS/ACDC, means the same bilateral structu
 two task levels, 3D segmentation grounding (Section 1) and 2D VQA/MCQ (here), on the exact same
 underlying data.
 
-#### Table 1: VQA
+#### VQA prompts
+
+**Table 8.** Example VQA prompts for the bilateral left/right experiment, by dataset.
 
 | No. | Dataset | Bilateral structure | Example VQA prompt | Models |
 |---|---|---|---|---|
@@ -170,11 +190,14 @@ underlying data.
 | 2 | CT_TotalSeg_cardiac (2D slice) | Left common carotid artery, right common carotid artery | "Is the artery marked in this image the left common carotid artery or the right common carotid artery?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 | 3 | MR_TotalSeg (2D slice) | Left kidney, right kidney | "Is the kidney marked in this image the left kidney or the right kidney?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 
-#### Table 2: Multiple-Choice (answer-position bias)
+#### Multiple-Choice prompts (answer-position bias)
 
 Same question, phrased as MCQ. Run each pair twice per image, once with the correct answer as
 option A and once as option B, to separate genuine bilateral-grounding accuracy from a simple
 preference for one letter position.
+
+**Table 9.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
+dataset.
 
 | No. | Dataset | Bilateral structure | Example MCQ prompt | Models |
 |---|---|---|---|---|
@@ -186,6 +209,8 @@ preference for one letter position.
 
 Reuses the same metrics style as the Section 1 bilateral-grounding experiment, adapted to a
 text answer instead of a mask.
+
+**Table 10.** Metrics for scoring the 2D VQA and Multiple-Choice bilateral experiments.
 
 | No. | Metric | Applies to | How it's used |
 |---|---|---|---|
@@ -202,6 +227,9 @@ text answer instead of a mask.
 Instead of extracting 2D slices from the 3D volumes above, these established medical VQA
 benchmarks already contain real, human-written laterality/position questions, no new
 preprocessing or synthetic question-writing needed. Found via HuggingFace and web search.
+
+**Table 11.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
+HuggingFace and web search.
 
 | No. | Dataset | Images | QA pairs | Modality / body region | Laterality coverage | Answer format | Access |
 |---|---|---|---|---|---|---|---|

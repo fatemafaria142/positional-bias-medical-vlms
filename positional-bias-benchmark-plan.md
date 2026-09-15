@@ -1,4 +1,4 @@
-# Spatial Reasoning & Positional-Bias Benchmark Plan
+# Multiple Approaches for Identifying and Characterizing Positional Bias in Medical Vision-Language Models
 ---
 
 ## 1. Segmentation
@@ -25,7 +25,7 @@ it.
 
 | No. | Dataset | Modality | Description | Left/right coverage | Upper/lower coverage | Link |
 |---|---|---|---|---|---|---|
-| 1 | Chest X-ray, via Chest ImaGenome | Radiography — largest single modality in Medical-SAM3's training corpus | A scene-graph annotation layer on MIMIC-CXR, defining 29 anatomical structures per image | Left lung, right lung | Each lung subdivided into upper, mid, and lower lung zones, plus lung base and apical zone | [PhysioNet: chest-imagenome](https://physionet.org/content/chest-imagenome/1.0.0/) |
+| 1 | Chest X-ray, via Chest ImaGenome | Radiography, largest single modality in Medical-SAM3's training corpus | A scene-graph annotation layer on MIMIC-CXR, defining 29 anatomical structures per image | Left lung, right lung | Each lung subdivided into upper, mid, and lower lung zones, plus lung base and apical zone | [PhysioNet: chest-imagenome](https://physionet.org/content/chest-imagenome/1.0.0/) |
 | 2 | Kidney ultrasound, via TRUSTED | Ultrasound (paired with CT) | Tridimensional Renal UltraSound TomodEnsitometrie Dataset: paired 3D transabdominal ultrasound and CT from 48 patients (96 kidneys), with 7 radiographer-annotated anatomical landmarks per kidney | Left kidney, right kidney | Upper pole, lower pole of each kidney | [Scientific Data paper](https://www.nature.com/articles/s41597-025-04467-1) · [arXiv:2310.12646](https://arxiv.org/abs/2310.12646) · [Figshare dataset](https://springernature.figshare.com/articles/dataset/TRUSTED_The_Paired_3D_Ultrasound_and_CT_Human_Data_for_Kidney_Segmentation_and_Registration_Research/27981050) |
 
 **Table 2.** Positional-bias analyses for the 3D segmentation models, and their readiness status
@@ -45,11 +45,14 @@ per model.
 
 ### VoxTell root-cause investigation
 
-Why does VoxTell degrade at certain rotation angles, and does it show a real positional bias
-rather than a resampling artifact? Five steps, in order, each building on the last.
+Scoped to VoxTell only (Medical-SAM3 and Text3DSAM root-cause work, and report generation, are
+out of scope for now). Why does VoxTell degrade at certain rotation angles and get left/right
+wrong, and does it show a real positional bias rather than a resampling artifact or a decorative
+modifier it never actually uses? Eight steps, in order, each building on the last: steps 1-6 test
+the rotation-angle behavior, steps 7-8 test whether the model uses positional language at all and,
+if not, where in the pipeline (text-image alignment vs. decoder/fusion) that signal is lost.
 
-**Table 3.** Five-step diagnostic plan for identifying why VoxTell shows rotation-related
-positional bias.
+**Table 3.** Eight-step diagnostic plan for identifying why VoxTell shows positional bias.
 
 | No. | Step | Question it answers | What to do | Status |
 |---|---|---|---|---|
@@ -57,7 +60,13 @@ positional bias.
 | 2 | **Test for a learned positional shortcut** | Does the model's error pull toward where the organ would sit at 0° (a canonical-pose prior), or does it track the rotated anatomy correctly? | Centroid-displacement-direction analysis: plot predicted centroid vs. ground-truth centroid across angles, check if the direction of drift is consistent (toward canonical pose) or random. | Ready now, from existing sweep data |
 | 3 | **Test whether the bias is size or organ dependent** | Does bias hit small/peripheral organs harder than large/central ones (a shortcut explanation), or is it uniform (an architecture explanation)? | Stratify the Dice-vs-angle curves by organ size and compare degradation slopes. | Ready now, from existing sweep data |
 | 4 | **Check for a threshold vs. smooth decay** | Does Dice degrade gradually (partial rotation-augmentation coverage during training), or fall off a cliff at one angle (a hard augmentation-range boundary)? | Re-run the sweep at finer angle steps (e.g., 10-15°) for at least a few organs, and look for a knee in the curve. | Pending, needs a new finer-grained sweep |
-| 5 | **Confirm the cause in the model itself** | Which of the above hypotheses is actually true, not just consistent with the data? | Read VoxTell's backbone architecture (standard CNN/U-Net vs. any rotation-equivariant components), its training augmentation config (rotation range and probability actually used), and whether its fusion/decoder uses absolute positional embeddings. | Pending, needs source/config review, not new inference |
+| 5 | **Confirm the cause in the architecture** | Does VoxTell's backbone or fusion/decoder have any component that would explain rotation or laterality sensitivity? | Check the backbone type (standard CNN vs. rotation-equivariant) and whether the fusion/decoder uses absolute positional embeddings. | **Done.** Backbone: plain ResEncL CNN, no rotation-equivariant components, so rotation robustness comes only from augmentation, not architecture. Decoder: no positional embeddings anywhere; position is only implicit in the CNN feature map. |
+| 6 | **Confirm the cause in the training data pipeline** | Does VoxTell's training augmentation config explain the rotation-angle threshold and the left/right errors specifically? | Check the rotation-augmentation range and whether left-right mirroring is included. | **Done.** Rotation augmentation covers roughly 30 degrees per axis, but left-right mirroring was deliberately excluded to protect laterality. Since rotation stayed on, a large rotation near 180 degrees can visually mimic a mirror flip the model was never trained to tell apart, a likely cause of wrong-side errors at large angles. |
+| 7 | **Test whether the model uses position at all, or just the organ name** | Does VoxTell actually ground "left kidney" using positional language, or does it segment "kidney" from the name alone and ignore "left"/"right" (i.e., position is decorative, not used)? | Prompt with position-only phrasing that drops the organ name (e.g., "the structure on the left side of the abdomen" instead of "left kidney"), on subjects where that's unambiguous. If output collapses (empty mask, or defaults to a fixed organ regardless of region), that shows the model isn't actually parsing spatial language, it's pattern-matching organ names and treating left/right as a near-ignored modifier. | Pending, needs new inference with name-free prompts |
+| 8 | **Test whether the failure is in text-image alignment, not the decoder** | When the model gets left/right wrong, is it because the text encoder fails to distinguish "left X" from "right X" as different embeddings (an alignment failure), or because both prompts produce distinct embeddings but the image decoder ignores that signal (a decoder/fusion failure)? | Compare the text-embedding distance between "left X" and "right X" prompts (cosine distance in the text encoder's output space) against the mask-output difference (Dice or centroid distance between the two predicted masks) for the same subject. If the text embeddings are nearly identical, the alignment step itself doesn't distinguish laterality, pointing upstream (contrastive/text-image alignment) rather than downstream (decoder). If the text embeddings are clearly distinct but the masks come out nearly identical anyway, the fusion/decoder is dropping the positional signal despite having it available. | Pending, needs access to VoxTell's text encoder output and a small embedding-comparison script |
+
+Source for steps 5-6: VoxTell CVPR 2026 paper, Appendix A, Implementation Details (arXiv:2511.11450v1,
+Sections A.1 Training Configuration and A.2 Model Architecture).
 
 ### Aggregate views
 
@@ -69,69 +78,43 @@ positional bias.
 
 ### Visual grounding with relational language (bilateral left/right only)
 
-None of the three models were trained on relational referring expressions, only anatomy/organ
-name prompts. "Left X" / "right X" is itself a relational expression, relative to body midline,
-so this is a relational-grounding test scoped to bilateral structures only: for each bilateral
-organ pair, does the model correctly ground "left X" vs. "right X" to the correct side. Ground
-truth side comes from the anatomical mask, not the prompt. The two Medical-SAM3 in-domain rows
-(Table 5) extend this to "upper X" / "lower X" as well, using the same logic against each
-dataset's upper/lower zone or pole annotations.
+**What this test is.** None of the three models were trained on phrases like "the organ to the
+left of X," only on plain anatomy names like "kidney." But "left kidney" / "right kidney" is
+itself a relational phrase (left/right only makes sense relative to the body's own midline), so
+this test checks something the models were never directly trained to do: can they tell "left X"
+apart from "right X" and put the mask on the correct side.
 
-**Table 5.** Bilateral (left/right) and, where the dataset supports it, upper/lower structures to
-check, per 3D model and dataset.
+**How one test works, step by step (using VoxTell on AMOS22-MRI, kidney):**
+1. Take one subject's MRI volume.
+2. Prompt the model with `"left kidney"`. It returns a predicted mask.
+3. Look at where that mask actually sits, left or right of the body's midline, and compare it to
+   the *true* left kidney's location (from the ground-truth annotation, not from the prompt).
+4. Repeat step 2-3 with `"right kidney"` on the exact same volume.
+5. A correct model puts the "left kidney" mask on the true left kidney, and the "right kidney"
+   mask on the true right kidney. A biased model gets one or both sides wrong, for example always
+   segmenting the anatomically-right kidney no matter which word it was given.
 
-| No. | Model | Dataset | Structures to check | Subjects to check |
-|---|---|---|---|---|
-| 1 | VoxTell | AMOS22-MRI | Kidney, adrenal gland | All AMOS22-MRI subjects with both left and right instances annotated |
-| 2 | VoxTell | Neurite-OASIS | Hippocampus, and any other paired brain structure in the manifest | All Neurite-OASIS subjects with both left and right instances annotated |
-| 3 | Text3DSAM | CT_HaN-Seg | Carotid artery, cochlea, anterior eyeball segment, posterior eyeball segment, lacrimal gland, submandibular gland, optic nerve, parotid gland | All CT_HaN-Seg subjects with both left and right instances annotated |
-| 4 | Text3DSAM | CT_TotalSeg_cardiac | Subclavian artery, common carotid artery, brachiocephalic vein, iliac artery, iliac vena | All CT_TotalSeg_cardiac subjects with both left and right instances annotated |
-| 5 | Text3DSAM | MR_TotalSeg | Kidney, adrenal gland, iliac artery, iliac vena, humerus, femur, hip, gluteus maximus, gluteus medius, gluteus minimus, autochthon, iliopsoas | All MR_TotalSeg subjects with both left and right instances annotated |
-| 6 | Medical-SAM3 (out-of-domain) | AMOS22-MRI, Neurite-OASIS | Same structures as the VoxTell rows above (kidney, adrenal gland, hippocampus), for direct comparison on the exact same out-of-domain data | All AMOS22-MRI / Neurite-OASIS subjects with both left and right instances annotated |
-| 7 | Medical-SAM3 (in-domain) | Chest X-ray, via Chest ImaGenome (MIMIC-CXR) | Left lung, right lung (bilateral); left/right upper, mid, and lower lung zones (upper/lower) | All subjects with left/right lung and lung-zone annotations in Chest ImaGenome |
-| 8 | Medical-SAM3 (in-domain) | Kidney ultrasound, via TRUSTED | Left kidney, right kidney (bilateral); upper pole, lower pole of each kidney (upper/lower) | All 48 TRUSTED subjects (96 kidneys), using the 7 annotated anatomical landmarks per kidney |
+Table 5 below repeats this exact same 5-step recipe once for each dataset, just swapping in the
+model, structure, and prompt wording. For the two Medical-SAM3 in-domain datasets, the identical
+recipe is also run with "upper X" / "lower X" instead of "left X" / "right X" (lung zones for
+Chest ImaGenome, kidney pole for TRUSTED); that variant isn't a separate table row, it's the same
+row's structure with the direction words swapped.
 
-### Worked examples
+**Table 5.** One worked example per dataset, following the 5-step recipe above.
 
-One example per row, so the experiment is concrete rather than abstract.
+| No. | Model | Dataset | Structure we prompt | First we ask | Then we ask | What makes this one worth checking |
+|---|---|---|---|---|---|---|
+| 1 | VoxTell | AMOS22-MRI | Kidney | `"left kidney"` | `"right kidney"` | The main baseline case for VoxTell |
+| 2 | VoxTell | Neurite-OASIS | Hippocampus | `"left hippocampus"` | `"right hippocampus"` | Same check, but on brain MRI instead of abdominal MRI |
+| 3 | Text3DSAM | CT_HaN-Seg | Parotid gland | `"left parotid gland"` | `"right parotid gland"` | This dataset is in-domain for Text3DSAM, so a wrong answer here can't be blamed on an unfamiliar dataset |
+| 4 | Text3DSAM | CT_TotalSeg_cardiac | Common carotid artery | `"left common carotid artery"` | `"right common carotid artery"` | Same in-domain check as row 3, on a blood vessel instead of a gland |
+| 5 | Text3DSAM | MR_TotalSeg | Gluteus maximus | `"left gluteus maximus"` | `"right gluteus maximus"` | A large, easy-to-see structure, a sanity check before trusting results on tiny structures |
+| 6 | Medical-SAM3 | Chest X-ray, via Chest ImaGenome | Lung | `"left lung"` | `"right lung"` | Chest X-ray is Medical-SAM3's largest training modality, so this is its in-domain case |
+| 7 | Medical-SAM3 | Kidney ultrasound, via TRUSTED | Kidney | `"left kidney"` | `"right kidney"` | A second, different in-domain modality (ultrasound) for the same model |
 
-- **VoxTell, AMOS22-MRI, kidney**: send the prompt `"left kidney"` on a subject's volume. The
-  model returns a mask. Check whether that mask's centroid actually sits on the left side of the
-  body (voxel x-axis vs. volume midline), using the ground-truth kidney mask's own side label as
-  the answer key. Then repeat with `"right kidney"` on the same subject and volume, expecting the
-  mask to land on the opposite side.
-- **VoxTell, Neurite-OASIS, hippocampus**: same idea, prompts `"left hippocampus"` and
-  `"right hippocampus"` on the same brain MRI volume, checked against the manifest's
-  `gt_side_axis2` label already recorded for that structure.
-- **Text3DSAM, CT_HaN-Seg, parotid gland**: prompts `"left parotid gland"` and
-  `"right parotid gland"` on the same head-and-neck CT volume. This dataset is in-domain for
-  Text3DSAM, so a wrong-side answer here is a stronger finding than the same error on an
-  out-of-domain dataset, it can't be blamed on domain shift.
-- **Text3DSAM, MR_TotalSeg, gluteus maximus**: prompts `"left gluteus maximus"` and
-  `"right gluteus maximus"`, a structure with a large, unambiguous left/right size, useful as an
-  easy-case sanity check before trusting results on smaller structures like the adrenal gland.
-- **Medical-SAM3, AMOS22-MRI, kidney**: same prompts and check as the VoxTell example above, run
-  on the same subjects. Since Medical-SAM3 has never seen CT/MRI at all in training, a wrong-side
-  result here is expected to be worse than VoxTell's, and tells you how the model behaves on a
-  modality it has no exposure to.
-- **Medical-SAM3, Chest X-ray (Chest ImaGenome), lung**: prompts `"left lung"` and `"right lung"`
-  on the same CXR image. This is in-domain for Medical-SAM3 (radiography is its largest training
-  modality), so compare this result against the AMOS22-MRI/Neurite-OASIS result above: a much
-  lower wrong-side rate here than out-of-domain would confirm the earlier failures are a
-  modality-gap effect, not a general inability to ground laterality language.
-- **Medical-SAM3, Chest X-ray (Chest ImaGenome), lung zones**: same idea but for upper/lower
-  instead of left/right, prompts `"right upper lung zone"` and `"right lower lung zone"` on the
-  same CXR image, checked against Chest ImaGenome's own zone bounding boxes. Tests whether the
-  model's absolute/relative position grounding generalizes beyond left/right to a different
-  relation on the same in-domain modality.
-- **Medical-SAM3, kidney ultrasound (TRUSTED), kidney**: prompts `"left kidney"` and
-  `"right kidney"` on the same ultrasound scan, checked against TRUSTED's own left/right kidney
-  segmentation. A second in-domain, different-modality data point alongside the Chest X-ray
-  result, to see whether an in-domain finding generalizes across modalities or is specific to one.
-- **Medical-SAM3, kidney ultrasound (TRUSTED), kidney pole**: prompts `"upper pole of the kidney"`
-  and `"lower pole of the kidney"` on the same scan, checked against TRUSTED's annotated pole
-  landmarks. Tests upper/lower grounding in a modality (ultrasound) distinct from Chest X-ray's
-  radiography.
+For every row, the model's answer is checked the same way: does the predicted mask's location
+actually match the true left/right side of that structure, as recorded in that dataset's own
+ground-truth annotations, not just whatever side the prompt happened to name.
 
 ### How to analyze it, metrics
 
@@ -162,23 +145,27 @@ Molmo2-8B, North-Micro-Vision-Instruct) ran on all 3 datasets:
 - **Kvasir** (colon)
 - **ISIC** (skin)
 
+**Florence-2** is added as a 9th localization model, not yet run. It needs the same three-dataset
+sweep as the existing 8 before any row in Table 7 can be filled in for it.
+
 **Metrics for the benchmark**, from the results already scored across 3 datasets (LGG, Kvasir,
-ISIC) for these 8 models. "Ready now" means computable today from the existing result CSVs, no
-new inference needed.
+ISIC) for the existing 8 models. "Ready now" means computable today from the existing result
+CSVs, no new inference needed. All rows below are pending for Florence-2 specifically, since it
+has not been run yet; once it has, it slots into the "Models" column alongside the other 8.
 
 **Table 7.** Positional-bias metrics for the 2D localization models, and which are already
 computed vs. ready to compute.
 
 | No. | Metric | Definition | Models | Status |
 |---|---|---|---|---|
-| 1 | Detect Rate | Share of P0–P4 calls that returned any usable prediction | All 8 (Grounding DINO, OWLv2, Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, Molmo2-8B, North-Micro-Vision-Instruct) | Already computed |
-| 2 | Wrong-Side Rate (per direction) | Share of prompted answers landing on the side opposite the one named in the prompt, broken down left/right/upper/lower | All 8 | Already computed (pooled); per-direction ready now |
-| 3 | No-Shift Rate | Share of P1–P4 answers that stayed near the model's own P0 answer; didn't move | All 8 | Already computed |
-| 4 | Mean Normalized Distance | Distance from predicted point to ground-truth centroid, normalized by image diagonal | All 8 | Already computed |
-| 5 | Mean IoU | Overlap between predicted box and ground-truth box | 7 of 8, all except Molmo2-8B (point-only, no box to compute overlap from) | Already computed |
-| 6 | Center-Bias Rate | Share of P0 answers landing near image center regardless of true target location | All 8 | Ready now |
-| 7 | Wrong-Side Rate vs. Target Eccentricity | Wrong-Side Rate stratified by how far the true target sits from image center | All 8 | Ready now |
-| 8 | Cross-Dataset Consistency | Whether Wrong-Side Rate holds steady across LGG, Kvasir, and ISIC | All 8 | Ready now |
+| 1 | Detect Rate | Share of P0–P4 calls that returned any usable prediction | All 8 (Grounding DINO, OWLv2, Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, Molmo2-8B, North-Micro-Vision-Instruct); pending for Florence-2 | Already computed for the 8; pending for Florence-2 |
+| 2 | Wrong-Side Rate (per direction) | Share of prompted answers landing on the side opposite the one named in the prompt, broken down left/right/upper/lower | All 8; pending for Florence-2 | Already computed (pooled) for the 8; per-direction ready now; pending for Florence-2 |
+| 3 | No-Shift Rate | Share of P1–P4 answers that stayed near the model's own P0 answer; didn't move | All 8; pending for Florence-2 | Already computed for the 8; pending for Florence-2 |
+| 4 | Mean Normalized Distance | Distance from predicted point to ground-truth centroid, normalized by image diagonal | All 8; pending for Florence-2 | Already computed for the 8; pending for Florence-2 |
+| 5 | Mean IoU | Overlap between predicted box and ground-truth box | 7 of 8, all except Molmo2-8B (point-only, no box to compute overlap from); pending for Florence-2 | Already computed for the 7; pending for Florence-2 |
+| 6 | Center-Bias Rate | Share of P0 answers landing near image center regardless of true target location | All 8; pending for Florence-2 | Ready now for the 8; pending for Florence-2 |
+| 7 | Wrong-Side Rate vs. Target Eccentricity | Wrong-Side Rate stratified by how far the true target sits from image center | All 8; pending for Florence-2 | Ready now for the 8; pending for Florence-2 |
+| 8 | Cross-Dataset Consistency | Whether Wrong-Side Rate holds steady across LGG, Kvasir, and ISIC | All 8; pending for Florence-2 | Ready now for the 8; pending for Florence-2 |
 
 ---
 
@@ -188,12 +175,12 @@ Open-ended visual question answering, for the localization models that can gener
 
 ### Model eligibility for VQA and MCQ experiments
 
-Not all 8 localization models can generate free text, so not all of them can be used for a
+Not all 9 localization models can generate free text, so not all of them can be used for a
 spatial-VQA or answer-position-bias experiment. Split by actual capability, not by architecture
 family alone. This eligibility applies to both the VQA experiments here and the MCQ experiments
 in Section 4.
 
-**Table 8.** Which of the 8 localization models can be used for VQA and Multiple-Choice
+**Table 8.** Which of the 9 localization models can be used for VQA and Multiple-Choice
 experiments.
 
 | No. | Model | Usable for VQA | Usable for Multiple-Choice (answer-position bias) | Why |
@@ -201,16 +188,19 @@ experiments.
 | 1 | Qwen2.5-VL-3B | Yes | Yes | Full instruction-tuned VLM, handles open QA and MCQ natively |
 | 2 | InternVL2.5 | Yes | Yes | Full instruction-tuned VLM, handles open QA and MCQ natively |
 | 3 | Molmo2-8B | Yes | Yes | Chat-capable VLM, pointing is one capability among several, not its only mode |
-| 4 | North-Micro-Vision-Instruct | Yes | Yes | Explicitly built for general VQA/OCR/grounding, likely the best fit of the 8 |
+| 4 | North-Micro-Vision-Instruct | Yes | Yes | Explicitly built for general VQA/OCR/grounding, likely the best fit of the 9 |
 
 **Usable**: Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct (4 models).
 **Excluded**: Grounding DINO and OWLv2, since both are pure detectors that only output boxes and
-confidence scores, with no free-text generation at all. Kosmos-2 and LocateAnything-3B are also
-excluded: both can generate text, but neither has a confirmed general instruction-following/MCQ
-capability. Kosmos-2's released focus was grounding/captioning, not instruction-following QA, and
-LocateAnything-3B is built around structured coordinate-output task templates (referring
-expressions, pointing) with no confirmed open-ended QA behavior. Both remain usable for the
-Section 2 localization/grounding experiments, where their capability is confirmed.
+confidence scores, with no free-text generation at all. Kosmos-2, LocateAnything-3B, and
+Florence-2 are also excluded: all three can generate text, but none has a confirmed general
+instruction-following/MCQ capability. Kosmos-2's released focus was grounding/captioning, not
+instruction-following QA. LocateAnything-3B is built around structured coordinate-output task
+templates (referring expressions, pointing) with no confirmed open-ended QA behavior. Florence-2
+is a task-token-driven model (separate tokens for captioning, open-vocabulary detection, phrase
+grounding, OCR, and similar tasks), not a chat-style model that takes arbitrary natural-language
+questions, so it has no confirmed free-form VQA or MCQ behavior either. All three remain usable
+for the Section 2 localization/grounding experiments, where their capability is confirmed.
 
 ### Bilateral-structure datasets for VQA and MCQ
 
@@ -244,7 +234,7 @@ positional language.
 | 3 | M3D-VQA | [GoodBaiBai88/M3D-VQA](https://huggingface.co/datasets/GoodBaiBai88/M3D-VQA) | 3D medical volumes (CT) | Large-scale (part of M3D suite) | Yes | Yes |
 | 4 | MedPix-VQA | [mmoukouba/MedPix-VQA](https://huggingface.co/datasets/mmoukouba/MedPix-VQA) | Mixed (MedPix teaching cases) | Varies | Yes | Yes |
 | 5 | Kvasir-VQA | [SimulaMet-HOST/Kvasir-VQA](https://huggingface.co/datasets/SimulaMet-HOST/Kvasir-VQA) | Endoscopy (GI) | 58,849 QA pairs, 6,500 images | Yes | Yes |
-| 6 | GEMeX-VQA (open-ended) | [BoKelvin/GEMeX-VQA](https://huggingface.co/datasets/BoKelvin/GEMeX-VQA) — `open_ended_question.jsonl` | Chest X-ray | Same corpus as the MCQ subset in Table 12 | Yes* | Yes* |
+| 6 | GEMeX-VQA (open-ended) | [BoKelvin/GEMeX-VQA](https://huggingface.co/datasets/BoKelvin/GEMeX-VQA), `open_ended_question.jsonl` | Chest X-ray | Same corpus as the MCQ subset in Table 12 | Yes* | Yes* |
 
 *GEMeX-VQA (open-ended) positional coverage was confirmed on the MCQ subset of this same dataset
 (Section 4, Table 12), not independently re-sampled for the open-ended split.
@@ -252,7 +242,7 @@ positional language.
 M3D-VQA is the only dataset here that's natively 3D/volumetric, making it the closest match in
 dimensionality to the Section 1 segmentation datasets. Of the others, note that SLAKE has a
 dedicated `location` field and Kvasir-VQA uses a structured 9-way grid answer
-(upper/center/lower × left/center/right) — both give cleaner, lower-noise positional labels than
+(upper/center/lower x left/center/right), both give cleaner, lower-noise positional labels than
 free-text mentions, even where their raw match rate is lower.
 
 ### VQA prompts
@@ -314,13 +304,13 @@ positional language.
 
 | No. | Dataset | HF Link | Modality | Size | Left/Right | Upper/Lower |
 |---|---|---|---|---|---|---|
-| 1 | GEMeX-VQA (MCQ subset) | [BoKelvin/GEMeX-VQA](https://huggingface.co/datasets/BoKelvin/GEMeX-VQA) — `multi_choice_question.jsonl` | Chest X-ray | Subset of GEMeX-VQA | Yes | Yes |
+| 1 | GEMeX-VQA (MCQ subset) | [BoKelvin/GEMeX-VQA](https://huggingface.co/datasets/BoKelvin/GEMeX-VQA), `multi_choice_question.jsonl` | Chest X-ray | Subset of GEMeX-VQA | Yes | Yes |
 | 2 | MedXpertQA (MM subset) | [TsinghuaC3I/MedXpertQA](https://huggingface.co/datasets/TsinghuaC3I/MedXpertQA) (config `MM`) | Radiology images + text | 4,460 questions total, 17 specialties, 11 body systems | Yes | Yes |
 | 3 | PMC-VQA | [RadGenome/PMC-VQA](https://huggingface.co/datasets/RadGenome/PMC-VQA) (also mirrored at [xmcmic/PMC-VQA](https://huggingface.co/datasets/xmcmic/PMC-VQA)) | Mixed medical figures (from PMC Open Access papers) | 227K QA pairs, 149K images | Yes | Yes |
 
 GEMeX-VQA (MCQ subset) has the strongest signal of the three: position is a first-class,
 structured MCQ answer choice (e.g. "Right lung" / "Left lung base" / "Cardiac region"), not just
-incidental phrasing — making it the best candidate for a controlled answer-position-bias MCQ run
+incidental phrasing, making it the best candidate for a controlled answer-position-bias MCQ run
 alongside the sliced-3D prompts below.
 
 **Table 13.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
@@ -370,16 +360,16 @@ once with the correct answer as option A and once as option B, exactly like the 
 
 ---
 
-## 5. Spatial Reasoning
+## 5. Mapping Spatial Reasoning to Positional Bias
 
 Which of the important spatial-reasoning skills each model, across all four sections above, can
 actually be tested on.
 
-**Table 16.** VLMs / segmentation models vs. spatial reasoning types.
+**Table 16.** Spatial reasoning types testable per model.
 
-| No. | Model | Relative position (left/right/above/below) | Absolute position (top/bottom/center) | Distance (near/far) | Depth (in front/behind) | Topological (inside/outside/overlap) |
+| No. | Model | Relative position (left/right/above/below another *object*, e.g. "tumor above the kidney") | Absolute position (top/bottom/center of the *image/volume itself*, no second object needed) | Distance (near/far) | Depth (in front/behind) | Topological (inside/outside/overlap) |
 |---|---|---|---|---|---|---|
-| 1 | VoxTell (3D seg) | Yes | Yes | No | No | Yes |
+| 1 | VoxTell (3D seg) | Unconfirmed, only shown with the organ name included in the prompt, not yet tested with position-only phrasing | Unconfirmed, only shown with the organ name included in the prompt, not yet tested with position-only phrasing | No | No | Yes |
 | 2 | Medical-SAM3 (3D seg) | Yes | Yes | No | No | Yes |
 | 3 | Text3DSAM (3D seg) | Yes | Yes | No | No | Yes |
 | 4 | Qwen2.5-VL-3B | Yes | Yes | Yes | Yes | Yes |
@@ -391,18 +381,21 @@ actually be tested on.
 | 10 | Grounding DINO | Yes | Yes | No | No | Yes |
 | 11 | OWLv2 | Yes | Yes | No | No | Yes |
 
-**Table 17.** What each spatial reasoning type means, and the metrics used to evaluate it.
+**Table 17.** Spatial reasoning types, definitions, and metrics.
 
 | No. | Reasoning type | What it means | Metric | How it's evaluated / what it measures |
 |---|---|---|---|---|
 | 1 | Relative position | The location of one object described with respect to another object, e.g. "left of", "above", "between" | Wrong-Side Rate | Prompt with the relation (e.g. "left kidney"), get the model's box/mask/point, compare its position to the reference object using the ground-truth layout. Share of answers where the predicted side is the opposite of the ground truth |
 | 2 | Relative position | (same as above) | Laterality Dice Gap | Difference in mean Dice/accuracy between the two sides of a relation, when the model does get the side right |
-| 3 | Absolute position | The location of an object described with respect to the whole image/volume, e.g. "top", "bottom", "center" | Region-Match Accuracy | Prompt with the absolute term, check if the returned box/mask/point centroid actually falls in that region of the image/volume (e.g. top third, center zone) |
-| 4 | Absolute position | (same as above) | Center-Bias Rate | Share of predictions landing near the image/volume center regardless of the true target location |
-| 5 | Distance | A qualitative near/far judgment between two objects | Correct-Answer Rate | For VLMs: ask "which is closer/farther" or "is X near Y", compare to ground-truth centroid distance. For segmentation/detection models: not directly askable, compute centroid-to-centroid distance from the two output masks/boxes instead |
-| 6 | Distance | (same as above) | Distance Correlation | Correlation between the model's predicted distance ordering and the true ground-truth distance, for models that output a number |
-| 7 | Depth | Front/behind or closer/farther in the camera or scan viewing axis | Correct-Answer Rate | For VLMs: ask "is X in front of Y" (2D images) or "which is closer to the viewer". For 3D volumes: reframe as slice-position (which axial/coronal/sagittal slice) since there's no camera depth |
-| 8 | Topological relationship | How two regions relate structurally, e.g. inside, outside, overlapping, touching, containing | IoU / Containment Ratio | Prompt with the relation (e.g. "tumor inside kidney"), check output mask/box overlap or containment against the ground-truth masks |
-| 9 | Topological relationship | (same as above) | Binary Correct/Incorrect Rate | Share of topological relation claims (e.g. "tumor inside kidney") that match ground truth, for models that only state the relation in text |
+| 3 | Relative position | (same as above) | Name-Free Grounding Rate | Prompt with position-only phrasing that drops the organ name (e.g. "the structure on the left side of the abdomen"). Share of cases where the model still lands on the correct-side structure without being told the organ name, distinguishing real spatial-language use from organ-name pattern-matching where "left/right" is decorative |
+| 4 | Relative position | (same as above) | Text-Image Alignment Gap | Cosine distance between the text-encoder embeddings of "left X" vs. "right X", compared against the mask-output difference (Dice/centroid distance) between the two predicted masks for the same subject. Localizes a laterality failure to the text-image alignment step (embeddings barely differ) vs. the decoder/fusion step (embeddings differ but the output doesn't) |
+| 5 | Absolute position | The location of an object described with respect to the whole image/volume, e.g. "top", "bottom", "center" | Region-Match Accuracy | Prompt with the absolute term, check if the returned box/mask/point centroid actually falls in that region of the image/volume (e.g. top third, center zone) |
+| 6 | Absolute position | (same as above) | Center-Bias Rate | Share of predictions landing near the image/volume center regardless of the true target location |
+| 7 | Absolute position | (same as above) | Name-Free Grounding Rate | Same idea as the relative-position version, applied to absolute-position phrasing (e.g. "the structure near the top of the volume" with no organ name). Tests whether "top/bottom" grounding also survives without the organ-name crutch |
+| 8 | Distance | A qualitative near/far judgment between two objects | Correct-Answer Rate | For VLMs: ask "which is closer/farther" or "is X near Y", compare to ground-truth centroid distance. For segmentation/detection models: not directly askable, compute centroid-to-centroid distance from the two output masks/boxes instead |
+| 9 | Distance | (same as above) | Distance Correlation | Correlation between the model's predicted distance ordering and the true ground-truth distance, for models that output a number |
+| 10 | Depth | Front/behind or closer/farther in the camera or scan viewing axis | Correct-Answer Rate | For VLMs: ask "is X in front of Y" (2D images) or "which is closer to the viewer". For 3D volumes: reframe as slice-position (which axial/coronal/sagittal slice) since there's no camera depth |
+| 11 | Topological relationship | How two regions relate structurally, e.g. inside, outside, overlapping, touching, containing | IoU / Containment Ratio | Prompt with the relation (e.g. "tumor inside kidney"), check output mask/box overlap or containment against the ground-truth masks |
+| 12 | Topological relationship | (same as above) | Binary Correct/Incorrect Rate | Share of topological relation claims (e.g. "tumor inside kidney") that match ground truth, for models that only state the relation in text |
 
 ---

@@ -244,30 +244,6 @@ mention order swapped between runs.
 | 2 | CT_TotalSeg_cardiac (2D slice) | Left common carotid artery, right common carotid artery | "Is the artery marked in this image the left common carotid artery or the right common carotid artery?" | "Is the artery marked in this image the right common carotid artery or the left common carotid artery?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 | 3 | MR_TotalSeg (2D slice) | Left kidney, right kidney | "Is the kidney marked in this image the left kidney or the right kidney?" | "Is the kidney marked in this image the right kidney or the left kidney?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 
-### Existing medical VQA datasets with laterality questions (alternative to slice extraction)
-
-Instead of extracting 2D slices from the 3D volumes above, these established medical VQA
-benchmarks already contain real, human-written laterality/position questions, no new
-preprocessing or synthetic question-writing needed. Found via HuggingFace and web search.
-
-**Table 10.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
-HuggingFace and web search.
-
-| No. | Dataset | Images | QA pairs | Modality / body region | Laterality + upper/lower coverage | Answer format | Compatible with your 4 VLMs? | Link |
-|---|---|---|---|---|---|---|---|---|
-| 1 | GEMeX | 151,025 | 1,605,575 | Chest X-ray, built on Chest ImaGenome anatomical regions | Chest ImaGenome defines left/right lung zones plus left/right upper, mid, and lower lung zones | **Natively single-choice and multiple-choice**, plus open/closed-ended, plus region-grounding (bounding box) per answer | Yes, directly — native 2D chest X-ray, no preprocessing needed | [med-vqa.com/GEMeX](https://www.med-vqa.com/GEMeX) · [arXiv:2411.16778](https://arxiv.org/abs/2411.16778) |
-| 2 | SPARC-Rad | 300 (from TCIA healthy-control studies) | 300 | CT, MRI, and radiography, across abdomen, chest, breast, neuro, and musculoskeletal | Manually written by radiology trainees to test anatomical identification, localization, laterality, regional recognition, and inter-structure spatial relationships | Closed-ended, graded via LLM-as-judge; MCQ-style answer choices not separately confirmed | Partial — radiography cases work directly; CT/MRI cases need a 2D slice extracted per case first, same as Table 9's approach | [arXiv:2608.00100](https://arxiv.org/abs/2608.00100) |
-
-**GEMeX is the stronger fit of the two**: it natively supports MCQ, works with your 4 VLMs
-without any preprocessing, is large-scale (1.6M QA pairs to filter down), and its
-Chest-ImaGenome basis already covers both left/right and upper/lower in one dataset. SPARC-Rad is
-more directly on-topic (laterality and spatial relationships are explicitly what it was built to
-test) but is much smaller (300 pairs), needs slice extraction for its CT/MRI cases, and its exact
-answer format needs confirming before treating it as a drop-in MCQ source.
-
-Both are genuinely out-of-domain for your 4 usable 2D VLMs (neither was part of their training
-data), keeping the zero-shot framing consistent with your other 2D datasets.
-
 ### How to analyze it, metrics
 
 Reuses the same metrics style as the Section 1 bilateral-grounding experiment, adapted to a

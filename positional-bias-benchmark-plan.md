@@ -15,23 +15,20 @@
   CT_TotalSeg_cardiac, MR_TotalSeg)
 
 Two public datasets cover both left/right and upper/lower structure, within Medical-SAM3's two
-largest confirmed training modalities:
+largest confirmed training modalities. Both are inherently different in dimensionality from the
+volumetric structures tested for VoxTell/Text3DSAM (Chest X-ray is 2D; TRUSTED's ultrasound arm
+is 3D but a different acquisition and anatomy than AMOS22-MRI/Neurite-OASIS), so these belong
+alongside the out-of-domain test as additional, separate comparison points, not a replacement for
+it.
 
-- **Chest X-ray, via Chest ImaGenome** (a scene-graph annotation layer on MIMIC-CXR): defines 29
-  anatomical structures including left/right lung, and subdivides each lung into upper, mid, and
-  lower lung zones, plus lung base and apical zone — giving left/right *and* upper/lower in one
-  radiography dataset, the largest single modality in Medical-SAM3's training corpus.
-- **Kidney ultrasound, via TRUSTED** (Tridimensional Renal UltraSound TomodEnsitometrie Dataset):
-  paired 3D transabdominal ultrasound and CT from 48 patients (96 kidneys), with left/right kidney
-  segmentation and 7 radiographer-annotated anatomical landmarks per kidney, including the upper
-  and lower pole — giving left/right *and* upper/lower in the ultrasound modality.
+**Table 1.** Medical-SAM3 in-domain datasets covering left/right and upper/lower structure.
 
-Both are inherently different in dimensionality from the volumetric structures tested for
-VoxTell/Text3DSAM (Chest X-ray is 2D; TRUSTED's ultrasound arm is 3D but a different acquisition
-and anatomy than AMOS22-MRI/Neurite-OASIS), so these belong alongside the out-of-domain test as
-additional, separate comparison points, not a replacement for it.
+| No. | Dataset | Modality | Description | Left/right coverage | Upper/lower coverage | Link |
+|---|---|---|---|---|---|---|
+| 1 | Chest X-ray, via Chest ImaGenome | Radiography — largest single modality in Medical-SAM3's training corpus | A scene-graph annotation layer on MIMIC-CXR, defining 29 anatomical structures per image | Left lung, right lung | Each lung subdivided into upper, mid, and lower lung zones, plus lung base and apical zone | [PhysioNet: chest-imagenome](https://physionet.org/content/chest-imagenome/1.0.0/) |
+| 2 | Kidney ultrasound, via TRUSTED | Ultrasound (paired with CT) | Tridimensional Renal UltraSound TomodEnsitometrie Dataset: paired 3D transabdominal ultrasound and CT from 48 patients (96 kidneys), with 7 radiographer-annotated anatomical landmarks per kidney | Left kidney, right kidney | Upper pole, lower pole of each kidney | [Scientific Data paper](https://www.nature.com/articles/s41597-025-04467-1) · [arXiv:2310.12646](https://arxiv.org/abs/2310.12646) · [Figshare dataset](https://springernature.figshare.com/articles/dataset/TRUSTED_The_Paired_3D_Ultrasound_and_CT_Human_Data_for_Kidney_Segmentation_and_Registration_Research/27981050) |
 
-**Table 1.** Positional-bias analyses for the 3D segmentation models, and their readiness status
+**Table 2.** Positional-bias analyses for the 3D segmentation models, and their readiness status
 per model.
 
 | No. | Analysis | What it is | VoxTell | Medical-SAM3 | Text3DSAM |
@@ -51,7 +48,7 @@ per model.
 Why does VoxTell degrade at certain rotation angles, and does it show a real positional bias
 rather than a resampling artifact? Five steps, in order, each building on the last.
 
-**Table 2.** Five-step diagnostic plan for identifying why VoxTell shows rotation-related
+**Table 3.** Five-step diagnostic plan for identifying why VoxTell shows rotation-related
 positional bias.
 
 | No. | Step | Question it answers | What to do | Status |
@@ -64,7 +61,7 @@ positional bias.
 
 ### Aggregate views
 
-**Table 3.** Aggregate visualizations already produced, or pending, per 3D model.
+**Table 4.** Aggregate visualizations already produced, or pending, per 3D model.
 
 | No. | Aggregate view | VoxTell | Medical-SAM3 | Text3DSAM |
 |---|---|---|---|---|
@@ -77,10 +74,10 @@ name prompts. "Left X" / "right X" is itself a relational expression, relative t
 so this is a relational-grounding test scoped to bilateral structures only: for each bilateral
 organ pair, does the model correctly ground "left X" vs. "right X" to the correct side. Ground
 truth side comes from the anatomical mask, not the prompt. The two Medical-SAM3 in-domain rows
-(Table 4) extend this to "upper X" / "lower X" as well, using the same logic against each
+(Table 5) extend this to "upper X" / "lower X" as well, using the same logic against each
 dataset's upper/lower zone or pole annotations.
 
-**Table 4.** Bilateral (left/right) and, where the dataset supports it, upper/lower structures to
+**Table 5.** Bilateral (left/right) and, where the dataset supports it, upper/lower structures to
 check, per 3D model and dataset.
 
 | No. | Model | Dataset | Structures to check | Subjects to check |
@@ -141,7 +138,7 @@ One example per row, so the experiment is concrete rather than abstract.
 Reuses the metrics already defined earlier in this section, applied specifically to this
 left/right-only prompt pair, per structure, per subject.
 
-**Table 5.** Metrics for scoring the 3D bilateral left/right grounding experiment.
+**Table 6.** Metrics for scoring the 3D bilateral left/right grounding experiment.
 
 | No. | Metric | How it's used for this experiment |
 |---|---|---|
@@ -169,7 +166,7 @@ Molmo2-8B, North-Micro-Vision-Instruct) ran on all 3 datasets:
 ISIC) for these 8 models. "Ready now" means computable today from the existing result CSVs, no
 new inference needed.
 
-**Table 6.** Positional-bias metrics for the 2D localization models, and which are already
+**Table 7.** Positional-bias metrics for the 2D localization models, and which are already
 computed vs. ready to compute.
 
 | No. | Metric | Definition | Models | Status |
@@ -196,7 +193,7 @@ spatial-VQA or answer-position-bias experiment. Split by actual capability, not 
 family alone. This eligibility applies to both the VQA experiments here and the MCQ experiments
 in Section 4.
 
-**Table 7.** Which of the 8 localization models can be used for VQA and Multiple-Choice
+**Table 8.** Which of the 8 localization models can be used for VQA and Multiple-Choice
 experiments.
 
 | No. | Model | Usable for VQA | Usable for Multiple-Choice (answer-position bias) | Why |
@@ -238,7 +235,7 @@ tendency to pick whichever option was named first) would look identical to a lat
 Each question is run twice per image, once phrased left-then-right and once phrased
 right-then-left, to separate the two.
 
-**Table 8.** Example VQA prompts for the bilateral left/right experiment, by dataset, with the
+**Table 9.** Example VQA prompts for the bilateral left/right experiment, by dataset, with the
 mention order swapped between runs.
 
 | No. | Dataset | Bilateral structure | Example VQA prompt (left-then-right) | Example VQA prompt (right-then-left) | Models |
@@ -253,13 +250,13 @@ Instead of extracting 2D slices from the 3D volumes above, these established med
 benchmarks already contain real, human-written laterality/position questions, no new
 preprocessing or synthetic question-writing needed. Found via HuggingFace and web search.
 
-**Table 9.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
+**Table 10.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
 HuggingFace and web search.
 
 | No. | Dataset | Images | QA pairs | Modality / body region | Laterality + upper/lower coverage | Answer format | Compatible with your 4 VLMs? | Link |
 |---|---|---|---|---|---|---|---|---|
 | 1 | GEMeX | 151,025 | 1,605,575 | Chest X-ray, built on Chest ImaGenome anatomical regions | Chest ImaGenome defines left/right lung zones plus left/right upper, mid, and lower lung zones | **Natively single-choice and multiple-choice**, plus open/closed-ended, plus region-grounding (bounding box) per answer | Yes, directly — native 2D chest X-ray, no preprocessing needed | [med-vqa.com/GEMeX](https://www.med-vqa.com/GEMeX) · [arXiv:2411.16778](https://arxiv.org/abs/2411.16778) |
-| 2 | SPARC-Rad | 300 (from TCIA healthy-control studies) | 300 | CT, MRI, and radiography, across abdomen, chest, breast, neuro, and musculoskeletal | Manually written by radiology trainees to test anatomical identification, localization, laterality, regional recognition, and inter-structure spatial relationships | Closed-ended, graded via LLM-as-judge; MCQ-style answer choices not separately confirmed | Partial — radiography cases work directly; CT/MRI cases need a 2D slice extracted per case first, same as Table 8's approach | [arXiv:2608.00100](https://arxiv.org/abs/2608.00100) |
+| 2 | SPARC-Rad | 300 (from TCIA healthy-control studies) | 300 | CT, MRI, and radiography, across abdomen, chest, breast, neuro, and musculoskeletal | Manually written by radiology trainees to test anatomical identification, localization, laterality, regional recognition, and inter-structure spatial relationships | Closed-ended, graded via LLM-as-judge; MCQ-style answer choices not separately confirmed | Partial — radiography cases work directly; CT/MRI cases need a 2D slice extracted per case first, same as Table 9's approach | [arXiv:2608.00100](https://arxiv.org/abs/2608.00100) |
 
 **GEMeX is the stronger fit of the two**: it natively supports MCQ, works with your 4 VLMs
 without any preprocessing, is large-scale (1.6M QA pairs to filter down), and its
@@ -277,7 +274,7 @@ Reuses the same metrics style as the Section 1 bilateral-grounding experiment, a
 text answer instead of a mask. Rows tagged "VQA" apply here; rows tagged "MCQ" apply to the
 Section 4 experiment instead.
 
-**Table 10.** Metrics for scoring the 2D VQA and Multiple-Choice bilateral experiments.
+**Table 11.** Metrics for scoring the 2D VQA and Multiple-Choice bilateral experiments.
 
 | No. | Metric | Applies to | How it's used |
 |---|---|---|---|
@@ -287,14 +284,14 @@ Section 4 experiment instead.
 | 4 | Per-Structure Accuracy | VQA, MCQ | Correct-Side Rate broken down by structure (parotid gland vs. carotid artery vs. kidney), to see which anatomy the model handles best or worst. |
 | 5 | Answer-Position Bias (Letter Preference) | MCQ only | Compare accuracy when the correct answer is option A vs. when it's option B. If accuracy drops (or the model just picks "A" more often) regardless of which side is actually correct, that's a letter-position bias, separate from genuine anatomical understanding. |
 | 6 | Content vs. Letter Bias Disentanglement | MCQ only | Cross-tabulate true side (left/right) against chosen letter (A/B) against correctness. Separates "the model is biased toward right-side anatomy" from "the model is biased toward option A," which look identical in raw accuracy but are different problems. |
-| 7 | Order-of-Mention Bias | VQA only | Compare accuracy, and raw pick rate, between the left-then-right and right-then-left phrasings of the same question (Table 8). If the model just tends to pick whichever side was named first, that's an order-of-mention bias, separate from genuine laterality understanding. |
+| 7 | Order-of-Mention Bias | VQA only | Compare accuracy, and raw pick rate, between the left-then-right and right-then-left phrasings of the same question (Table 9). If the model just tends to pick whichever side was named first, that's an order-of-mention bias, separate from genuine laterality understanding. |
 
 ---
 
 ## 4. MCQ
 
 Multiple-choice framing of the same bilateral left/right questions, run for the same 4 usable
-VLMs (Table 7), added to test answer-position bias.
+VLMs (Table 8), added to test answer-position bias.
 
 ### Multiple-Choice prompts (answer-position bias)
 
@@ -302,7 +299,7 @@ Same question as the VQA prompts in Section 3, phrased as MCQ. Run each pair twi
 once with the correct answer as option A and once as option B, to separate genuine
 bilateral-grounding accuracy from a simple preference for one letter position.
 
-**Table 11.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
+**Table 12.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
 dataset.
 
 | No. | Dataset | Bilateral structure | Example MCQ prompt | Models |
@@ -313,7 +310,7 @@ dataset.
 
 ### How to analyze it, metrics
 
-Uses Table 10 in Section 3, specifically the rows tagged "MCQ" or "VQA, MCQ": Correct-Side Rate,
+Uses Table 11 in Section 3, specifically the rows tagged "MCQ" or "VQA, MCQ": Correct-Side Rate,
 Wrong-Side Rate, Per-Structure Accuracy, Answer-Position Bias, and Content vs. Letter Bias
 Disentanglement.
 
@@ -322,7 +319,7 @@ Disentanglement.
 Same idea as the laterality MCQ above, applied to the Distance and Depth reasoning types (Table
 14) instead of left/right. 3D segmentation models and the two pure detectors can't be probed
 this way, since they only output a mask/box, never a distance or depth judgment in text; this
-experiment is limited to the 4 usable 2D VLMs from Table 7 (Qwen2.5-VL-3B, InternVL2.5,
+experiment is limited to the 4 usable 2D VLMs from Table 8 (Qwen2.5-VL-3B, InternVL2.5,
 Molmo2-8B, North-Micro-Vision-Instruct).
 
 Uses the same 2D slices as the sections above (CT_HaN-Seg, CT_TotalSeg_cardiac, MR_TotalSeg),
@@ -331,7 +328,7 @@ from the ground-truth 3D coordinates (e.g., which of two organs' centroids is cl
 reference point, or which sits in a more anterior slice). Each question is run twice per image,
 once with the correct answer as option A and once as option B, exactly like the laterality MCQ.
 
-**Table 12.** Example Distance/Depth MCQ prompts, order-swapped to test position bias.
+**Table 13.** Example Distance/Depth MCQ prompts, order-swapped to test position bias.
 
 | No. | Dataset | Structure pair | Reasoning type | Example MCQ prompt | Models |
 |---|---|---|---|---|---|
@@ -339,7 +336,7 @@ once with the correct answer as option A and once as option B, exactly like the 
 | 2 | CT_TotalSeg_cardiac (2D slice) | Common carotid artery vs. subclavian artery | Distance | "Which vessel is closer to the marked point? A) Common carotid artery B) Subclavian artery" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 | 3 | CT_HaN-Seg (2D slice) | Parotid gland vs. submandibular gland | Depth | "Which gland is more anterior, closer to the front of the face? A) Parotid gland B) Submandibular gland" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 
-**Table 13.** Metrics for scoring the Distance/Depth order-bias experiment.
+**Table 14.** Metrics for scoring the Distance/Depth order-bias experiment.
 
 | No. | Metric | How it's used |
 |---|---|---|
@@ -354,7 +351,7 @@ once with the correct answer as option A and once as option B, exactly like the 
 Which of the important spatial-reasoning skills each model, across all four sections above, can
 actually be tested on.
 
-**Table 14.** VLMs / segmentation models vs. spatial reasoning types.
+**Table 15.** VLMs / segmentation models vs. spatial reasoning types.
 
 | No. | Model | Relative position (left/right/above/below) | Absolute position (top/bottom/center) | Distance (near/far) | Depth (in front/behind) | Topological (inside/outside/overlap) |
 |---|---|---|---|---|---|---|
@@ -370,29 +367,18 @@ actually be tested on.
 | 10 | Grounding DINO | Yes | Yes | No | No | Yes |
 | 11 | OWLv2 | Yes | Yes | No | No | Yes |
 
-**Table 15.** What each spatial reasoning type means, and how to evaluate it.
+**Table 16.** What each spatial reasoning type means, and the metrics used to evaluate it.
 
-| No. | Reasoning type | What it means | How to evaluate it |
-|---|---|---|---|
-| 1 | Relative position | The location of one object described with respect to another object, e.g. "left of", "above", "between" | Prompt with the relation (e.g. "left kidney"), get the model's box/mask/point, compare its position to the reference object using the ground-truth layout. Metric: Wrong-Side Rate |
-| 2 | Absolute position | The location of an object described with respect to the whole image/volume, e.g. "top", "bottom", "center" | Prompt with the absolute term, check if the returned box/mask/point centroid actually falls in that region of the image/volume (e.g. top third, center zone). Metric: Region-Match Accuracy |
-| 3 | Distance | A qualitative near/far judgment between two objects | For VLMs: ask "which is closer/farther" or "is X near Y", compare to ground-truth centroid distance. For segmentation/detection models: not directly askable, compute centroid-to-centroid distance from the two output masks/boxes instead. Metric: Accuracy vs. ground-truth ranking, or correlation between predicted and true distance |
-| 4 | Depth | Front/behind or closer/farther in the camera or scan viewing axis | For VLMs: ask "is X in front of Y" (2D images) or "which is closer to the viewer". For 3D volumes: reframe as slice-position (which axial/coronal/sagittal slice) since there's no camera depth. Metric: Accuracy vs. ground-truth ordering along that axis |
-| 5 | Topological relationship | How two regions relate structurally, e.g. inside, outside, overlapping, touching, containing | Prompt with the relation (e.g. "tumor inside kidney"), check output mask/box overlap or containment against the ground-truth masks. Metric: IoU / containment ratio, or binary correct/incorrect on the relation |
-
-**Table 16.** Metrics for evaluating each spatial reasoning type.
-
-| No. | Reasoning type | Metric | What it measures |
-|---|---|---|---|
-| 1 | Relative position | Wrong-Side Rate | Share of answers where the predicted side (left/right/above/below) is the opposite of the ground truth |
-| 2 | Relative position | Laterality Dice Gap | Difference in mean Dice/accuracy between the two sides of a relation, when the model does get the side right |
-| 3 | Absolute position | Region-Match Accuracy | Share of predictions whose centroid falls in the correct absolute region of the image/volume (e.g. top third, center zone) |
-| 4 | Absolute position | Center-Bias Rate | Share of predictions landing near the image/volume center regardless of the true target location |
-| 5 | Distance | Correct-Answer Rate | Share of near/far judgments matching the ground-truth centroid-distance ranking |
-| 6 | Distance | Distance Correlation | Correlation between the model's predicted distance ordering and the true ground-truth distance, for models that output a number |
-| 7 | Depth | Correct-Answer Rate | Share of front/behind or closer/farther judgments matching the ground-truth ordering along the viewing/scan axis |
-| 8 | Topological relationship | IoU / Containment Ratio | Overlap or containment between the predicted and ground-truth masks/boxes, for inside/outside/overlap/touching claims |
-| 9 | Topological relationship | Binary Correct/Incorrect Rate | Share of topological relation claims (e.g. "tumor inside kidney") that match ground truth, for models that only state the relation in text |
-| 10 | Any type (bias check) | Answer-Position Bias (Letter Preference) | For MCQ-framed questions, compares accuracy/pick-rate when the correct answer is option A vs. option B, to separate content understanding from letter-position bias |
+| No. | Reasoning type | What it means | Metric | How it's evaluated / what it measures |
+|---|---|---|---|---|
+| 1 | Relative position | The location of one object described with respect to another object, e.g. "left of", "above", "between" | Wrong-Side Rate | Prompt with the relation (e.g. "left kidney"), get the model's box/mask/point, compare its position to the reference object using the ground-truth layout. Share of answers where the predicted side is the opposite of the ground truth |
+| 2 | Relative position | (same as above) | Laterality Dice Gap | Difference in mean Dice/accuracy between the two sides of a relation, when the model does get the side right |
+| 3 | Absolute position | The location of an object described with respect to the whole image/volume, e.g. "top", "bottom", "center" | Region-Match Accuracy | Prompt with the absolute term, check if the returned box/mask/point centroid actually falls in that region of the image/volume (e.g. top third, center zone) |
+| 4 | Absolute position | (same as above) | Center-Bias Rate | Share of predictions landing near the image/volume center regardless of the true target location |
+| 5 | Distance | A qualitative near/far judgment between two objects | Correct-Answer Rate | For VLMs: ask "which is closer/farther" or "is X near Y", compare to ground-truth centroid distance. For segmentation/detection models: not directly askable, compute centroid-to-centroid distance from the two output masks/boxes instead |
+| 6 | Distance | (same as above) | Distance Correlation | Correlation between the model's predicted distance ordering and the true ground-truth distance, for models that output a number |
+| 7 | Depth | Front/behind or closer/farther in the camera or scan viewing axis | Correct-Answer Rate | For VLMs: ask "is X in front of Y" (2D images) or "which is closer to the viewer". For 3D volumes: reframe as slice-position (which axial/coronal/sagittal slice) since there's no camera depth |
+| 8 | Topological relationship | How two regions relate structurally, e.g. inside, outside, overlapping, touching, containing | IoU / Containment Ratio | Prompt with the relation (e.g. "tumor inside kidney"), check output mask/box overlap or containment against the ground-truth masks |
+| 9 | Topological relationship | (same as above) | Binary Correct/Incorrect Rate | Share of topological relation claims (e.g. "tumor inside kidney") that match ground truth, for models that only state the relation in text |
 
 ---

@@ -256,23 +256,20 @@ preprocessing or synthetic question-writing needed. Found via HuggingFace and we
 **Table 9.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
 HuggingFace and web search.
 
-| No. | Dataset | Images | QA pairs | Modality / body region | Laterality coverage | Answer format | Access |
-|---|---|---|---|---|---|---|---|
-| 1 | VQA-RAD | 315 | 3,515 | X-ray/CT/MRI, head, chest, abdomen | Confirmed, e.g. "Which side of the heart border is obscured?" answer "right" | Open-answer, not natively MCQ | Public |
-| 2 | GEMeX | 151,025 | 1,605,575 | Chest X-ray, built on Chest ImaGenome anatomical regions | Chest ImaGenome defines left/right lung zones, so laterality questions are plausible, needs filtering to confirm exact wording | **Natively single-choice and multiple-choice**, plus region-grounding (bounding box) per answer | Public (med-vqa.com/GEMeX) |
-| 3 | Medical-Diff-VQA | 164,324 image pairs | 700,703 | Chest X-ray (MIMIC-CXR derived) | Confirmed, has a "location" question category with a worked example: "what abnormality is seen in the left lung?" | Open-answer | Requires PhysioNet credentialed access |
-| 4 | MIMIC-CXR-VQA / MIMIC-Ext-MIMIC-CXR-VQA | MIMIC-CXR-derived | Large-scale | Chest X-ray | Location-based questions, likely includes left/right lung | Open-answer | Requires PhysioNet credentialed access |
+| No. | Dataset | Images | QA pairs | Modality / body region | Laterality + upper/lower coverage | Answer format | Compatible with your 4 VLMs? | Link |
+|---|---|---|---|---|---|---|---|---|
+| 1 | GEMeX | 151,025 | 1,605,575 | Chest X-ray, built on Chest ImaGenome anatomical regions | Chest ImaGenome defines left/right lung zones plus left/right upper, mid, and lower lung zones | **Natively single-choice and multiple-choice**, plus open/closed-ended, plus region-grounding (bounding box) per answer | Yes, directly — native 2D chest X-ray, no preprocessing needed | [med-vqa.com/GEMeX](https://www.med-vqa.com/GEMeX) · [arXiv:2411.16778](https://arxiv.org/abs/2411.16778) |
+| 2 | SPARC-Rad | 300 (from TCIA healthy-control studies) | 300 | CT, MRI, and radiography, across abdomen, chest, breast, neuro, and musculoskeletal | Manually written by radiology trainees to test anatomical identification, localization, laterality, regional recognition, and inter-structure spatial relationships | Closed-ended, graded via LLM-as-judge; MCQ-style answer choices not separately confirmed | Partial — radiography cases work directly; CT/MRI cases need a 2D slice extracted per case first, same as Table 8's approach | [arXiv:2608.00100](https://arxiv.org/abs/2608.00100) |
 
-**GEMeX stands out as the best fit**, since it solves the MCQ-format gap that VQA-RAD has: it
-natively supports both VQA (open/closed-ended) and MCQ (single/multi-choice) in one dataset, is
-built on an anatomical-region ontology that already defines left/right lung zones, and even ships
-region-grounding boxes per answer, useful for cross-checking against your Section 2 localization
-results on the same images.
+**GEMeX is the stronger fit of the two**: it natively supports MCQ, works with your 4 VLMs
+without any preprocessing, is large-scale (1.6M QA pairs to filter down), and its
+Chest-ImaGenome basis already covers both left/right and upper/lower in one dataset. SPARC-Rad is
+more directly on-topic (laterality and spatial relationships are explicitly what it was built to
+test) but is much smaller (300 pairs), needs slice extraction for its CT/MRI cases, and its exact
+answer format needs confirming before treating it as a drop-in MCQ source.
 
-All are genuinely out-of-domain for your 4 usable 2D VLMs (none were trained on medical VQA data), so
-this keeps the zero-shot framing consistent with your other 2D datasets. The two PhysioNet-gated
-datasets (Medical-Diff-VQA, MIMIC-CXR-VQA) need credentialed access approval before download,
-worth factoring into timeline if you go that route.
+Both are genuinely out-of-domain for your 4 usable 2D VLMs (neither was part of their training
+data), keeping the zero-shot framing consistent with your other 2D datasets.
 
 ### How to analyze it, metrics
 

@@ -8,41 +8,28 @@
 ### Dataset coverage
 
 - **VoxTell**: AMOS22-MRI, Neurite-OASIS
-- **Medical-SAM3**: AMOS22-MRI, Neurite-OASIS (out-of-domain), plus a Chest X-ray dataset with
-  left/right lung masks (in-domain, see note below)
+- **Medical-SAM3**: AMOS22-MRI, Neurite-OASIS (out-of-domain), plus two in-domain datasets with
+  left/right *and* upper/lower structure (see note below): Chest X-ray via Chest ImaGenome, and
+  kidney ultrasound via TRUSTED
 - **Text3DSAM**: AMOS22-MRI, Neurite-OASIS (out-of-domain), plus in-domain datasets (CT_HaN-Seg,
   CT_TotalSeg_cardiac, MR_TotalSeg)
 
-**Medical-SAM3's actual training modalities** (per its own paper: fully fine-tuned SAM3 on 33
-datasets, 10 imaging modalities) are radiography (CXR and X-ray/angiography), ultrasound,
-endoscopy, pathology, fundus, dermoscopy, and microscopy — **no CT or MRI at all**. So AMOS22-MRI
-and Neurite-OASIS aren't just unseen datasets for this model, they're an unseen *modality*, a
-larger domain gap than "out-of-domain" alone suggests. It's also worth confirming whether this
-model, being SAM3-based (natively an image/video architecture), is run per-slice on the 3D
-volumes rather than as a true volumetric model in this pipeline — that changes how the
-Rotation-Equivariance metric (Table 1) should be interpreted for it specifically, since a
-slice-wise model has no notion of out-of-plane rotation. To test it in-domain instead, use a
-public Chest X-ray dataset with left/right lung segmentation masks (e.g., the Montgomery County
-and Shenzhen CXR sets, or JSRT) — radiography is the largest single modality in its training
-corpus, and left/right lung is a well-established bilateral structure with existing masks. This
-in-domain test is inherently 2D, unlike the volumetric structures tested for VoxTell/Text3DSAM,
-so it belongs alongside the out-of-domain 3D test as a second, separate comparison point, not a
-replacement for it.
+Two public datasets cover both left/right and upper/lower structure, within Medical-SAM3's two
+largest confirmed training modalities:
 
-### Laterality convention
+- **Chest X-ray, via Chest ImaGenome** (a scene-graph annotation layer on MIMIC-CXR): defines 29
+  anatomical structures including left/right lung, and subdivides each lung into upper, mid, and
+  lower lung zones, plus lung base and apical zone — giving left/right *and* upper/lower in one
+  radiography dataset, the largest single modality in Medical-SAM3's training corpus.
+- **Kidney ultrasound, via TRUSTED** (Tridimensional Renal UltraSound TomodEnsitometrie Dataset):
+  paired 3D transabdominal ultrasound and CT from 48 patients (96 kidneys), with left/right kidney
+  segmentation and 7 radiographer-annotated anatomical landmarks per kidney, including the upper
+  and lower pole — giving left/right *and* upper/lower in the ultrasound modality.
 
-All "left"/"right" ground truth in this plan, in every section, uses **anatomical (patient)
-laterality**, as recorded in each dataset's native mask/label metadata, not image/radiological
-left-right (which mirrors anatomical laterality on standard axial CT/MR display). Prompts must
-use the same convention: `"left kidney"` means the patient's own left side, not the left side of
-the displayed image. Before running any experiment in this plan, confirm each dataset's masks are
-labeled in this convention. A convention mismatch between prompt and annotation would produce a
-high Wrong-Side Rate that looks exactly like model bias but is actually an annotation/prompt
-mismatch, so this needs verifying once per dataset before trusting any bias result from it.
-
-"Ready now" means the metric can be computed today, either the full rotation sweep already ran,
-or the metric only needs existing result files with no new inference. "Pending" means the
-rotation sweep for that model hasn't run yet, so that metric can't be computed until it does.
+Both are inherently different in dimensionality from the volumetric structures tested for
+VoxTell/Text3DSAM (Chest X-ray is 2D; TRUSTED's ultrasound arm is 3D but a different acquisition
+and anatomy than AMOS22-MRI/Neurite-OASIS), so these belong alongside the out-of-domain test as
+additional, separate comparison points, not a replacement for it.
 
 **Table 1.** Positional-bias analyses for the 3D segmentation models, and their readiness status
 per model.
@@ -89,11 +76,14 @@ None of the three models were trained on relational referring expressions, only 
 name prompts. "Left X" / "right X" is itself a relational expression, relative to body midline,
 so this is a relational-grounding test scoped to bilateral structures only: for each bilateral
 organ pair, does the model correctly ground "left X" vs. "right X" to the correct side. Ground
-truth side comes from the anatomical mask, not the prompt.
+truth side comes from the anatomical mask, not the prompt. The two Medical-SAM3 in-domain rows
+(Table 4) extend this to "upper X" / "lower X" as well, using the same logic against each
+dataset's upper/lower zone or pole annotations.
 
-**Table 4.** Bilateral left/right structures and subjects to check, per 3D model and dataset.
+**Table 4.** Bilateral (left/right) and, where the dataset supports it, upper/lower structures to
+check, per 3D model and dataset.
 
-| No. | Model | Dataset | Bilateral structures to check | Subjects to check |
+| No. | Model | Dataset | Structures to check | Subjects to check |
 |---|---|---|---|---|
 | 1 | VoxTell | AMOS22-MRI | Kidney, adrenal gland | All AMOS22-MRI subjects with both left and right instances annotated |
 | 2 | VoxTell | Neurite-OASIS | Hippocampus, and any other paired brain structure in the manifest | All Neurite-OASIS subjects with both left and right instances annotated |
@@ -101,7 +91,8 @@ truth side comes from the anatomical mask, not the prompt.
 | 4 | Text3DSAM | CT_TotalSeg_cardiac | Subclavian artery, common carotid artery, brachiocephalic vein, iliac artery, iliac vena | All CT_TotalSeg_cardiac subjects with both left and right instances annotated |
 | 5 | Text3DSAM | MR_TotalSeg | Kidney, adrenal gland, iliac artery, iliac vena, humerus, femur, hip, gluteus maximus, gluteus medius, gluteus minimus, autochthon, iliopsoas | All MR_TotalSeg subjects with both left and right instances annotated |
 | 6 | Medical-SAM3 (out-of-domain) | AMOS22-MRI, Neurite-OASIS | Same structures as the VoxTell rows above (kidney, adrenal gland, hippocampus), for direct comparison on the exact same out-of-domain data | All AMOS22-MRI / Neurite-OASIS subjects with both left and right instances annotated |
-| 7 | Medical-SAM3 (in-domain) | Chest X-ray (e.g. Montgomery/Shenzhen CXR sets, or JSRT) | Left lung, right lung | All subjects with both left and right lung masks annotated |
+| 7 | Medical-SAM3 (in-domain) | Chest X-ray, via Chest ImaGenome (MIMIC-CXR) | Left lung, right lung (bilateral); left/right upper, mid, and lower lung zones (upper/lower) | All subjects with left/right lung and lung-zone annotations in Chest ImaGenome |
+| 8 | Medical-SAM3 (in-domain) | Kidney ultrasound, via TRUSTED | Left kidney, right kidney (bilateral); upper pole, lower pole of each kidney (upper/lower) | All 48 TRUSTED subjects (96 kidneys), using the 7 annotated anatomical landmarks per kidney |
 
 ### Worked examples
 
@@ -126,11 +117,24 @@ One example per row, so the experiment is concrete rather than abstract.
   on the same subjects. Since Medical-SAM3 has never seen CT/MRI at all in training, a wrong-side
   result here is expected to be worse than VoxTell's, and tells you how the model behaves on a
   modality it has no exposure to.
-- **Medical-SAM3, Chest X-ray, lung**: prompts `"left lung"` and `"right lung"` on the same CXR
-  image. This is in-domain for Medical-SAM3 (radiography is its largest training modality), so
-  compare this result against the AMOS22-MRI/Neurite-OASIS result above: a much lower wrong-side
-  rate here than out-of-domain would confirm the earlier failures are a modality-gap effect, not a
-  general inability to ground laterality language.
+- **Medical-SAM3, Chest X-ray (Chest ImaGenome), lung**: prompts `"left lung"` and `"right lung"`
+  on the same CXR image. This is in-domain for Medical-SAM3 (radiography is its largest training
+  modality), so compare this result against the AMOS22-MRI/Neurite-OASIS result above: a much
+  lower wrong-side rate here than out-of-domain would confirm the earlier failures are a
+  modality-gap effect, not a general inability to ground laterality language.
+- **Medical-SAM3, Chest X-ray (Chest ImaGenome), lung zones**: same idea but for upper/lower
+  instead of left/right, prompts `"right upper lung zone"` and `"right lower lung zone"` on the
+  same CXR image, checked against Chest ImaGenome's own zone bounding boxes. Tests whether the
+  model's absolute/relative position grounding generalizes beyond left/right to a different
+  relation on the same in-domain modality.
+- **Medical-SAM3, kidney ultrasound (TRUSTED), kidney**: prompts `"left kidney"` and
+  `"right kidney"` on the same ultrasound scan, checked against TRUSTED's own left/right kidney
+  segmentation. A second in-domain, different-modality data point alongside the Chest X-ray
+  result, to see whether an in-domain finding generalizes across modalities or is specific to one.
+- **Medical-SAM3, kidney ultrasound (TRUSTED), kidney pole**: prompts `"upper pole of the kidney"`
+  and `"lower pole of the kidney"` on the same scan, checked against TRUSTED's annotated pole
+  landmarks. Tests upper/lower grounding in a modality (ultrasound) distinct from Chest X-ray's
+  radiography.
 
 ### How to analyze it, metrics
 

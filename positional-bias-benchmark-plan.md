@@ -1,15 +1,44 @@
-# Positional-Bias Benchmark Plan: Localization + Segmentation (2D & 3D)
+# Spatial Reasoning & Positional-Bias Benchmark Plan
 ---
 
-## 1. Segmentation models (3D): text-prompted, active in this repo
+## 1. Segmentation
+
+3D, text-prompted segmentation models, active in this repo.
 
 ### Dataset coverage
 
 - **VoxTell**: AMOS22-MRI, Neurite-OASIS
-- **Medical-SAM3**: AMOS22-MRI, Neurite-OASIS (out-of-domain)
+- **Medical-SAM3**: AMOS22-MRI, Neurite-OASIS (out-of-domain), plus a Chest X-ray dataset with
+  left/right lung masks (in-domain, see note below)
 - **Text3DSAM**: AMOS22-MRI, Neurite-OASIS (out-of-domain), plus in-domain datasets (CT_HaN-Seg,
   CT_TotalSeg_cardiac, MR_TotalSeg)
 
+**Medical-SAM3's actual training modalities** (per its own paper: fully fine-tuned SAM3 on 33
+datasets, 10 imaging modalities) are radiography (CXR and X-ray/angiography), ultrasound,
+endoscopy, pathology, fundus, dermoscopy, and microscopy — **no CT or MRI at all**. So AMOS22-MRI
+and Neurite-OASIS aren't just unseen datasets for this model, they're an unseen *modality*, a
+larger domain gap than "out-of-domain" alone suggests. It's also worth confirming whether this
+model, being SAM3-based (natively an image/video architecture), is run per-slice on the 3D
+volumes rather than as a true volumetric model in this pipeline — that changes how the
+Rotation-Equivariance metric (Table 1) should be interpreted for it specifically, since a
+slice-wise model has no notion of out-of-plane rotation. To test it in-domain instead, use a
+public Chest X-ray dataset with left/right lung segmentation masks (e.g., the Montgomery County
+and Shenzhen CXR sets, or JSRT) — radiography is the largest single modality in its training
+corpus, and left/right lung is a well-established bilateral structure with existing masks. This
+in-domain test is inherently 2D, unlike the volumetric structures tested for VoxTell/Text3DSAM,
+so it belongs alongside the out-of-domain 3D test as a second, separate comparison point, not a
+replacement for it.
+
+### Laterality convention
+
+All "left"/"right" ground truth in this plan, in every section, uses **anatomical (patient)
+laterality**, as recorded in each dataset's native mask/label metadata, not image/radiological
+left-right (which mirrors anatomical laterality on standard axial CT/MR display). Prompts must
+use the same convention: `"left kidney"` means the patient's own left side, not the left side of
+the displayed image. Before running any experiment in this plan, confirm each dataset's masks are
+labeled in this convention. A convention mismatch between prompt and annotation would produce a
+high Wrong-Side Rate that looks exactly like model bias but is actually an annotation/prompt
+mismatch, so this needs verifying once per dataset before trusting any bias result from it.
 
 "Ready now" means the metric can be computed today, either the full rotation sweep already ran,
 or the metric only needs existing result files with no new inference. "Pending" means the
@@ -71,7 +100,8 @@ truth side comes from the anatomical mask, not the prompt.
 | 3 | Text3DSAM | CT_HaN-Seg | Carotid artery, cochlea, anterior eyeball segment, posterior eyeball segment, lacrimal gland, submandibular gland, optic nerve, parotid gland | All CT_HaN-Seg subjects with both left and right instances annotated |
 | 4 | Text3DSAM | CT_TotalSeg_cardiac | Subclavian artery, common carotid artery, brachiocephalic vein, iliac artery, iliac vena | All CT_TotalSeg_cardiac subjects with both left and right instances annotated |
 | 5 | Text3DSAM | MR_TotalSeg | Kidney, adrenal gland, iliac artery, iliac vena, humerus, femur, hip, gluteus maximus, gluteus medius, gluteus minimus, autochthon, iliopsoas | All MR_TotalSeg subjects with both left and right instances annotated |
-| 6 | Medical-SAM3 | Datasets from its own training corpus (SAM 3 fine-tuned on 33 datasets, 10 modalities, not the same CVPR-BiomedSegFM subsets Text3DSAM used) | Not yet identified in this roster, needs its own bilateral-structure inventory, do not reuse the Text3DSAM list above | Pending, identify Medical-SAM3's actual training datasets first |
+| 6 | Medical-SAM3 (out-of-domain) | AMOS22-MRI, Neurite-OASIS | Same structures as the VoxTell rows above (kidney, adrenal gland, hippocampus), for direct comparison on the exact same out-of-domain data | All AMOS22-MRI / Neurite-OASIS subjects with both left and right instances annotated |
+| 7 | Medical-SAM3 (in-domain) | Chest X-ray (e.g. Montgomery/Shenzhen CXR sets, or JSRT) | Left lung, right lung | All subjects with both left and right lung masks annotated |
 
 ### Worked examples
 
@@ -92,10 +122,19 @@ One example per row, so the experiment is concrete rather than abstract.
 - **Text3DSAM, MR_TotalSeg, gluteus maximus**: prompts `"left gluteus maximus"` and
   `"right gluteus maximus"`, a structure with a large, unambiguous left/right size, useful as an
   easy-case sanity check before trusting results on smaller structures like the adrenal gland.
+- **Medical-SAM3, AMOS22-MRI, kidney**: same prompts and check as the VoxTell example above, run
+  on the same subjects. Since Medical-SAM3 has never seen CT/MRI at all in training, a wrong-side
+  result here is expected to be worse than VoxTell's, and tells you how the model behaves on a
+  modality it has no exposure to.
+- **Medical-SAM3, Chest X-ray, lung**: prompts `"left lung"` and `"right lung"` on the same CXR
+  image. This is in-domain for Medical-SAM3 (radiography is its largest training modality), so
+  compare this result against the AMOS22-MRI/Neurite-OASIS result above: a much lower wrong-side
+  rate here than out-of-domain would confirm the earlier failures are a modality-gap effect, not a
+  general inability to ground laterality language.
 
 ### How to analyze it, metrics
 
-Reuses the metrics already defined earlier in Section 1, applied specifically to this
+Reuses the metrics already defined earlier in this section, applied specifically to this
 left/right-only prompt pair, per structure, per subject.
 
 **Table 5.** Metrics for scoring the 3D bilateral left/right grounding experiment.
@@ -109,7 +148,9 @@ left/right-only prompt pair, per structure, per subject.
 
 ---
 
-## 2. Localization models (2D): bbox / point output
+## 2. Localization
+
+2D localization models: bbox / point output.
 
 ### Dataset coverage
 
@@ -137,13 +178,19 @@ computed vs. ready to compute.
 | 6 | Center-Bias Rate | Share of P0 answers landing near image center regardless of true target location | All 8 | Ready now |
 | 7 | Wrong-Side Rate vs. Target Eccentricity | Wrong-Side Rate stratified by how far the true target sits from image center | All 8 | Ready now |
 | 8 | Cross-Dataset Consistency | Whether Wrong-Side Rate holds steady across LGG, Kvasir, and ISIC | All 8 | Ready now |
-| 9 | Significance vs. Chance | Statistical test confirming Wrong-Side Rate is really different from the 50% chance baseline | All 8 | Ready now |
+
+---
+
+## 3. VQA
+
+Open-ended visual question answering, for the localization models that can generate free text.
 
 ### Model eligibility for VQA and MCQ experiments
 
 Not all 8 localization models can generate free text, so not all of them can be used for a
 spatial-VQA or answer-position-bias experiment. Split by actual capability, not by architecture
-family alone.
+family alone. This eligibility applies to both the VQA experiments here and the MCQ experiments
+in Section 4.
 
 **Table 7.** Which of the 8 localization models can be used for VQA and Multiple-Choice
 experiments.
@@ -154,16 +201,15 @@ experiments.
 | 2 | InternVL2.5 | Yes | Yes | Full instruction-tuned VLM, handles open QA and MCQ natively |
 | 3 | Molmo2-8B | Yes | Yes | Chat-capable VLM, pointing is one capability among several, not its only mode |
 | 4 | North-Micro-Vision-Instruct | Yes | Yes | Explicitly built for general VQA/OCR/grounding, likely the best fit of the 8 |
-| 5 | Grounding DINO | No | No | Pure detector, outputs only boxes and confidence scores, no free-text generation at all |
-| 6 | OWLv2 | No | No | Same, zero-shot detector only, no QA capability |
-| 7 | Kosmos-2 | Yes, pilot-test first | Yes, pilot-test first | Real multimodal LLM, can generate free text, but its released focus was grounding/captioning, not instruction-following QA, unclear how reliably it follows an MCQ prompt |
-| 8 | LocateAnything-3B | Yes, pilot-test first | Yes, pilot-test first | Built around structured coordinate-output task templates (categories, referring expressions, pointing), unclear if it retains general open-ended instruction-following for arbitrary questions |
 
-**Solid, no pilot needed**: Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct
-(4 models).
-**Plausible, run a small pilot first**: Kosmos-2, LocateAnything-3B (2 models).
-**Excluded**: Grounding DINO, OWLv2 (2 models), structurally incapable of producing a QA-style
-answer.
+**Usable**: Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct (4 models).
+**Excluded**: Grounding DINO and OWLv2, since both are pure detectors that only output boxes and
+confidence scores, with no free-text generation at all. Kosmos-2 and LocateAnything-3B are also
+excluded: both can generate text, but neither has a confirmed general instruction-following/MCQ
+capability. Kosmos-2's released focus was grounding/captioning, not instruction-following QA, and
+LocateAnything-3B is built around structured coordinate-output task templates (referring
+expressions, pointing) with no confirmed open-ended QA behavior. Both remain usable for the
+Section 2 localization/grounding experiments, where their capability is confirmed.
 
 ### Bilateral-structure datasets for VQA and MCQ
 
@@ -180,35 +226,55 @@ Reusing these datasets, rather than CHAOS/ACDC, means the same bilateral structu
 two task levels, 3D segmentation grounding (Section 1) and 2D VQA/MCQ (here), on the exact same
 underlying data.
 
-#### VQA prompts
+### VQA prompts
 
-**Table 8.** Example VQA prompts for the bilateral left/right experiment, by dataset.
+Same order-counterbalancing concern as the MCQ experiment: phrasing a question as "...the left X
+or the right X?" always mentions "left" first, so a model with any order-of-mention bias (a
+tendency to pick whichever option was named first) would look identical to a laterality bias.
+Each question is run twice per image, once phrased left-then-right and once phrased
+right-then-left, to separate the two.
 
-| No. | Dataset | Bilateral structure | Example VQA prompt | Models |
-|---|---|---|---|---|
-| 1 | CT_HaN-Seg (2D slice) | Left parotid gland, right parotid gland | "Is the gland marked in this image the left parotid gland or the right parotid gland?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
-| 2 | CT_TotalSeg_cardiac (2D slice) | Left common carotid artery, right common carotid artery | "Is the artery marked in this image the left common carotid artery or the right common carotid artery?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
-| 3 | MR_TotalSeg (2D slice) | Left kidney, right kidney | "Is the kidney marked in this image the left kidney or the right kidney?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+**Table 8.** Example VQA prompts for the bilateral left/right experiment, by dataset, with the
+mention order swapped between runs.
 
-#### Multiple-Choice prompts (answer-position bias)
+| No. | Dataset | Bilateral structure | Example VQA prompt (left-then-right) | Example VQA prompt (right-then-left) | Models |
+|---|---|---|---|---|---|
+| 1 | CT_HaN-Seg (2D slice) | Left parotid gland, right parotid gland | "Is the gland marked in this image the left parotid gland or the right parotid gland?" | "Is the gland marked in this image the right parotid gland or the left parotid gland?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+| 2 | CT_TotalSeg_cardiac (2D slice) | Left common carotid artery, right common carotid artery | "Is the artery marked in this image the left common carotid artery or the right common carotid artery?" | "Is the artery marked in this image the right common carotid artery or the left common carotid artery?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+| 3 | MR_TotalSeg (2D slice) | Left kidney, right kidney | "Is the kidney marked in this image the left kidney or the right kidney?" | "Is the kidney marked in this image the right kidney or the left kidney?" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 
-Same question, phrased as MCQ. Run each pair twice per image, once with the correct answer as
-option A and once as option B, to separate genuine bilateral-grounding accuracy from a simple
-preference for one letter position.
+### Existing medical VQA datasets with laterality questions (alternative to slice extraction)
 
-**Table 9.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
-dataset.
+Instead of extracting 2D slices from the 3D volumes above, these established medical VQA
+benchmarks already contain real, human-written laterality/position questions, no new
+preprocessing or synthetic question-writing needed. Found via HuggingFace and web search.
 
-| No. | Dataset | Bilateral structure | Example MCQ prompt | Models |
-|---|---|---|---|---|
-| 1 | CT_HaN-Seg (2D slice) | Left parotid gland, right parotid gland | "Which gland is marked in this image? A) Left parotid gland B) Right parotid gland" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
-| 2 | CT_TotalSeg_cardiac (2D slice) | Left common carotid artery, right common carotid artery | "Which artery is marked in this image? A) Left common carotid artery B) Right common carotid artery" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
-| 3 | MR_TotalSeg (2D slice) | Left kidney, right kidney | "Which kidney is marked in this image? A) Left kidney B) Right kidney" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+**Table 9.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
+HuggingFace and web search.
+
+| No. | Dataset | Images | QA pairs | Modality / body region | Laterality coverage | Answer format | Access |
+|---|---|---|---|---|---|---|---|
+| 1 | VQA-RAD | 315 | 3,515 | X-ray/CT/MRI, head, chest, abdomen | Confirmed, e.g. "Which side of the heart border is obscured?" answer "right" | Open-answer, not natively MCQ | Public |
+| 2 | GEMeX | 151,025 | 1,605,575 | Chest X-ray, built on Chest ImaGenome anatomical regions | Chest ImaGenome defines left/right lung zones, so laterality questions are plausible, needs filtering to confirm exact wording | **Natively single-choice and multiple-choice**, plus region-grounding (bounding box) per answer | Public (med-vqa.com/GEMeX) |
+| 3 | Medical-Diff-VQA | 164,324 image pairs | 700,703 | Chest X-ray (MIMIC-CXR derived) | Confirmed, has a "location" question category with a worked example: "what abnormality is seen in the left lung?" | Open-answer | Requires PhysioNet credentialed access |
+| 4 | MIMIC-CXR-VQA / MIMIC-Ext-MIMIC-CXR-VQA | MIMIC-CXR-derived | Large-scale | Chest X-ray | Location-based questions, likely includes left/right lung | Open-answer | Requires PhysioNet credentialed access |
+
+**GEMeX stands out as the best fit**, since it solves the MCQ-format gap that VQA-RAD has: it
+natively supports both VQA (open/closed-ended) and MCQ (single/multi-choice) in one dataset, is
+built on an anatomical-region ontology that already defines left/right lung zones, and even ships
+region-grounding boxes per answer, useful for cross-checking against your Section 2 localization
+results on the same images.
+
+All are genuinely out-of-domain for your 4 usable 2D VLMs (none were trained on medical VQA data), so
+this keeps the zero-shot framing consistent with your other 2D datasets. The two PhysioNet-gated
+datasets (Medical-Diff-VQA, MIMIC-CXR-VQA) need credentialed access approval before download,
+worth factoring into timeline if you go that route.
 
 ### How to analyze it, metrics
 
 Reuses the same metrics style as the Section 1 bilateral-grounding experiment, adapted to a
-text answer instead of a mask.
+text answer instead of a mask. Rows tagged "VQA" apply here; rows tagged "MCQ" apply to the
+Section 4 experiment instead.
 
 **Table 10.** Metrics for scoring the 2D VQA and Multiple-Choice bilateral experiments.
 
@@ -220,37 +286,112 @@ text answer instead of a mask.
 | 4 | Per-Structure Accuracy | VQA, MCQ | Correct-Side Rate broken down by structure (parotid gland vs. carotid artery vs. kidney), to see which anatomy the model handles best or worst. |
 | 5 | Answer-Position Bias (Letter Preference) | MCQ only | Compare accuracy when the correct answer is option A vs. when it's option B. If accuracy drops (or the model just picks "A" more often) regardless of which side is actually correct, that's a letter-position bias, separate from genuine anatomical understanding. |
 | 6 | Content vs. Letter Bias Disentanglement | MCQ only | Cross-tabulate true side (left/right) against chosen letter (A/B) against correctness. Separates "the model is biased toward right-side anatomy" from "the model is biased toward option A," which look identical in raw accuracy but are different problems. |
-| 7 | Significance vs. Chance | VQA, MCQ | Binomial test of Correct-Side Rate against the 50% chance baseline (a 2-option question), so a result like "58% correct" can be labeled as a real effect or noise. |
+| 7 | Order-of-Mention Bias | VQA only | Compare accuracy, and raw pick rate, between the left-then-right and right-then-left phrasings of the same question (Table 8). If the model just tends to pick whichever side was named first, that's an order-of-mention bias, separate from genuine laterality understanding. |
 
-### Existing medical VQA datasets with laterality questions (alternative to slice extraction)
+---
 
-Instead of extracting 2D slices from the 3D volumes above, these established medical VQA
-benchmarks already contain real, human-written laterality/position questions, no new
-preprocessing or synthetic question-writing needed. Found via HuggingFace and web search.
+## 4. MCQ
 
-**Table 11.** Existing public medical VQA/MCQ datasets with laterality coverage, found via
-HuggingFace and web search.
+Multiple-choice framing of the same bilateral left/right questions, run for the same 4 usable
+VLMs (Table 7), added to test answer-position bias.
 
-| No. | Dataset | Images | QA pairs | Modality / body region | Laterality coverage | Answer format | Access |
-|---|---|---|---|---|---|---|---|
-| 1 | VQA-RAD | 315 | 3,515 | X-ray/CT/MRI, head, chest, abdomen | Confirmed, e.g. "Which side of the heart border is obscured?" answer "right" | Open-answer, not natively MCQ | Public |
-| 2 | SLAKE | 642 | 7,000+ | CT/MRI/X-ray, brain, neck, chest, abdomen, pelvic cavity, 39 organs | Has an explicit "position" question category; specific bilateral-organ questions not yet confirmed | Open-answer, not natively MCQ; bilingual (English/Chinese) | Public |
-| 3 | PMC-VQA | 149,000 | 227,000 | Broad, pulled from PubMed Central figures, many modalities | Not confirmed, would need filtering for laterality questions | Open-answer | Public, HuggingFace (`xmcmic/PMC-VQA`) |
-| 4 | OmniMedVQA | 118,010 | 127,995 | 12 modalities, 20+ human anatomical regions, 73 source datasets | Not confirmed for left/right specifically, but broad anatomical coverage makes it likely present, worth filtering | **Natively MCQ**, each question ships with incorrect distractor options already built in | Public, HuggingFace (`foreverbeliever/OmniMedVQA`) |
-| 5 | GEMeX | 151,025 | 1,605,575 | Chest X-ray, built on Chest ImaGenome anatomical regions | Chest ImaGenome defines left/right lung zones, so laterality questions are plausible, needs filtering to confirm exact wording | **Natively single-choice and multiple-choice**, plus region-grounding (bounding box) per answer | Public (med-vqa.com/GEMeX) |
-| 6 | Medical-Diff-VQA | 164,324 image pairs | 700,703 | Chest X-ray (MIMIC-CXR derived) | Confirmed, has a "location" question category with a worked example: "what abnormality is seen in the left lung?" | Open-answer | Requires PhysioNet credentialed access |
-| 7 | MIMIC-CXR-VQA / MIMIC-Ext-MIMIC-CXR-VQA | MIMIC-CXR-derived | Large-scale | Chest X-ray | Location-based questions, likely includes left/right lung | Open-answer | Requires PhysioNet credentialed access |
+### Multiple-Choice prompts (answer-position bias)
 
-**Two stand out as the best fit**, since they solve the MCQ-format gap that VQA-RAD/SLAKE have:
+Same question as the VQA prompts in Section 3, phrased as MCQ. Run each pair twice per image,
+once with the correct answer as option A and once as option B, to separate genuine
+bilateral-grounding accuracy from a simple preference for one letter position.
 
-- **OmniMedVQA** is already MCQ-native, no distractor-writing needed, directly usable for
-  Table 2 as-is once laterality questions are filtered out of its 128k QA items.
-- **GEMeX** is the strongest overall candidate: natively supports both VQA (open/closed-ended)
-  and MCQ (single/multi-choice) in one dataset, is built on an anatomical-region ontology that
-  already defines left/right lung zones, and even ships region-grounding boxes per answer, useful
-  for cross-checking against your Section 2 localization results on the same images.
+**Table 11.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
+dataset.
 
-All are genuinely out-of-domain for your 8 2D VLMs (none were trained on medical VQA data), so
-this keeps the zero-shot framing consistent with your other 2D datasets. The two PhysioNet-gated
-datasets (Medical-Diff-VQA, MIMIC-CXR-VQA) need credentialed access approval before download,
-worth factoring into timeline if you go that route.
+| No. | Dataset | Bilateral structure | Example MCQ prompt | Models |
+|---|---|---|---|---|
+| 1 | CT_HaN-Seg (2D slice) | Left parotid gland, right parotid gland | "Which gland is marked in this image? A) Left parotid gland B) Right parotid gland" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+| 2 | CT_TotalSeg_cardiac (2D slice) | Left common carotid artery, right common carotid artery | "Which artery is marked in this image? A) Left common carotid artery B) Right common carotid artery" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+| 3 | MR_TotalSeg (2D slice) | Left kidney, right kidney | "Which kidney is marked in this image? A) Left kidney B) Right kidney" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+
+### How to analyze it, metrics
+
+Uses Table 10 in Section 3, specifically the rows tagged "MCQ" or "VQA, MCQ": Correct-Side Rate,
+Wrong-Side Rate, Per-Structure Accuracy, Answer-Position Bias, and Content vs. Letter Bias
+Disentanglement.
+
+### Distance / depth order-bias experiment
+
+Same idea as the laterality MCQ above, applied to the Distance and Depth reasoning types (Table
+14) instead of left/right. 3D segmentation models and the two pure detectors can't be probed
+this way, since they only output a mask/box, never a distance or depth judgment in text; this
+experiment is limited to the 4 usable 2D VLMs from Table 7 (Qwen2.5-VL-3B, InternVL2.5,
+Molmo2-8B, North-Micro-Vision-Instruct).
+
+Uses the same 2D slices as the sections above (CT_HaN-Seg, CT_TotalSeg_cardiac, MR_TotalSeg),
+each showing two distinguishable structures whose relative distance or depth is already known
+from the ground-truth 3D coordinates (e.g., which of two organs' centroids is closer to a marked
+reference point, or which sits in a more anterior slice). Each question is run twice per image,
+once with the correct answer as option A and once as option B, exactly like the laterality MCQ.
+
+**Table 12.** Example Distance/Depth MCQ prompts, order-swapped to test position bias.
+
+| No. | Dataset | Structure pair | Reasoning type | Example MCQ prompt | Models |
+|---|---|---|---|---|---|
+| 1 | MR_TotalSeg (2D slice) | Kidney vs. liver | Distance | "Which structure's center is closer to the marked point? A) Kidney B) Liver" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+| 2 | CT_TotalSeg_cardiac (2D slice) | Common carotid artery vs. subclavian artery | Distance | "Which vessel is closer to the marked point? A) Common carotid artery B) Subclavian artery" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+| 3 | CT_HaN-Seg (2D slice) | Parotid gland vs. submandibular gland | Depth | "Which gland is more anterior, closer to the front of the face? A) Parotid gland B) Submandibular gland" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
+
+**Table 13.** Metrics for scoring the Distance/Depth order-bias experiment.
+
+| No. | Metric | How it's used |
+|---|---|---|
+| 1 | Correct-Answer Rate | Share of answers matching the ground-truth distance/depth relationship, computed from the two structures' 3D centroids. |
+| 2 | Answer-Position Bias (Letter Preference) | Compare accuracy, and raw pick rate, when the correct answer is option A vs. option B, same as the laterality MCQ bias test. |
+| 3 | Content vs. Letter Bias Disentanglement | Cross-tabulate the true closer/more-anterior structure against the chosen letter against correctness, to separate a genuine bias toward one structure from a bias toward one letter. |
+
+---
+
+## 5. Spatial Reasoning
+
+Which of the important spatial-reasoning skills each model, across all four sections above, can
+actually be tested on.
+
+**Table 14.** VLMs / segmentation models vs. spatial reasoning types.
+
+| No. | Model | Relative position (left/right/above/below) | Absolute position (top/bottom/center) | Distance (near/far) | Depth (in front/behind) | Topological (inside/outside/overlap) |
+|---|---|---|---|---|---|---|
+| 1 | VoxTell (3D seg) | Yes | Yes | No | No | Yes |
+| 2 | Medical-SAM3 (3D seg) | Yes | Yes | No | No | Yes |
+| 3 | Text3DSAM (3D seg) | Yes | Yes | No | No | Yes |
+| 4 | Qwen2.5-VL-3B | Yes | Yes | Yes | Yes | Yes |
+| 5 | InternVL2.5 | Yes | Yes | Yes | Yes | Yes |
+| 6 | Molmo2-8B | Yes | Yes | Yes | Yes | Yes |
+| 7 | North-Micro-Vision-Instruct | Yes | Yes | Yes | Yes | Yes |
+| 8 | Kosmos-2 | Yes | Yes | No | No | Yes |
+| 9 | LocateAnything-3B | Yes | Yes | No | No | Yes |
+| 10 | Grounding DINO | Yes | Yes | No | No | Yes |
+| 11 | OWLv2 | Yes | Yes | No | No | Yes |
+
+**Table 15.** What each spatial reasoning type means, and how to evaluate it.
+
+| No. | Reasoning type | What it means | How to evaluate it |
+|---|---|---|---|
+| 1 | Relative position | The location of one object described with respect to another object, e.g. "left of", "above", "between" | Prompt with the relation (e.g. "left kidney"), get the model's box/mask/point, compare its position to the reference object using the ground-truth layout. Metric: Wrong-Side Rate |
+| 2 | Absolute position | The location of an object described with respect to the whole image/volume, e.g. "top", "bottom", "center" | Prompt with the absolute term, check if the returned box/mask/point centroid actually falls in that region of the image/volume (e.g. top third, center zone). Metric: Region-Match Accuracy |
+| 3 | Distance | A qualitative near/far judgment between two objects | For VLMs: ask "which is closer/farther" or "is X near Y", compare to ground-truth centroid distance. For segmentation/detection models: not directly askable, compute centroid-to-centroid distance from the two output masks/boxes instead. Metric: Accuracy vs. ground-truth ranking, or correlation between predicted and true distance |
+| 4 | Depth | Front/behind or closer/farther in the camera or scan viewing axis | For VLMs: ask "is X in front of Y" (2D images) or "which is closer to the viewer". For 3D volumes: reframe as slice-position (which axial/coronal/sagittal slice) since there's no camera depth. Metric: Accuracy vs. ground-truth ordering along that axis |
+| 5 | Topological relationship | How two regions relate structurally, e.g. inside, outside, overlapping, touching, containing | Prompt with the relation (e.g. "tumor inside kidney"), check output mask/box overlap or containment against the ground-truth masks. Metric: IoU / containment ratio, or binary correct/incorrect on the relation |
+
+**Table 16.** Metrics for evaluating each spatial reasoning type.
+
+| No. | Reasoning type | Metric | What it measures |
+|---|---|---|---|
+| 1 | Relative position | Wrong-Side Rate | Share of answers where the predicted side (left/right/above/below) is the opposite of the ground truth |
+| 2 | Relative position | Laterality Dice Gap | Difference in mean Dice/accuracy between the two sides of a relation, when the model does get the side right |
+| 3 | Absolute position | Region-Match Accuracy | Share of predictions whose centroid falls in the correct absolute region of the image/volume (e.g. top third, center zone) |
+| 4 | Absolute position | Center-Bias Rate | Share of predictions landing near the image/volume center regardless of the true target location |
+| 5 | Distance | Correct-Answer Rate | Share of near/far judgments matching the ground-truth centroid-distance ranking |
+| 6 | Distance | Distance Correlation | Correlation between the model's predicted distance ordering and the true ground-truth distance, for models that output a number |
+| 7 | Depth | Correct-Answer Rate | Share of front/behind or closer/farther judgments matching the ground-truth ordering along the viewing/scan axis |
+| 8 | Topological relationship | IoU / Containment Ratio | Overlap or containment between the predicted and ground-truth masks/boxes, for inside/outside/overlap/touching claims |
+| 9 | Topological relationship | Binary Correct/Incorrect Rate | Share of topological relation claims (e.g. "tumor inside kidney") that match ground truth, for models that only state the relation in text |
+| 10 | Any type (bias check) | Answer-Position Bias (Letter Preference) | For MCQ-framed questions, compares accuracy/pick-rate when the correct answer is option A vs. option B, to separate content understanding from letter-position bias |
+
+---

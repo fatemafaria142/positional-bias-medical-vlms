@@ -227,6 +227,34 @@ Reusing these datasets, rather than CHAOS/ACDC, means the same bilateral structu
 two task levels, 3D segmentation grounding (Section 1) and 2D VQA/MCQ (here), on the exact same
 underlying data.
 
+### External multimodal VQA datasets (left/right + upper/lower)
+
+Alongside the sliced-3D approach above, these existing Hugging Face multimodal VQA datasets were
+checked directly (by sampling their actual `question`/`answer` text) and confirmed to contain
+**both** left/right and upper/lower positional language already, without needing any slicing or
+relabeling. Useful as ready-made, larger-scale supplementary data for the VQA experiment.
+
+**Table 9.** External multimodal VQA datasets confirmed to cover both left/right and upper/lower
+positional language.
+
+| No. | Dataset | HF Link | Modality | Size | Left/Right | Upper/Lower |
+|---|---|---|---|---|---|---|
+| 1 | SLAKE | [BoKelvin/SLAKE](https://huggingface.co/datasets/BoKelvin/SLAKE) | MRI, CT | 14,028 QA pairs (9,840 train / 2,100 val / 2,090 test) | Yes | Yes |
+| 2 | Medical-CXR-VQA | [X-iZhang/Medical-CXR-VQA](https://huggingface.co/datasets/X-iZhang/Medical-CXR-VQA) | Chest X-ray | ~78K QA pairs | Yes | Yes |
+| 3 | M3D-VQA | [GoodBaiBai88/M3D-VQA](https://huggingface.co/datasets/GoodBaiBai88/M3D-VQA) | 3D medical volumes (CT) | Large-scale (part of M3D suite) | Yes | Yes |
+| 4 | MedPix-VQA | [mmoukouba/MedPix-VQA](https://huggingface.co/datasets/mmoukouba/MedPix-VQA) | Mixed (MedPix teaching cases) | Varies | Yes | Yes |
+| 5 | Kvasir-VQA | [SimulaMet-HOST/Kvasir-VQA](https://huggingface.co/datasets/SimulaMet-HOST/Kvasir-VQA) | Endoscopy (GI) | 58,849 QA pairs, 6,500 images | Yes | Yes |
+| 6 | GEMeX-VQA (open-ended) | [BoKelvin/GEMeX-VQA](https://huggingface.co/datasets/BoKelvin/GEMeX-VQA) — `open_ended_question.jsonl` | Chest X-ray | Same corpus as the MCQ subset in Table 12 | Yes* | Yes* |
+
+*GEMeX-VQA (open-ended) positional coverage was confirmed on the MCQ subset of this same dataset
+(Section 4, Table 12), not independently re-sampled for the open-ended split.
+
+M3D-VQA is the only dataset here that's natively 3D/volumetric, making it the closest match in
+dimensionality to the Section 1 segmentation datasets. Of the others, note that SLAKE has a
+dedicated `location` field and Kvasir-VQA uses a structured 9-way grid answer
+(upper/center/lower × left/center/right) — both give cleaner, lower-noise positional labels than
+free-text mentions, even where their raw match rate is lower.
+
 ### VQA prompts
 
 Same order-counterbalancing concern as the MCQ experiment: phrasing a question as "...the left X
@@ -235,7 +263,7 @@ tendency to pick whichever option was named first) would look identical to a lat
 Each question is run twice per image, once phrased left-then-right and once phrased
 right-then-left, to separate the two.
 
-**Table 9.** Example VQA prompts for the bilateral left/right experiment, by dataset, with the
+**Table 10.** Example VQA prompts for the bilateral left/right experiment, by dataset, with the
 mention order swapped between runs.
 
 | No. | Dataset | Bilateral structure | Example VQA prompt (left-then-right) | Example VQA prompt (right-then-left) | Models |
@@ -260,7 +288,7 @@ Section 4 experiment instead.
 | 4 | Per-Structure Accuracy | VQA, MCQ | Correct-Side Rate broken down by structure (parotid gland vs. carotid artery vs. kidney), to see which anatomy the model handles best or worst. |
 | 5 | Answer-Position Bias (Letter Preference) | MCQ only | Compare accuracy when the correct answer is option A vs. when it's option B. If accuracy drops (or the model just picks "A" more often) regardless of which side is actually correct, that's a letter-position bias, separate from genuine anatomical understanding. |
 | 6 | Content vs. Letter Bias Disentanglement | MCQ only | Cross-tabulate true side (left/right) against chosen letter (A/B) against correctness. Separates "the model is biased toward right-side anatomy" from "the model is biased toward option A," which look identical in raw accuracy but are different problems. |
-| 7 | Order-of-Mention Bias | VQA only | Compare accuracy, and raw pick rate, between the left-then-right and right-then-left phrasings of the same question (Table 9). If the model just tends to pick whichever side was named first, that's an order-of-mention bias, separate from genuine laterality understanding. |
+| 7 | Order-of-Mention Bias | VQA only | Compare accuracy, and raw pick rate, between the left-then-right and right-then-left phrasings of the same question (Table 10). If the model just tends to pick whichever side was named first, that's an order-of-mention bias, separate from genuine laterality understanding. |
 
 ---
 
@@ -275,7 +303,27 @@ Same question as the VQA prompts in Section 3, phrased as MCQ. Run each pair twi
 once with the correct answer as option A and once as option B, to separate genuine
 bilateral-grounding accuracy from a simple preference for one letter position.
 
-**Table 12.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
+### External multimodal MCQ datasets (left/right + upper/lower)
+
+Same idea as the Section 3 external VQA table (Table 9), but for existing multimodal MCQ
+datasets: checked directly against their actual `question`/`answer`/`choices` text and confirmed
+to contain both left/right and upper/lower positional language already.
+
+**Table 12.** External multimodal MCQ datasets confirmed to cover both left/right and upper/lower
+positional language.
+
+| No. | Dataset | HF Link | Modality | Size | Left/Right | Upper/Lower |
+|---|---|---|---|---|---|---|
+| 1 | GEMeX-VQA (MCQ subset) | [BoKelvin/GEMeX-VQA](https://huggingface.co/datasets/BoKelvin/GEMeX-VQA) — `multi_choice_question.jsonl` | Chest X-ray | Subset of GEMeX-VQA | Yes | Yes |
+| 2 | MedXpertQA (MM subset) | [TsinghuaC3I/MedXpertQA](https://huggingface.co/datasets/TsinghuaC3I/MedXpertQA) (config `MM`) | Radiology images + text | 4,460 questions total, 17 specialties, 11 body systems | Yes | Yes |
+| 3 | PMC-VQA | [RadGenome/PMC-VQA](https://huggingface.co/datasets/RadGenome/PMC-VQA) (also mirrored at [xmcmic/PMC-VQA](https://huggingface.co/datasets/xmcmic/PMC-VQA)) | Mixed medical figures (from PMC Open Access papers) | 227K QA pairs, 149K images | Yes | Yes |
+
+GEMeX-VQA (MCQ subset) has the strongest signal of the three: position is a first-class,
+structured MCQ answer choice (e.g. "Right lung" / "Left lung base" / "Cardiac region"), not just
+incidental phrasing — making it the best candidate for a controlled answer-position-bias MCQ run
+alongside the sliced-3D prompts below.
+
+**Table 13.** Example Multiple-Choice prompts for the bilateral left/right experiment, by
 dataset.
 
 | No. | Dataset | Bilateral structure | Example MCQ prompt | Models |
@@ -293,7 +341,7 @@ Disentanglement.
 ### Distance / depth order-bias experiment
 
 Same idea as the laterality MCQ above, applied to the Distance and Depth reasoning types (Table
-14) instead of left/right. 3D segmentation models and the two pure detectors can't be probed
+15) instead of left/right. 3D segmentation models and the two pure detectors can't be probed
 this way, since they only output a mask/box, never a distance or depth judgment in text; this
 experiment is limited to the 4 usable 2D VLMs from Table 8 (Qwen2.5-VL-3B, InternVL2.5,
 Molmo2-8B, North-Micro-Vision-Instruct).
@@ -304,7 +352,7 @@ from the ground-truth 3D coordinates (e.g., which of two organs' centroids is cl
 reference point, or which sits in a more anterior slice). Each question is run twice per image,
 once with the correct answer as option A and once as option B, exactly like the laterality MCQ.
 
-**Table 13.** Example Distance/Depth MCQ prompts, order-swapped to test position bias.
+**Table 14.** Example Distance/Depth MCQ prompts, order-swapped to test position bias.
 
 | No. | Dataset | Structure pair | Reasoning type | Example MCQ prompt | Models |
 |---|---|---|---|---|---|
@@ -312,7 +360,7 @@ once with the correct answer as option A and once as option B, exactly like the 
 | 2 | CT_TotalSeg_cardiac (2D slice) | Common carotid artery vs. subclavian artery | Distance | "Which vessel is closer to the marked point? A) Common carotid artery B) Subclavian artery" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 | 3 | CT_HaN-Seg (2D slice) | Parotid gland vs. submandibular gland | Depth | "Which gland is more anterior, closer to the front of the face? A) Parotid gland B) Submandibular gland" | Qwen2.5-VL-3B, InternVL2.5, Molmo2-8B, North-Micro-Vision-Instruct |
 
-**Table 14.** Metrics for scoring the Distance/Depth order-bias experiment.
+**Table 15.** Metrics for scoring the Distance/Depth order-bias experiment.
 
 | No. | Metric | How it's used |
 |---|---|---|
@@ -327,7 +375,7 @@ once with the correct answer as option A and once as option B, exactly like the 
 Which of the important spatial-reasoning skills each model, across all four sections above, can
 actually be tested on.
 
-**Table 15.** VLMs / segmentation models vs. spatial reasoning types.
+**Table 16.** VLMs / segmentation models vs. spatial reasoning types.
 
 | No. | Model | Relative position (left/right/above/below) | Absolute position (top/bottom/center) | Distance (near/far) | Depth (in front/behind) | Topological (inside/outside/overlap) |
 |---|---|---|---|---|---|---|
@@ -343,7 +391,7 @@ actually be tested on.
 | 10 | Grounding DINO | Yes | Yes | No | No | Yes |
 | 11 | OWLv2 | Yes | Yes | No | No | Yes |
 
-**Table 16.** What each spatial reasoning type means, and the metrics used to evaluate it.
+**Table 17.** What each spatial reasoning type means, and the metrics used to evaluate it.
 
 | No. | Reasoning type | What it means | Metric | How it's evaluated / what it measures |
 |---|---|---|---|---|

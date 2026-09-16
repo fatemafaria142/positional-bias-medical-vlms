@@ -78,39 +78,69 @@ Sections A.1 Training Configuration and A.2 Model Architecture).
 
 ### Visual grounding with relational language (bilateral left/right only)
 
-**What this test is.** None of the three models were trained on phrases like "the organ to the
-left of X," only on plain anatomy names like "kidney." But "left kidney" / "right kidney" is
-itself a relational phrase (left/right only makes sense relative to the body's own midline), so
-this test checks something the models were never directly trained to do: can they tell "left X"
-apart from "right X" and put the mask on the correct side.
+**Segmentation vs. grounding, the difference this test is built around:**
+- Segmentation quality asks: *"is the predicted mask shaped correctly?"* → scored with Dice
+  against the ground-truth mask, regardless of what the prompt said.
+- Visual grounding asks a different question: *"did the mask land where the words actually
+  pointed?"* → a model can have great Dice on "kidney" in general and still put the mask on the
+  wrong side when the word "left" or "right" is the only thing that changes.
+- A model can nail one and fail the other. Good shape, wrong side = a grounding failure hiding
+  behind an otherwise-healthy Dice score.
 
-**How one test works, step by step (using VoxTell on AMOS22-MRI, kidney):**
+**The core setup, in one line:**
+- We send the exact same image to the model twice.
+- Each time, we send a different prompt, and the only thing that changes between the two prompts
+  is the position word:
+  - `"Segment the left kidney in this image."`
+  - `"Segment the right kidney in this image."`
+- Why: since the image never changes, the only thing that can explain a difference in where the
+  two masks land is whether the model actually read "left" vs. "right." This isolates the
+  model's use of positional language from everything else (image content, mask quality, dataset).
+
+**Why "left/right" counts as relational language:**
+- None of the three models were trained on longer relational phrases like "the organ to the left
+  of the spine," only on plain anatomy names like "kidney."
+- But "left"/"right" only mean anything relative to the body's own midline, so `"left kidney"` is
+  itself a minimal relational phrase, even though it looks like just a name.
+- This is the one relational test these models can be fairly given today.
+
+**The 5-step recipe (worked example: VoxTell, AMOS22-MRI, kidney):**
 1. Take one subject's MRI volume.
-2. Prompt the model with `"left kidney"`. It returns a predicted mask.
-3. Look at where that mask actually sits, left or right of the body's midline, and compare it to
-   the *true* left kidney's location (from the ground-truth annotation, not from the prompt).
-4. Repeat step 2-3 with `"right kidney"` on the exact same volume.
-5. A correct model puts the "left kidney" mask on the true left kidney, and the "right kidney"
-   mask on the true right kidney. A biased model gets one or both sides wrong, for example always
-   segmenting the anatomically-right kidney no matter which word it was given.
+2. Prompt with `"Segment the left kidney in this image."` → get a predicted mask.
+3. Prompt with `"Segment the right kidney in this image."` on the *same* volume → get a second
+   predicted mask.
+4. For each mask, check which side of the body's midline it actually sits on, and compare it to
+   the *true* side from the ground-truth annotation (not from the prompt).
+5. Pass = "left" prompt lands on the true left kidney, and "right" prompt lands on the true right
+   kidney. Fail = one or both land on the opposite side (e.g., always the anatomically-right
+   kidney, no matter which word it was given).
 
-Table 5 below repeats this exact same 5-step recipe once for each dataset, just swapping in the
-model, structure, and prompt wording. For the two Medical-SAM3 in-domain datasets, the identical
-recipe is also run with "upper X" / "lower X" instead of "left X" / "right X" (lung zones for
-Chest ImaGenome, kidney pole for TRUSTED); that variant isn't a separate table row, it's the same
-row's structure with the direction words swapped.
+**Scope of this section:**
+- Applies to the 3D segmentation models only: VoxTell, Medical-SAM3, Text3DSAM.
+- Table 5 below repeats this exact recipe once per dataset, just swapping in the model, structure,
+  and prompt wording.
+- For the two Medical-SAM3 in-domain datasets, the identical recipe is also run with `"upper X"` /
+  `"lower X"` instead of `"left X"` / `"right X"` (lung zones for Chest ImaGenome, kidney pole for
+  TRUSTED) — not a separate table row, just the same row's structure with the direction words
+  swapped.
 
-**Table 5.** One worked example per dataset, following the 5-step recipe above.
+**Table 5.** One worked example per dataset, following the 5-step recipe above. Rows 1-7 are the
+left/right pairs; rows 8-9 repeat the identical recipe with upper/lower instead, for the two
+Medical-SAM3 in-domain datasets.
 
-| No. | Model | Dataset | Structure we prompt | First we ask | Then we ask | What makes this one worth checking |
+| No. | Model | Dataset | Structure we prompt | First we ask (full prompt) | Then we ask (full prompt) | What makes this one worth checking |
 |---|---|---|---|---|---|---|
-| 1 | VoxTell | AMOS22-MRI | Kidney | `"left kidney"` | `"right kidney"` | The main baseline case for VoxTell |
-| 2 | VoxTell | Neurite-OASIS | Hippocampus | `"left hippocampus"` | `"right hippocampus"` | Same check, but on brain MRI instead of abdominal MRI |
-| 3 | Text3DSAM | CT_HaN-Seg | Parotid gland | `"left parotid gland"` | `"right parotid gland"` | This dataset is in-domain for Text3DSAM, so a wrong answer here can't be blamed on an unfamiliar dataset |
-| 4 | Text3DSAM | CT_TotalSeg_cardiac | Common carotid artery | `"left common carotid artery"` | `"right common carotid artery"` | Same in-domain check as row 3, on a blood vessel instead of a gland |
-| 5 | Text3DSAM | MR_TotalSeg | Gluteus maximus | `"left gluteus maximus"` | `"right gluteus maximus"` | A large, easy-to-see structure, a sanity check before trusting results on tiny structures |
-| 6 | Medical-SAM3 | Chest X-ray, via Chest ImaGenome | Lung | `"left lung"` | `"right lung"` | Chest X-ray is Medical-SAM3's largest training modality, so this is its in-domain case |
-| 7 | Medical-SAM3 | Kidney ultrasound, via TRUSTED | Kidney | `"left kidney"` | `"right kidney"` | A second, different in-domain modality (ultrasound) for the same model |
+| 1 | VoxTell | AMOS22-MRI | Kidney | `"Segment the left kidney in this image."` | `"Segment the right kidney in this image."` | The main baseline case for VoxTell |
+| 2 | VoxTell | Neurite-OASIS | Hippocampus | `"Segment the left hippocampus in this image."` | `"Segment the right hippocampus in this image."` | Same check, but on brain MRI instead of abdominal MRI |
+| 3 | Text3DSAM | CT_HaN-Seg | Parotid gland | `"Segment the left parotid gland in this image."` | `"Segment the right parotid gland in this image."` | This dataset is in-domain for Text3DSAM, so a wrong answer here can't be blamed on an unfamiliar dataset |
+| 4 | Text3DSAM | CT_TotalSeg_cardiac | Common carotid artery | `"Segment the left common carotid artery in this image."` | `"Segment the right common carotid artery in this image."` | Same in-domain check as row 3, on a blood vessel instead of a gland |
+| 5 | Text3DSAM | MR_TotalSeg | Gluteus maximus | `"Segment the left gluteus maximus in this image."` | `"Segment the right gluteus maximus in this image."` | A large, easy-to-see structure, a sanity check before trusting results on tiny structures |
+| 6 | Medical-SAM3 | Chest X-ray, via Chest ImaGenome | Lung | `"Segment the left lung in this image."` | `"Segment the right lung in this image."` | Chest X-ray is Medical-SAM3's largest training modality, so this is its in-domain case |
+| 7 | Medical-SAM3 | Kidney ultrasound, via TRUSTED | Kidney | `"Segment the left kidney in this image."` | `"Segment the right kidney in this image."` | A second, different in-domain modality (ultrasound) for the same model |
+| 8 | Medical-SAM3 | Chest X-ray, via Chest ImaGenome | Lung zone | `"Segment the upper lung zone in this image."` | `"Segment the lower lung zone in this image."` | Same dataset as row 6, upper/lower instead of left/right |
+| 9 | Medical-SAM3 | Kidney ultrasound, via TRUSTED | Kidney pole | `"Segment the upper kidney pole in this image."` | `"Segment the lower kidney pole in this image."` | Same dataset as row 7, upper/lower instead of left/right |
+
+*Prompt template source: the exact wording VoxTell is prompted with in this repo's own dataset manifests (e.g. `faria/samples/amos22_mri/manifest_amos22_mri.csv`, `prompt_text` column: `"Segment the right kidney in this image."`). The same template is applied here to Text3DSAM and Medical-SAM3 for consistency across the three models.
 
 For every row, the model's answer is checked the same way: does the predicted mask's location
 actually match the true left/right side of that structure, as recorded in that dataset's own
@@ -129,6 +159,32 @@ left/right-only prompt pair, per structure, per subject.
 | 2 | **Laterality Dice Gap** | Compare mean Dice when the model is prompted with the correct-matching side (e.g., "left kidney" scored against the true left kidney mask) between the left and right prompts. A large gap means the model segments one side much better than the other, even when it gets the side right. |
 | 3 | **Centroid-Displacement Direction** | When the model gets the side wrong, check whether the predicted centroid still lands *near* the correct-side structure's true location, or somewhere else entirely. Distinguishes "swapped the label" from "genuinely lost track of the anatomy." |
 | 4 | **Failure-Mode Classification** | For wrong-side cases, classify whether the predicted mask is a real structure on the wrong side (a true label swap) or a missing/empty prediction (the model didn't find the relational cue at all). |
+
+**Explain**
+
+- **Wrong-Side Rate**
+  - Send both prompts ("left X" and "right X") on the same subject, take each predicted mask's
+    centroid, and note which side of the body it falls on.
+  - Compare that side to the side named in the prompt: if they don't match, count it as a
+    wrong-side error. This is the main pass/fail number for the whole experiment.
+
+- **Laterality Dice Gap**
+  - For the cases where the model gets the side right, compute Dice separately for the left
+    prompt's mask and the right prompt's mask, each against its matching ground-truth side.
+  - Subtract the two Dice scores: a large gap means the model is much worse at segmenting one
+    side than the other, even though it isn't confusing left and right.
+
+- **Centroid-Displacement Direction**
+  - Only looked at when the side is wrong: take the predicted centroid and measure how far it is
+    from the true location of the correct-side structure.
+  - If it's close, the model just mislabeled the side (mask is basically in the right place); if
+    it's far, the model lost track of the anatomy entirely, not just the label.
+
+- **Failure-Mode Classification**
+  - For each wrong-side case, check whether the model still produced a real, structure-shaped
+    mask, just on the wrong side, or produced an empty/near-empty prediction.
+  - This separates "the model swapped left and right" from "the model didn't understand the
+    prompt at all," which need different fixes.
 
 ---
 

@@ -18,9 +18,15 @@ result points which way.
 
 All setups assume access to `predictor.text_backbone` (`Qwen/Qwen3-Embedding-4B`),
 `predictor.embed_text_prompts(text_prompts)`, and `predictor.predict_single_image(img, organs)`
-(from `voxtell-amos-rotation-multiangle-kaggle.ipynb`). Rows marked "needs hook" require locating
-an interception point inside `voxtell.inference.predictor` first — see the **Prerequisite** note
-below the table; this is unverified and must be scoped before those rows can run.
+(from `voxtell-amos-rotation-multiangle-kaggle.ipynb`).
+
+**What "needs hook" means:** a *hook* here is a PyTorch `forward_hook` — a small callback attached
+to a specific internal layer of the model that lets you intercept or inspect the data flowing
+through that layer while the model runs, without modifying VoxTell's own code. `predict_single_image`
+only gives you the final mask; if a row needs to see something *inside* the model (the fused
+feature map, the text embedding at the exact point it enters the decoder), it needs a hook attached
+to the right internal module first. Whether such a clean attachment point even exists in VoxTell's
+code is currently **unverified** — see the **Prerequisite** note below the table for how to check.
 
 | ID | Category | Use Case | Setup — What We Do | Reasoning — Why This Test | Metric — What We Measure | Analysis — What We Learn |
 |---|---|---|---|---|---|---|
@@ -36,8 +42,8 @@ below the table; this is unverified and must be scoped before those rows can run
 | G2 | Word Attribution — Target Metric | `f_dice_self` | Dice(predicted mask for perturbed prompt, predicted mask for the *original, unperturbed* prompt). | Doesn't require ground truth, so it also works on unlabeled subjects — isolates "does the word change the output at all" from "is the output correct." | Dice vs. original prediction, per perturbation. | Which words matter for *changing the output at all* — the stability/sensitivity view. |
 | G3 | Word Attribution — Target Metric | `f_centroid_shift` | Signed displacement of the predicted mask's centroid along the left-right axis, relative to the original prompt's centroid. | The single most on-point metric for the core laterality question — directly measures whether removing a word moves the mask to the other side. | Signed centroid displacement, per perturbation. | Which word, when removed, moves the predicted mask's side — the most direct test for "does it take the anatomy or the L/R word." |
 | G4 | Word Attribution — Target Metric | `f_volume` | Predicted mask voxel count. | Captures a different failure mode than moving to the wrong side — the model "giving up" entirely. | Voxel count, per perturbation. | Detects collapse to empty/near-empty prediction when a word is removed. |
-| S1 | Synthesis | Organ-name contribution (e.g. "kidney") | Cross-reference F5's pass/fail with Section 5's (M1-M3/G1-G4) organ-name attribution score. | Combines a causal output-level test (F5) with a quantified attribution score to triangulate the organ name's real contribution, not just one anecdotal signal. | F5 outcome + attribution magnitude on the organ-name word. | Output changes correctly when organ name changes (F5) *and* high attribution score → organ name genuinely drives the output. |
-| S2 | Synthesis | Position-word contribution (e.g. "left"/"right") | Cross-reference F3's causal shift with Section 5's position-word attribution score, especially on `f_centroid_shift` (G3). | Combines the strongest causal fusion test (F3) with the quantified word-attribution score to answer whether position words genuinely move the output, not just look different in isolation. | F3 outcome + attribution magnitude on the position word, esp. G3. | Output actually moves (F3) *and* high attribution on `f_centroid_shift` → position word contributes (H1). Both weak together → strongest case that position is decorative (H2). |
+| S1 | Synthesis | Organ-name contribution (e.g. "kidney") | Cross-reference F5's pass/fail with the organ-name word's attribution score from the M1-M3/G1-G4 word-attribution rows. | Combines a causal output-level test (F5) with a quantified attribution score to triangulate the organ name's real contribution, not just one anecdotal signal. | F5 outcome + attribution magnitude on the organ-name word. | Output changes correctly when organ name changes (F5) *and* high attribution score → organ name genuinely drives the output. |
+| S2 | Synthesis | Position-word contribution (e.g. "left"/"right") | Cross-reference F3's causal shift with the position word's attribution score from the M1-M3/G1-G4 rows, especially on `f_centroid_shift` (G3). | Combines the strongest causal fusion test (F3) with the quantified word-attribution score to answer whether position words genuinely move the output, not just look different in isolation. | F3 outcome + attribution magnitude on the position word, esp. G3. | Output actually moves (F3) *and* high attribution on `f_centroid_shift` → position word contributes (H1). Both weak together → strongest case that position is decorative (H2). |
 | S3 | Synthesis | Image-text alignment (as currently scoped) | Read AL4 on its own — this is the only alignment test currently in scope. | Flags that the broader alignment test suite (matched-vs-mismatched confidence ranking, alignment-vs-rotation-angle) was trimmed out; AL4 alone is a real but narrower signal than the full suite would give. | AL4's spatial-overlap result. | High overlap only for matched pairs → real alignment exists inside the network. Otherwise → no real correspondence, or the image dominates regardless of prompt. |
 
 ---

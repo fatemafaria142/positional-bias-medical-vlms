@@ -36,6 +36,29 @@ here is produced fresh via `predict_single_image` for this analysis specifically
 
 ---
 
+## 0.5. Training-data provenance check — done, and it matters
+
+Every hypothesis in Section 0 assumes the model is generalizing (well or badly) to subjects it
+never saw during training. That assumption doesn't hold cleanly for this repo's two evaluation
+datasets — checked directly against VoxTell's own paper (Appendix B.1, "Large-Scale Multi-Modality
+Dataset," the table of all 158 datasets in VoxTell's training corpus; arXiv:2511.11450v1, PDF pages
+23-24):
+
+| # | Finding | Evidence | What it means |
+|---|---|---|---|
+| P1 | **OASIS is in VoxTell's training corpus** | Appendix B.1 table entry: `OASIS [143] 436 3 MRI Brain Regions`, citing Marcus et al.'s cross-sectional MRI OASIS release — the same underlying source **Neurite-OASIS** (used throughout this repo's evaluation) derives from. Same modality (MRI), same anatomical region (brain). | **High risk of train/eval overlap for every Neurite-OASIS result in this plan and in `positional-bias-benchmark-plan.md`.** A Dice score or correct laterality call on Neurite-OASIS is *not* clean evidence of generalization — the model may simply have seen this dataset's poses during training. This caveat should attach to every OASIS-based finding, not just the ones in this document. |
+| P2 | **AMOS is partially in the training corpus — CT only, not confirmed for MRI** | Appendix B.1 table entry: `AMOS [82] 360 16 CT Abdominal Organs`. No separate AMOS-MRI row appears anywhere in the 158-dataset table. | This repo evaluates **AMOS22-MRI**, not the CT arm. Lower direct-overlap risk than OASIS for this specific evaluation subset — but not a clean negative either, since AMOS22's CT and MRI arms were collected from overlapping patient cohorts by the same challenge, so some indirect familiarity (similar anatomy/scanner distribution, if not the literal MRI volumes) can't be ruled out from the paper text alone. |
+| P3 | **Practical implication for prioritization** | — | Given P1/P2, treat **AMOS22-MRI as the closer-to-held-out dataset of the two** — prioritize it when a finding needs to be defended as evidence of genuine generalization rather than recall. Any finding that only replicates on Neurite-OASIS and not on AMOS22-MRI should be reported as *consistent with* memorization, not just consistent with a generic pose prior. |
+
+**Why this mattered to check first:** a memorized-prior finding from Section 2/3 (H3) means something
+different depending on whether the underlying data was in training at all — "the model falls back
+to a canonical pose because it memorized *this dataset's* poses" (now a live possibility for OASIS)
+is a stronger and more specific claim than "the model has a generic pose prior." P1-P3 are what let
+you tell those two apart, and they should be cited alongside any H3-supporting result that uses
+Neurite-OASIS data.
+
+---
+
 ## 1. Text-side use cases — what is the text encoder actually encoding?
 
 **Important scope note:** this section only probes the *text encoder in isolation* —
@@ -202,6 +225,9 @@ listen to text" and "is text-image alignment real" observationally, just not cau
 
 ## Execution order
 
+0. **Section 0.5 (P1-P3, training-data provenance)** — absolute first step, before any inference is
+   run. Cheapest step in the whole plan (reading a paper section) and reframes how every later
+   result should be interpreted and reported.
 1. **Section 1 (T1-T5)** — cheap, no GPU image inference, gates interpretation of Sections 3-4.
 2. **Section 5 (word attribution)** — can start as soon as Section 1 is done; needs fresh inference
    but no hook discovery, and directly produces your headline "which word matters" numbers.

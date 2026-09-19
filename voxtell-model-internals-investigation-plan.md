@@ -14,6 +14,55 @@ each row spells out, in full, what result points which way — no shorthand code
 
 ---
 
+## Plain-language summary (read this first if the table below feels dense)
+
+**The big question, in one sentence:** when VoxTell draws an outline for "the right kidney," is it
+actually listening to the word "right," or is it just guessing based on what a kidney usually looks
+like and where it usually sits?
+
+**What's a "hook"?** A few rows below need something called a "hook." Think of it as a small window
+you open into the model while it's working, so you can peek at what it's doing *inside*, not just
+look at the final drawing it hands back. Without a hook, we can only ever see the finished outline —
+never the model's "thought process" that led to it.
+
+**Image-Text Alignment (row 1):** Does the model's internal "spotlight" actually land on the right
+body part when it hears the word "right"? This isn't about the final drawing — it's about checking,
+inside the model, whether the word and the correct spot in the image are actually connected to each
+other before any drawing happens.
+
+**Fusion (rows 2-4) — does the word actually change what gets drawn?**
+- **Row 2:** If we only swap the word "left" for "right," does the final drawing actually move? We
+  check whether "how different the two words look to the model" lines up with "how different the two
+  drawings turn out."
+- **Row 3 — the strongest test:** We secretly swap in the "right" word's internal signal while the
+  model thinks it's still processing "left," and watch whether the drawing follows. If the drawing
+  doesn't budge, the model isn't really using the word at all — no matter how different the two words
+  looked to it.
+- **Row 4:** We look inside the model (not the final picture) to find exactly where — if anywhere —
+  the "left" version and the "right" version start to look different from each other.
+
+**Word Attribution (rows 5-11) — which word matters most?** The idea: remove one word from the
+prompt at a time (e.g. drop "left," or drop "kidney") and watch how the answer changes. The word
+that changes the answer the most is the word that actually matters.
+- **Rows 5-7** are three different tools for doing this removal-and-measure process. Row 5 tries
+  every possible combination of words removed (most thorough, and cheap enough here since the
+  prompts are short). Rows 6 and 7 are faster, approximate shortcuts for the same idea.
+- **Rows 8-11** are four different ways to *score* what changed when a word was removed:
+  - **Row 8:** Did the answer get worse compared to the real, correct answer?
+  - **Row 9:** Did the answer change at all, compared to what the model said before — even without
+    knowing the real answer?
+  - **Row 10:** Did removing the word flip the drawing from the left side to the right side (or vice
+    versa)? This is the most direct test for the actual left/right question.
+  - **Row 11:** Did the model just give up and draw nothing at all?
+
+**How to read a "genuine grounding" vs. "shortcut/memorized" result:** every row's Analysis column
+ends in one of two directions. "Genuine grounding" means the evidence says the model really is
+reading and using the word. "Shortcut or memorized" means the evidence says the model is leaning on
+something else instead — what the organ usually looks like, or where it usually sits — and the word
+itself isn't doing much work.
+
+---
+
 ## Master analysis table
 
 All setups assume access to `predictor.text_backbone` (`Qwen/Qwen3-Embedding-4B`),
@@ -43,41 +92,3 @@ code is currently **unverified** — see the **Prerequisite** note below the tab
 | 11 | Word Attribution — Target Metric | `f_volume` | Predicted mask voxel count. | Captures a different failure mode than moving to the wrong side — the model "giving up" entirely. | Voxel count, per perturbation. | • Detects collapse to empty/near-empty prediction when a word is removed. |
 
 ---
-
-## Supporting notes (not tabular — kept as prose)
-
-**Perturbation/masking rule for rows 5-7 (word removal):** don't just delete a token — it breaks
-grammar in ways that could confound the result (removing "left" from "Segment the left kidney in
-this image" leaves a still-grammatical sentence, but removing "kidney" doesn't). Use role-aware
-templated ablation instead:
-- Remove the position word → `"Segment the kidney in this image."`
-- Remove the organ name, replace with a generic noun → `"Segment the left structure in this image."`
-- Remove a function word (`"the"`, `"in"`, `"this"`, `"image"`) → drop cleanly; these are the
-  low-importance control rows you'd expect near-zero attribution for, and double as a sanity check
-  that the attribution method isn't just picking up sentence-length artifacts.
-
-**Output of the word-attribution rows (5-11):** one attribution table per (dataset, organ) — rows =
-words in the template, columns = the four target functions (rows 8-11), cell = Shapley/LIME
-importance score. Rank the position word against the organ-name word directly, per organ, per
-dataset, and run across many organs/subjects to report a distribution (e.g. "position word
-attribution was in the bottom quartile of all content words in 80% of cases"), not just one number.
-
-**Prerequisite for rows 1, 3, 4 (marked "needs hook"):** `predict_single_image` is the only
-documented entry point. These three rows need a hook inside the installed `voxtell` package
-(`voxtell.inference.predictor` and whatever segmentation network class it wraps) to intercept the
-text embedding and/or fused feature map — unverified, scope it by reading the installed package
-source directly (`python -c "import voxtell; print(voxtell.__file__)"`, then walk from there)
-before writing any ablation code against it. If no such hook point exists cleanly (e.g. fusion
-happens inside a compiled/traced graph), those three rows fall out of scope and row 2 (no hook
-needed) is what's left to answer "does fusion listen to text" observationally, not causally.
-
----
-
-## Execution order
-
-1. **Row 2** — cheapest, no hook needed, self-contained (computes its own embedding-distance and
-   output-distance inputs).
-2. **Rows 5-11 (word attribution)** — independent of the hook; produces the per-word contribution
-   tables.
-3. **Rows 1, 3, 4** — blocked on the hook-discovery prerequisite above; run last, only if the hook
-   point is found.

@@ -16,10 +16,10 @@ explanations. Keep these four in view — each table row states which one it mov
 
 | Hypothesis | Statement | What would prove it |
 |---|---|---|
-| **H1 — Genuine grounding** | The model reads the position word, locates the correct side in the image, and segments accordingly, at least approximately independent of training augmentation range. | Text encoder separates left/right (Section 2); that separation causally changes the output (Section 4); performance degradation doesn't align suspiciously with the training augmentation boundary. |
-| **H2 — Organ-name-only shortcut** | The position word ("left"/"right") is close to decorative. The model segments "kidney" from the name and picks a side based on image content or a fixed prior, not the word. | Position-word embedding distance is small relative to organ-name distance (Section 2); swapping only the position word barely changes output (Section 4); name-free position-only prompts fail (Section 2, A4). |
+| **H1 — Genuine grounding** | The model reads the position word, locates the correct side in the image, and segments accordingly, at least approximately independent of training augmentation range. | Text encoder separates left/right (Section 2); that separation causally changes the output (Section 5); image-text alignment holds up under mismatched pairs (Section 4); degradation doesn't align suspiciously with the augmentation boundary (Section 1). |
+| **H2 — Organ-name-only shortcut** | The position word ("left"/"right") is close to decorative. The model segments "kidney" from the name and picks a side based on image content or a fixed prior, not the word. | Position-word embedding distance is small relative to organ-name distance (Section 2, sharpened by Section 6's exact word-attribution); swapping only the position word barely changes output (Section 5); name-free position-only prompts fail (Section 2, T4). |
 | **H3 — Training-distribution memorization** | The model performs well only inside the augmentation range it was trained on (~30°/axis), because it memorized the training pose distribution rather than learning rotation-robust geometry. | Degradation onset angle matches the augmentation boundary closely, consistently across organs/datasets (Section 1 — headline test). |
-| **H4 — Surface-token reactivity** | The text encoder reacts to *any* token change, not specifically to spatial semantics — so "left vs. right" distance looks meaningful only because it's *a* token change, not because it's a *position* token change. | Nonsense-token substitution shifts the embedding about as much as the real left/right swap (Section 2, A5). |
+| **H4 — Surface-token reactivity** | The text encoder reacts to *any* token change, not specifically to spatial semantics — so "left vs. right" distance looks meaningful only because it's *a* token change, not because it's a *position* token change. | Nonsense-token substitution shifts the embedding about as much as the real left/right swap (Section 2, T5), and Section 6's word-attribution scores don't concentrate on the position word specifically. |
 
 These aren't mutually exclusive — e.g., H2 and H3 can both be true at once (the model is organ-name-driven *and* pose-memorized). The tables below are built so each row's result maps cleanly onto one or more of these.
 
@@ -30,7 +30,16 @@ These aren't mutually exclusive — e.g., H2 and H3 can both be true at once (th
 
 **Access confirmed available** (from `voxtell-amos-rotation-multiangle-kaggle.ipynb`):
 - `predictor.text_backbone` (`Qwen/Qwen3-Embedding-4B`) and `predictor.embed_text_prompts(text_prompts)` — text embeddings are directly extractable.
-- `predictor.predict_single_image(img, organs)` — the only documented entry point into image/fusion/decoder. Anything beneath the final mask needs a `forward_hook` on internal `nn.Module`s inside `voxtell.inference.predictor` — an open discovery task (see Section 6), not yet confirmed hookable.
+- `predictor.predict_single_image(img, organs)` — the only documented entry point into image/fusion/decoder. Anything beneath the final mask needs a `forward_hook` on internal `nn.Module`s inside `voxtell.inference.predictor` — an open discovery task (see Section 8), not yet confirmed hookable.
+
+**Data policy for this plan:** everything below runs off the raw volumes directly
+(`faria/samples/<dataset>/volumes/*_image.nii.gz` / `*_label.nii.gz`, with the manifest CSVs used
+only for their `prompt_text` / `organ` / `label_path` columns — i.e., as an index into inputs and
+ground truth, not as a source of precomputed predictions). No step below reuses the existing
+`predictions_voxtell_*_rotation_*.csv` output files; every Dice, centroid, or mask-size number used
+here is produced fresh via `predict_single_image` for this analysis specifically. This matters
+because those CSVs were generated for the rotation-sweep behavioral study, on different metric
+definitions than several use cases below need (e.g. mask-vs-mask divergence, not mask-vs-GT).
 
 ---
 
@@ -39,20 +48,13 @@ These aren't mutually exclusive — e.g., H2 and H3 can both be true at once (th
 Run this first. It's the cheapest, highest-leverage test you have, and it reframes everything else:
 if the empirical breakdown point matches the known training augmentation range, that alone is a
 strong, direct argument for H3 (memorization of training pose distribution) over H1 (genuine
-rotation-robust geometric understanding) — no internals access required, just the sweep data
-you already have.
+rotation-robust geometric understanding).
 
 | # | Use case | Setup | Metric | Supports H1 (genuine) if... | Supports H3 (memorized) if... |
 |---|---|---|---|---|---|
-| R1 | **Breakdown-angle vs. augmentation-boundary correlation** | From the existing rotation-sweep CSVs (`predictions_voxtell_*_rotation_*.csv`), for each organ compute the angle at which Dice first drops below a fixed threshold (e.g. 90% of its 0° value). | Breakdown angle per organ, plotted against the known ~30°/axis augmentation range. | Breakdown angle is well past 30° and roughly *uniform* across organs regardless of size/frequency in training. | Breakdown angle clusters tightly *at or just past* 30°, consistently across organs and both datasets (AMOS22-MRI, Neurite-OASIS). |
-| R2 | **Fine-grained boundary localization** | Re-run the sweep at 10-15° steps (this is already flagged as pending, finer-grained, in the existing plan) specifically in the 20-40° window. | Shape of the Dice-vs-angle curve in that window: smooth decay vs. a knee/cliff. | Smooth, gradual decay with no sharp knee near 30° — consistent with a general robustness limit, not a hard-coded boundary. | A visible knee right around 30° — a hard cutoff shape is the signature of "augmentation covered this range and nothing more," not a learned geometric limit that would decay more gradually. |
-| R3 | **Per-organ boundary vs. organ frequency/size** | Cross-reference R1's per-organ breakdown angle against organ size and how often that organ appears across the training-relevant literature/manifests (proxy: voxel count, frequency in manifest). | Correlation coefficient between breakdown angle and organ size/frequency. | No correlation — breakdown angle is architecture/training-range driven uniformly, not tied to how "familiar" an organ is. | Positive correlation — larger/more common organs tolerate rotation slightly better (more augmented exposure), smaller/rarer ones break down earlier — a memorization-frequency signature layered on top of the general 30° boundary. |
-
-**Why this table goes first:** this is the single fastest way to test H3 directly, using data you
-already have (the CSVs), before touching model internals at all. If R1/R2 come back cleanly aligned
-with 30°, that's your headline finding, and it reframes Sections 2-4 below as "why does the model
-fail to generalize past its training range" rather than "does the model understand position at all"
-— two related but distinct questions worth keeping separate in your write-up.
+| R1 | **Breakdown-angle vs. augmentation-boundary correlation** | Fresh inference: for each subject/organ, run `predict_single_image` on every rotated volume already on disk (`*_rot000_image.nii.gz` through `*_rot180_image.nii.gz`), score Dice against that angle's own `*_label.nii.gz`. | Angle at which Dice first drops below a fixed threshold (e.g. 90% of its own 0° value), per organ. | Breakdown angle is well past 30° and roughly *uniform* across organs regardless of size/frequency in training. | Breakdown angle clusters tightly *at or just past* 30°, consistently across organs and both datasets (AMOS22-MRI, Neurite-OASIS). |
+| R2 | **Fine-grained boundary localization** | New inference at 10-15° steps in the 20-40° window specifically (needs new rotated volumes generated via `scripts/rotate_multiangle_samples.py` at finer angles — not currently on disk). | Shape of the Dice-vs-angle curve in that window: smooth decay vs. a knee/cliff. | Smooth, gradual decay with no sharp knee near 30°. | A visible knee right around 30° — the signature of "augmentation covered this range and nothing more." |
+| R3 | **Per-organ boundary vs. organ size** | Cross-reference R1's per-organ breakdown angle against organ size (voxel count, from the fresh GT masks — not the CSV's precomputed `n_pred_voxels`). | Correlation coefficient between breakdown angle and organ size. | No correlation — breakdown angle is uniform, architecture/training-range driven. | Positive correlation — larger/more common organs tolerate rotation slightly better, smaller/rarer ones break down earlier. |
 
 ---
 
@@ -60,93 +62,158 @@ fail to generalize past its training range" rather than "does the model understa
 
 Goal: isolate what token(s) in the prompt the *text encoder* treats as meaningful, before asking
 whether that meaning survives into the output. No image inference needed — cheapest phase, and it
-gates Sections 3-4 (if the text side doesn't separate two prompts, nothing downstream can use a
-distinction that was never made).
+gates Sections 4-5. Treat T1/T2 here as the coarse, two-point version of the question; Section 6
+gives you the fine-grained, per-word version.
 
 | # | Use case | Setup | What's held fixed | What's varied | Metric | Supports H1/genuine position use | Supports H2 (name-only) / H4 (surface-token) |
 |---|---|---|---|---|---|---|---|
 | T1 | **Left vs. right, same organ** | Embed `"Segment the left kidney..."` and `"Segment the right kidney..."` via `embed_text_prompts`. | Organ name, sentence template | Position word only | Cosine distance | Distance is clearly non-trivial (well above tokenizer noise floor). | Distance is near zero — position word barely registers. |
-| T2 | **Organ-name swap, same side (control/scale reference)** | Embed `"Segment the left kidney..."` vs `"Segment the left spleen..."`. | Position word, template | Organ name only | Cosine distance, compared directly against T1's value | T1 distance ≈ T2 distance (position and organ carry comparable weight). | T2 distance >> T1 distance — organ identity dominates, position is a minor perturbation. **This is the direct test of "which word is contributing more."** |
+| T2 | **Organ-name swap, same side (control/scale reference)** | Embed `"Segment the left kidney..."` vs `"Segment the left spleen..."`. | Position word, template | Organ name only | Cosine distance, compared directly against T1's value | T1 distance ≈ T2 distance (position and organ carry comparable weight). | T2 distance >> T1 distance — organ identity dominates. |
 | T3 | **Full-vocabulary clustering** | Embed every organ × side combination in the manifests. PCA/UMAP to 2D. | — | Organ, side | Whether left/right pairs split into position-defined clusters or sit as minor within-organ jitter | Position forms a visible, separate axis of variation across the whole vocabulary. | Points cluster almost entirely by organ; left/right pairs sit right on top of each other. |
-| T4 | **Position-only, name-free prompt** | Embed `"the structure on the left side of the abdomen"` vs. the right-side equivalent — no organ name at all. | Everything except side | Side word, no organ name | Cosine distance, compared to T1 | Name-free distance is comparable to or larger than T1 (position alone is meaningful language to the encoder). | Name-free distance collapses toward zero — without an organ name to modulate, "left"/"right" alone means almost nothing to the encoder. |
-| T5 | **Nonsense-token control** | Re-embed T1's pair, but swap "left" for a semantically empty token of similar length (e.g. a rare/filler word), instead of "right." | Organ name, template, token count | Token identity (real position word vs. nonsense word) | Compare T5's distance-from-original to T1's left→right distance | T5's nonsense-swap distance is clearly *smaller* than T1's real swap — the encoder reacts specifically to spatial meaning, not just to "a word changed." | T5's distance is roughly the *same size* as T1 — the encoder is reacting to token perturbation in general (H4), and T1's "position sensitivity" is an artifact of that, not evidence of spatial understanding. |
-
-**Read T1-T5 together, in this order:** T2 tells you which word matters more in the raw geometry
-(directly answers "does it focus on 'kidney' more than 'right'"). T5 tells you whether even that
-weaker position signal is really about *position*, or just about *some word changed*. T4 tells you
-whether position can stand on its own without an organ name propping it up.
+| T4 | **Position-only, name-free prompt** | Embed `"the structure on the left side of the abdomen"` vs. the right-side equivalent — no organ name at all. | Everything except side | Side word, no organ name | Cosine distance, compared to T1 | Name-free distance is comparable to or larger than T1. | Name-free distance collapses toward zero — position alone means almost nothing without an organ name. |
+| T5 | **Nonsense-token control** | Re-embed T1's pair, but swap "left" for a semantically empty token of similar length, instead of "right." | Organ name, template, token count | Token identity | Compare T5's distance-from-original to T1's left→right distance | T5's nonsense-swap distance is clearly *smaller* than T1's real swap. | T5's distance ≈ T1's — the encoder reacts to any token perturbation, not spatial meaning specifically. |
 
 ---
 
 ## 3. Image-side use cases — how sensitive is the visual path to rotation, independent of text?
 
 Goal: isolate what the *image* side contributes, holding the prompt fixed, so a later Dice drop
-can be attributed to image representation degradation rather than a text-side failure.
+can be attributed to image representation degradation rather than a text-side failure. All rows use
+fresh `predict_single_image` calls on the on-disk rotated volumes.
 
 | # | Use case | Setup | What's held fixed | What's varied | Metric | Supports H1 (image tracks real anatomy) | Supports H3 (image representation is pose-bound) |
 |---|---|---|---|---|---|---|---|
-| I1 | **Same prompt, image rotated across the sweep** | Fixed prompt (e.g. `"Segment the right kidney..."`), run across all angles in the existing sweep (this is what the sweep CSVs already contain — reuse, don't re-run). | Prompt | Rotation angle | Dice vs. angle (already available) — but re-read specifically as "how much of Section 1's cliff is explainable by image path alone" | Degradation is gradual and organ-appropriate. | Degradation shape matches R1/R2's cliff — confirms the image path, not the text path, is where the augmentation-boundary sensitivity actually lives (since the prompt never changed across this whole sweep). |
-| I2 | **Canonical-pose bias in predicted centroid (quantified)** | Fit, per organ: `predicted_centroid(angle) = a · true_centroid(angle) + (1−a) · canonical_centroid_at_0°`, via regression across the sweep. | Prompt | Angle | Fitted coefficient `a` per organ | `a` near 1 — predicted centroid tracks the *true*, rotated anatomy at every angle. | `a` trending toward 0 as angle increases past ~30° — the model increasingly falls back to where the organ *would* sit at 0°, i.e. a memorized canonical pose, not the anatomy actually in front of it. |
-| I3 | **Cross-subject shape-template check** | For a fixed organ + side prompt, compare predicted mask *shape* (centered/aligned) across multiple different subjects at 0°, then again at 60°+. | Prompt, angle | Subject | Shape similarity (e.g. Dice after alignment) across subjects | Shape similarity across subjects is only as high as real anatomical similarity would predict. | Shape similarity is suspiciously high and *doesn't degrade* even as per-subject Dice-vs-ground-truth collapses post-30° — the model is outputting a templated shape regardless of what's actually in the rotated image. |
-| I4 | **Zero/mean text-embedding ablation** | Replace the text embedding with an all-zero vector or the across-vocabulary mean, keep image and rotation angle as normal, run inference. | Image, angle | Text embedding (real vs. ablated) | Output mask vs. the real-prompt output, same image | Output changes substantially without a real text embedding — image alone isn't enough to produce a specific organ+side mask. | Output barely changes — the decoder is already leaning almost entirely on image content, i.e. doing organ-agnostic "segment the salient structure" regardless of what was asked, a strong image-only/memorized-prior signature. |
+| I1 | **Same prompt, image rotated across the sweep** | Fixed prompt, fresh inference across all on-disk angles for that organ/subject. | Prompt | Rotation angle | Dice vs. angle, computed fresh against each angle's own GT | Degradation is gradual and organ-appropriate. | Degradation shape matches R1/R2's cliff — confirms the image path is where the augmentation-boundary sensitivity lives, since the prompt never changed. |
+| I2 | **Canonical-pose bias in predicted centroid (quantified)** | From I1's fresh predictions, fit per organ: `predicted_centroid(angle) = a · true_centroid(angle) + (1−a) · canonical_centroid_at_0°`, via regression. | Prompt | Angle | Fitted coefficient `a` per organ | `a` near 1 — predicted centroid tracks the *true*, rotated anatomy at every angle. | `a` trending toward 0 past ~30° — falls back to where the organ *would* sit at 0°, not the anatomy actually in front of it. |
+| I3 | **Cross-subject shape-template check** | Fixed organ + side prompt, fresh inference across multiple subjects at 0°, then again at 60°+. | Prompt, angle | Subject | Shape similarity (Dice after alignment) across subjects | Shape similarity only as high as real anatomical similarity predicts. | Shape similarity stays suspiciously high post-30° even as per-subject Dice-vs-GT collapses — templated shape output. |
+| I4 | **Zero/mean text-embedding ablation** | Replace the text embedding with an all-zero vector or across-vocabulary mean, keep image/angle fixed, run fresh inference. | Image, angle | Text embedding (real vs. ablated) | Output mask vs. the real-prompt output, same image | Output changes substantially without a real text embedding. | Output barely changes — decoder already leans almost entirely on image content. |
 
 ---
 
-## 4. Fusion-side use cases — does the positional signal, once it exists in text, actually reach and move the output?
+## 4. Image-text alignment — does the text embedding actually correspond to what's in the image?
 
-Goal: causally test whether a text-side distinction (confirmed or refuted in Section 2) propagates
-through fusion into a different mask. This is where "is it image-focused or text-focused" gets a
-direct, causal answer rather than an inferred one.
+This is a distinct question from Section 5 (fusion/does the *decoder* use the signal). Alignment
+asks: independent of what the decoder does with it, is there a coherent correspondence between a
+prompt's embedding and the image region it should point to — the kind of thing a retrieval score or
+contrastive alignment score would normally measure. VoxTell isn't published as a CLIP-style dual
+encoder, so there's no ready-made similarity score; this section builds one from observable
+behavior instead.
+
+| # | Use case | Setup | Metric | Supports H1 (aligned) if... | Supports H2/H3 (poorly aligned) if... |
+|---|---|---|---|---|---|
+| AL1 | **Prompt-ranking retrieval proxy** | Fix one image. Run every organ×side prompt that's anatomically plausible for that volume through `predict_single_image` individually. Rank prompts by an output-confidence proxy (predicted mask voxel count, or the raw probability map's max/mean confidence before thresholding, if the API exposes it). | Whether the *correct* organ+side prompt for a given visible structure ranks at or near the top of that ranking. | The correct prompt reliably produces the highest-confidence, best-localized output relative to mismatched prompts on the same image. | Multiple mismatched prompts (wrong side, or even wrong organ) produce comparably confident output — the model can't discriminate a matching prompt from a non-matching one via output confidence alone. |
+| AL2 | **Matched vs. mismatched pair gap** | For each (image, correct-prompt) pair, also run 2-3 deliberately mismatched prompts (wrong side; a different but plausible organ) on the *same* image. | Distribution of confidence/Dice for matched vs. mismatched pairs — a gap (like a CLIP alignment margin). | Clear, consistent gap: matched pairs score higher than mismatched ones across subjects. | Gap is small or inconsistent — alignment isn't reliably discriminating matched from mismatched content. |
+| AL3 | **Alignment vs. rotation angle** | Repeat AL2 across the rotation sweep (0° through 180°, fresh inference). | Matched-vs-mismatched gap as a function of angle. | Gap holds steady across angles. | Gap shrinks or disappears past ~30° — alignment itself (not just decoder use of it) degrades at the same boundary as Section 1's cliff, pointing the memorization failure further upstream than fusion. |
+| AL4 | **Fused-representation correspondence (if hookable)** | If Section 8's hook point is found: for a matched pair, check whether the fused feature map's high-activation region spatially overlaps the ground-truth structure location; for a mismatched pair, whether it still does (wrongly) or goes diffuse. | Spatial overlap (e.g. IoU between high-activation region and GT bounding box) | High overlap only for matched pairs. | High overlap even for mismatched pairs (image dominates regardless of prompt) — or low overlap even for matched pairs (no real correspondence exists to align in the first place). |
+
+---
+
+## 5. Fusion-side use cases — does the positional signal, once it exists in text, actually reach and move the output?
+
+Goal: causally test whether a text-side distinction (Section 2/6) and an alignment signal (Section
+4) actually propagate through fusion into a different mask.
 
 | # | Use case | Setup | Metric | Supports H1 (fusion listens to text) | Supports H2/H3 (fusion ignores or barely uses text) |
 |---|---|---|---|---|---|
-| F1 | **Paired-prompt output divergence (core test)** | Same image, run `predict_single_image` once with `"left X"`, once with `"right X"`. | Dice/centroid distance *between the two output masks* (not vs. ground truth) | Two prompts, same image → clearly different masks, tracking the two true locations. | Two prompts, same image → nearly identical masks, despite Section 2 showing the text embeddings *do* differ — fusion is discarding an available signal. |
-| F2 | **Embedding-distance vs. output-distance regression** | Plot Section 2's text-embedding cosine distance (x-axis, per organ pair) against F1's mask-difference metric (y-axis). | Regression slope across all bilateral organ/subject pairs | Positive slope — more text-side separation predicts more output-side separation. | Flat/near-zero slope — output difference doesn't track text difference at all, regardless of how distinct the embeddings are. |
-| F3 | **Embedding-swap ablation (causal, strongest test in this table)** | Compute image features for the `"left X"` prompt, but substitute in the *text embedding* computed for `"right X"` before fusion (requires a hook at the point `voxtell.inference.predictor` consumes the text embedding — see Section 6). | Whether the output mask shifts toward the right-side location | Output shifts toward the "right" location — fusion is causally driven by the text embedding, not just correlated with it. | Output doesn't move — fusion provably isn't using the text embedding for this decision, independent of how different the embeddings are. |
-| F4 | **Fused feature-map spatial diff (if hookable)** | Once F3's hook point is found, log the fused feature map for left- vs. right-prompt runs on the same image; compute a spatial difference map. | Where in the network left/right first diverge (or fail to) | Divergence appears early and localizes near the correct anatomical side. | No meaningful divergence anywhere in the fused representation — pinpoints that the failure is at/before fusion, not in the decoder's use of an available signal. |
-| F5 | **Wrong-organ / absent-organ prompt-invariance** | Fixed 0° image, run the correct prompt plus: wrong organ name, wrong side, and an organ genuinely absent from the volume. | Whether output tracks the prompt or stays roughly constant | Output changes appropriately per prompt — segments the right thing, or returns empty for absent organs. | Output stays "something plausible" regardless of prompt — a "there's always something here" memorized-prior signature, independent of what was actually asked. |
+| F1 | **Paired-prompt output divergence (core test)** | Same image, fresh runs of `"left X"` and `"right X"`. | Dice/centroid distance *between the two output masks* (not vs. ground truth) | Clearly different masks, tracking the two true locations. | Nearly identical masks, despite Section 2 showing the text embeddings *do* differ. |
+| F2 | **Embedding-distance vs. output-distance regression** | Plot Section 2's text-embedding cosine distance (x-axis) against F1's mask-difference metric (y-axis), across all bilateral organ/subject pairs. | Regression slope | Positive slope. | Flat/near-zero slope — output doesn't track text difference at all. |
+| F3 | **Embedding-swap ablation (causal, strongest test in this table)** | Compute image features for `"left X"`, substitute in the text embedding computed for `"right X"` before fusion (needs the Section 8 hook). | Whether the output mask shifts toward the right-side location | Output shifts toward "right." | Output doesn't move — fusion provably isn't using the swapped embedding. |
+| F4 | **Fused feature-map spatial diff (if hookable)** | Log the fused feature map for left- vs. right-prompt runs on the same image; compute a spatial difference map. | Where left/right first diverge (or fail to) | Divergence appears early, localizes near the correct side. | No meaningful divergence anywhere in the fused representation. |
+| F5 | **Wrong-organ / absent-organ prompt-invariance** | Fixed 0° image, run correct prompt plus: wrong organ name, wrong side, and an organ genuinely absent from the volume. | Whether output tracks the prompt or stays roughly constant | Output changes appropriately per prompt. | Output stays "something plausible" regardless of prompt. |
 
 ---
 
-## 5. Which word contributes more? — direct answer table
+## 6. Text feature attribution — which word actually drives the output? (LIME / SHAP)
 
-This collapses the "does it focus on anatomy, the position word, or just the organ name" question
-into one side-by-side view, cross-referencing Sections 2-4 so it can be read on its own.
+This is the direct, quantified answer to "which word is contributing more," replacing T1/T2's
+coarse two-point comparison with per-word importance scores. Yes, LIME and SHAP both apply here,
+and they're a better fit than they usually are for text, for one specific reason: VoxTell prompts
+are short and templated (typically 6-9 words: `"Segment"`, `"the"`, `"left"`/`"right"`, organ name
+(1-2 words), `"in"`, `"this"`, `"image"`). At that length, you don't need LIME's random-sampling
+approximation or KernelSHAP's sampling approximation — **exact leave-one-word-out / full Shapley
+enumeration is cheap** (a prompt with 8 words has 2^8 = 256 subsets; even at ~1-2s of inference per
+call, that's minutes, not hours, per (image, prompt) pair).
+
+**Recommended approach, in order of rigor:**
+
+| Method | What it does | When to use it here |
+|---|---|---|
+| **Exact word-ablation / brute-force Shapley** (recommended default) | Enumerate all 2^n subsets of the prompt's content words (or at least all leave-one-out and leave-two-out subsets if n is a bit large), run each through the model, compute the exact Shapley value per word from the resulting output values. | Default choice given how short these prompts are — gives exact, not approximate, per-word attribution. No library dependency beyond basic combinatorics; `shap.explainers.Exact` or `shap.explainers.Permutation` (via `shap.Explainer(f, masker)` with a `shap.maskers.Text` masker) will do this enumeration for you if you'd rather not hand-roll it. |
+| **LIME (`lime.lime_text.LimeTextExplainer`)** | Fits a local linear surrogate model on randomly perturbed (word-masked) versions of the prompt, weighted by similarity to the original. | Reasonable if you want a quick, well-known library and don't need exactness; less precise than brute-force at this prompt length, and LIME's classifier-oriented API needs adapting for a continuous target (see below). |
+| **KernelSHAP / PartitionExplainer** | Approximate Shapley values via sampled coalitions, standard for longer text. | Not really needed here since exact enumeration is affordable — use it only if you extend this to longer, paragraph-style prompts later. |
+
+**Defining the target function** (both LIME and SHAP need a scalar `f(prompt) → number`; segmentation output is a 3D mask, so pick one of these per experiment, all computed fresh from `predict_single_image`, never from the CSVs):
+
+| Target | Definition | What it isolates |
+|---|---|---|
+| `f_dice_gt` | Dice(predicted mask for perturbed prompt, ground-truth mask) | Which words matter for *getting the answer right* — the accuracy-facing view. |
+| `f_dice_self` | Dice(predicted mask for perturbed prompt, predicted mask for the *original, unperturbed* prompt) | Which words matter for *changing the output at all* — the stability/sensitivity view, doesn't need ground truth, so it also works on subjects without labels. |
+| `f_centroid_shift` | Signed displacement of the predicted mask's centroid along the left-right axis, relative to the original prompt's centroid | The most direct test for laterality specifically: **which word, when removed, moves the predicted mask's side.** This is the single most on-point metric for your original question ("does it take the anatomy or the L/R word"). |
+| `f_volume` | Predicted mask voxel count | Detects collapse to empty/near-empty prediction when a word is removed — a different failure mode (model "gives up") from moving to the wrong side. |
+
+**Perturbation/masking rule for word removal:** don't just delete a token (it breaks grammar in
+ways that could confound the result — e.g. removing "left" from "Segment the left kidney in this
+image" leaves a still-grammatical sentence, but removing "kidney" doesn't). Use role-aware
+templated ablation instead:
+- Remove the position word → `"Segment the kidney in this image."`
+- Remove the organ name, replace with a generic noun → `"Segment the left structure in this image."`
+- Remove a function word (`"the"`, `"in"`, `"this"`, `"image"`) → drop cleanly, these are the
+  low-importance control rows you'd expect near-zero attribution for, and they double as a sanity
+  check that the attribution method isn't just picking up sentence-length artifacts.
+
+**Output of this section:** one attribution table per (dataset, organ) — rows = words in the
+template, columns = the four target functions, cell = Shapley/LIME importance score. Rank the
+position word against the organ-name word directly, per organ, per dataset. This is what makes
+Section 0's H2 vs. H1 distinction quantitative rather than a single anecdotal T1/T2 comparison —
+and running it across many organs/subjects lets you report a distribution (e.g. "position word
+attribution was in the bottom quartile of all content words in 80% of cases"), not just one number.
+
+---
+
+## 7. Which word contributes more? — combined direct-answer table
+
+Cross-references Sections 2, 3, 4, 5, 6 into one place.
 
 | Contribution source | Evidence from | What a strong result looks like | What a weak result looks like |
 |---|---|---|---|
-| **Organ name (e.g. "kidney")** | T2 (embedding distance), F5 (wrong-organ prompt) | T2 distance is large; F5 shows output changes correctly when organ name changes. | — |
-| **Position word (e.g. "left"/"right")** | T1, T4 (embedding distance, with/without organ name); F1, F3 (does it move the output) | T1/T4 distances are non-trivial *and* F1/F3 show the output actually moving. | T1 small and/or F1 flat — position word is present in the prompt but contributes ~nothing to the output. |
-| **Image content (anatomy actually visible)** | I1, I2, I4 (rotation sweep, canonical-pose pull, zero-text ablation) | I2's `a` stays near 1 across angles; I4 shows output collapses without real text (image alone insufficient — i.e., image isn't just being segmented on its own, it needs the prompt to know *what*). | I2's `a` falls toward 0 post-30°, and/or I4 shows output barely changes without text — image path is doing most of the work, off a memorized prior, largely independent of the prompt. |
-| **Surface token identity (not meaning)** | T5 (nonsense-token control) | T5 distance << T1 distance — the encoder is specifically meaning-sensitive. | T5 distance ≈ T1 distance — apparent "position sensitivity" is really just "a token changed." |
+| **Organ name (e.g. "kidney")** | T2, F5, Section 6 (organ-name row of the attribution table) | Large T2 distance; F5 shows output changes correctly when organ name changes; high Shapley/LIME attribution. | — |
+| **Position word (e.g. "left"/"right")** | T1, T4, F1, F3, Section 6 (position-word row) | Non-trivial T1/T4 distance *and* F1/F3 show output actually moving *and* high attribution in Section 6, especially on `f_centroid_shift`. | Any of these individually weak is a warning sign; all weak together (T1 small, F1 flat, Section 6 attribution low) is the strongest case that position is decorative. |
+| **Image content (anatomy actually visible)** | I1, I2, I4 | I2's `a` stays near 1 across angles; I4 shows output collapses without real text. | I2's `a` falls toward 0 post-30°, and/or I4 shows output barely changes without text. |
+| **Surface token identity (not meaning)** | T5 | T5 distance << T1 distance. | T5 distance ≈ T1 distance. |
+| **Image-text alignment itself** | AL1-AL4 | Consistent matched-vs-mismatched gap across angles. | Gap shrinks or vanishes past ~30° (Section 1's boundary), or never existed. |
 
 **How to read the combination for your specific claim** ("works 0-30°, blows away after"): if
 Section 1 confirms the cliff aligns with the augmentation boundary, *and* I2 shows `a` collapsing
-toward 0 past that same boundary, *and* F1 shows left/right masks staying similar even when T1
-shows the text embeddings differ — that combination is the strongest possible case for: **the model
-has a memorized, training-distribution-bound spatial prior, and position words contribute much less
-than organ identity or the image's own default pose expectation.** Any one of those three alone is
-suggestive; all three together is a real finding.
+toward 0 past that boundary, *and* AL3 shows the alignment gap itself degrading at the same
+boundary, *and* Section 6 shows the position word's attribution score is consistently low relative
+to the organ name — that combination is the strongest possible case for: **the model has a
+memorized, training-distribution-bound spatial prior, and position words contribute much less than
+organ identity or the image's own default pose expectation.**
 
 ---
 
-## 6. Open discovery task before Section 4's F3-F5 can run
+## 8. Open discovery task before Section 4's AL4 and Section 5's F3/F4 can run
 
-`predict_single_image` is the only documented entry point. F3-F5 need a hook inside the installed
-`voxtell` package (`voxtell.inference.predictor` and whatever segmentation network class it wraps)
-to intercept the text embedding at the point it's consumed by fusion. This is unverified — scope it
-by reading the installed package source directly (`python -c "import voxtell; print(voxtell.__file__)"`
+`predict_single_image` is the only documented entry point. AL4, F3, F4 need a hook inside the
+installed `voxtell` package (`voxtell.inference.predictor` and whatever segmentation network class
+it wraps) to intercept the text embedding and/or fused feature map. This is unverified — scope it
+by reading the installed package source directly (`python -c "import voxtell; print(voxtell.__file__)"`,
 then walk from there) before writing any ablation code against it. If no such hook point exists
-cleanly (e.g. fusion happens inside a compiled/traced graph), F3-F5 may need to fall back to
-input-level surrogates only (F1, F2, F5), which is still enough to answer "does fusion listen to
-text" observationally, just not causally.
+cleanly (e.g. fusion happens inside a compiled/traced graph), those three rows may need to fall back
+to input-level surrogates only (F1, F2, F5, AL1-AL3), which is still enough to answer "does fusion
+listen to text" and "is text-image alignment real" observationally, just not causally.
 
 ---
 
 ## Execution order
 
-1. **Section 1 (R1-R3)** — first, cheapest, reuses existing CSVs, and reframes everything after it.
-2. **Section 2 (T1-T5)** — cheap, no GPU inference, gates interpretation of Section 4.
-3. **Section 3 (I1-I3)** reuse existing sweep data; **I4** and **Section 4's F1, F2, F5** need one
-   new paired-prompt inference pass — straightforward with the existing `predict_single_image` setup.
-4. **Section 4's F3, F4** last — blocked on Section 6's hook discovery.
+1. **Section 1 (R1-R3)** — first, cheapest relative to payoff, fresh inference off the on-disk
+   rotated volumes, reframes everything after it.
+2. **Section 2 (T1-T5)** — cheap, no GPU image inference, gates interpretation of Sections 4-5.
+3. **Section 6 (word attribution)** — can start as soon as Section 2 is done; needs fresh inference
+   but no hook discovery, and directly produces your headline "which word matters" numbers.
+4. **Section 3 (I1-I4)** and **Section 4 (AL1-AL3)** — new inference passes across the rotation
+   sweep and across matched/mismatched prompt pairs; independent of each other, can run in parallel.
+5. **Section 5 (F1, F2, F5)** — needs one new paired-prompt inference pass; independent of the hook.
+6. **Section 4's AL4, Section 5's F3/F4** — last, blocked on Section 8's hook discovery.
+7. **Section 7** — write-up step, combines everything above; no new inference.

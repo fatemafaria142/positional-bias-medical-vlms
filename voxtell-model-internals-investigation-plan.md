@@ -38,10 +38,19 @@ here is produced fresh via `predict_single_image` for this analysis specifically
 
 ## 1. Text-side use cases — what is the text encoder actually encoding?
 
-Goal: isolate what token(s) in the prompt the *text encoder* treats as meaningful, before asking
-whether that meaning survives into the output. No image inference needed — cheapest phase, and it
-gates Sections 3-4. Treat T1/T2 here as the coarse, two-point version of the question; Section 5
-gives you the fine-grained, per-word version.
+**Important scope note:** this section only probes the *text encoder in isolation* —
+`embed_text_prompts` never touches an image. It answers "does the encoder produce a different
+embedding for 'left' vs. 'right'," **not** "does that word actually change the segmentation."
+A word can register here and still be ignored downstream, or vice versa in theory. This section
+exists to rule out the cheapest failure mode first (if the text side can't even tell "left" from
+"right," nothing downstream can recover it) — the actual word-to-segmentation-output question is
+answered in **Section 5**, which re-runs real image inference per word perturbation. Read the two
+together, don't treat Section 1 alone as an answer to "does this word matter."
+
+Goal here: isolate what token(s) in the prompt the *text encoder* treats as meaningful, before
+asking whether that meaning survives into the output. No image inference needed — cheapest phase,
+and it gates Sections 3-4. Treat T1/T2 here as the coarse, two-point version of the question;
+Section 5 gives you the fine-grained, per-word, *image-grounded* version.
 
 | # | Use case | Setup | What's held fixed | What's varied | Metric | Supports H1/genuine position use | Supports H2 (name-only) / H4 (surface-token) |
 |---|---|---|---|---|---|---|---|
@@ -101,11 +110,20 @@ Goal: causally test whether a text-side distinction (Section 1/5) and an alignme
 
 ---
 
-## 5. Text feature attribution — which word actually drives the output? (LIME / SHAP)
+## 5. Text-to-image contribution — is each word actually related to the segmentation, or not? (LIME / SHAP)
 
-This is the direct, quantified answer to "which word is contributing more," replacing T1/T2's
-coarse two-point comparison with per-word importance scores. Yes, LIME and SHAP both apply here,
-and they're a better fit than they usually are for text, for one specific reason: VoxTell prompts
+**This is the section that directly answers "is this word related to the image segmentation, or
+not."** Unlike Section 1 (text-encoder-only, no image), every score in this section comes from
+re-running real inference on the real image with the word perturbed, then measuring the change in
+the *actual predicted mask* — so a word's importance here is measured strictly in terms of its
+effect on segmentation output, not on how different it looks in embedding space. A word can look
+very different in Section 1's embedding space and still score near-zero here (text-side distinction
+that never reaches the output — a fusion/decoder failure), or the reverse in principle. This is
+where you get a real, per-word, image-grounded contribution score.
+
+This replaces T1/T2's coarse two-point comparison with per-word importance scores. Yes, LIME and
+SHAP both apply here, and they're a better fit than they usually are for text, for one specific
+reason: VoxTell prompts
 are short and templated (typically 6-9 words: `"Segment"`, `"the"`, `"left"`/`"right"`, organ name
 (1-2 words), `"in"`, `"this"`, `"image"`). At that length, you don't need LIME's random-sampling
 approximation or KernelSHAP's sampling approximation — **exact leave-one-word-out / full Shapley

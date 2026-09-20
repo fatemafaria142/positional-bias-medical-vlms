@@ -337,6 +337,22 @@ no position slot).
     add_cell(nb, "code", """import itertools
 from math import factorial
 
+# GPU OOM fix: predict_sliding_window_return_logits allocates one (n_prompts, X, Y, Z)
+# fp16 tensor for ALL prompts passed in at once -- for a bilateral-heavy organ (64 combos)
+# times many organs, that's 500+ prompts x a full volume, easily 15-20GB. Run prompts in
+# small batches instead; lower this if you still OOM, raise it (slower per-prompt, but
+# fewer repeated encoder passes) if you have headroom.
+PROMPT_CHUNK_SIZE = 16
+
+def predict_logits_chunked(data, embeddings, chunk_size=PROMPT_CHUNK_SIZE):
+    n = embeddings.shape[1]
+    chunks = []
+    for start in range(0, n, chunk_size):
+        chunk_emb = embeddings[:, start:start + chunk_size]
+        chunks.append(predictor.predict_sliding_window_return_logits(data, chunk_emb).to('cpu'))
+        torch.cuda.empty_cache()
+    return torch.cat(chunks, dim=0)
+
 POSITION_WORDS = {'left', 'right'}
 GENERIC_ORGAN_WORD = 'structure'
 
@@ -441,7 +457,7 @@ t0 = time.time()
 smoke_img, _ = load_volume_ras(smoke_image_path)
 smoke_data, smoke_bbox, smoke_orig_shape = predictor.preprocess(smoke_img)
 smoke_embeddings = predictor.embed_text_prompts(smoke_prompts)
-smoke_logits = predictor.predict_sliding_window_return_logits(smoke_data, smoke_embeddings).to('cpu')
+smoke_logits = predict_logits_chunked(smoke_data, smoke_embeddings)
 smoke_elapsed = time.time() - t0
 
 print(f'smoke test elapsed: {smoke_elapsed:.1f}s for {len(smoke_prompts)} prompts '
@@ -533,7 +549,7 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
     t0 = time.time()
     data, bbox, orig_shape = predictor.preprocess(img_arr)
     embeddings = predictor.embed_text_prompts(prompts)  # (1, n_prompts, dim)
-    logits = predictor.predict_sliding_window_return_logits(data, embeddings).to('cpu')
+    logits = predict_logits_chunked(data, embeddings)
     with torch.no_grad():
         masks_cropped = (torch.sigmoid(logits.float()) > 0.5).numpy().astype(np.uint8)
     masks = np.zeros((masks_cropped.shape[0], *orig_shape), dtype=np.uint8)
@@ -821,7 +837,7 @@ def make_lime_classifier_fn(data, orig_shape, bbox, gt_mask):
     def classifier_fn(text_list):
         texts = list(text_list)
         embeddings = predictor.embed_text_prompts(texts)
-        logits = predictor.predict_sliding_window_return_logits(data, embeddings).to('cpu')
+        logits = predict_logits_chunked(data, embeddings)
         with torch.no_grad():
             masks_cropped = (torch.sigmoid(logits.float()) > 0.5).numpy().astype(np.uint8)
         masks_full = np.zeros((masks_cropped.shape[0], *orig_shape), dtype=np.uint8)

@@ -191,18 +191,27 @@ def load_seg_ras(path):
     data, props = reader.read_seg(str(path))
     return spatial_view(data).astype(np.int32), props
 
+# NibabelIOWithReorient (nnU-Net's reader) returns arrays in REVERSED axis order
+# relative to the canonical RAS affine -- i.e. axis0 is Superior-Inferior, axis1 is
+# Anterior-Posterior, axis2 is Right-Left (not the naive (R,A,S) <-> (0,1,2) mapping).
+# Verified empirically against real predictions: left/right kidney centroids differ by
+# ~85 voxels on axis2 but only ~3 voxels on axis0, for every subject. Getting this wrong
+# silently breaks every side/laterality computation (Dice is unaffected -- voxel overlap
+# doesn't care about axis labels -- but side, centroid-shift, and causal-agreement do).
+AXCODES = ("S", "A", "R")
+RL_AXIS = AXCODES.index("R")
+
 def mask_centroid_side(mask: np.ndarray):
-    \"\"\"Centroid + bbox + anatomical side in RAS-reoriented voxel space. axis0/1/2 are
-    always R/A/S respectively once reoriented (axis0 increases toward Right). Returns
-    (centroid, bbox, sides) where bbox = (min0,min1,min2,max0,max1,max2).\"\"\"
+    \"\"\"Centroid + bbox + anatomical side in RAS-reoriented voxel space (see AXCODES
+    above for the actual axis order). Returns (centroid, bbox, sides) where
+    bbox = (min0,min1,min2,max0,max1,max2).\"\"\"
     coords = np.nonzero(mask)
     if len(coords[0]) == 0:
         return None
     centroid = tuple(float(c.mean()) for c in coords)
     bbox = tuple(int(c.min()) for c in coords) + tuple(int(c.max()) for c in coords)
-    axcodes = ("R", "A", "S")
     sides = tuple(code if centroid_val > mask.shape[axis] / 2 else _OPPOSITE[code]
-                  for axis, (code, centroid_val) in enumerate(zip(axcodes, centroid)))
+                  for axis, (code, centroid_val) in enumerate(zip(AXCODES, centroid)))
     return centroid, bbox, sides
 
 def dice_score(pred: np.ndarray, gt: np.ndarray) -> float:
@@ -516,6 +525,12 @@ shap_rows_out = []
 # masks + bbox/centroid/side, downloadable and plottable entirely locally afterwards (no
 # GPU/torch needed -- see scripts/plot_groundedness_results.py, which only needs numpy/
 # pandas/matplotlib and the decode_mask_rle() helper also defined in this notebook).
+# gt_* columns below are computed FRESH from gt_mask (mask_centroid_side), NOT taken from
+# the manifest -- the manifest was built by a different, older pipeline whose array axis
+# order doesn't match this notebook's (see the AXCODES comment near mask_centroid_side).
+# manifest_gt_side_axis* is kept too, for reference/transparency, but should not be compared
+# directly against pred_side_axis* (different convention -- use gt_side_axis* instead, which
+# is directly comparable since it's computed the same way as pred_side_axis*).
 bp_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'label_id', 'is_bilateral', 'split',
                   'prompt_text', 'image_path', 'label_path', 'volume_shape_ras',
                   'n_pred_voxels', 'dice_gt', 'gt_mask_rle_b64', 'pred_mask_rle_b64',
@@ -526,7 +541,9 @@ bp_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'label_id', 'is_bil
                   'gt_centroid_vox_0', 'gt_centroid_vox_1', 'gt_centroid_vox_2',
                   'gt_bbox_vox_0min', 'gt_bbox_vox_1min', 'gt_bbox_vox_2min',
                   'gt_bbox_vox_0max', 'gt_bbox_vox_1max', 'gt_bbox_vox_2max',
-                  'gt_side_axis0', 'gt_side_axis1', 'gt_side_axis2']
+                  'gt_side_axis0', 'gt_side_axis1', 'gt_side_axis2', 'rl_axis',
+                  'manifest_gt_centroid_vox_0', 'manifest_gt_centroid_vox_1', 'manifest_gt_centroid_vox_2',
+                  'manifest_gt_side_axis0', 'manifest_gt_side_axis1', 'manifest_gt_side_axis2']
 bp_csv_path = RESULTS_ROOT / f'baseline_predictions_{dataset_name}.csv'
 bp_rows_out = []
 
@@ -594,9 +611,19 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
         baseline_idx = next(idx for rec, idx in entries if rec['subset'] == full_key)
         baseline_embed = embeddings[0, baseline_idx].detach().cpu().numpy()
 
+        # Computed FRESH from gt_mask via mask_centroid_side(), NOT taken from the manifest's
+        # gt_side_axis0 column -- the manifest was built by a different, older pipeline whose
+        # array axis order doesn't match this notebook's (see the AXCODES comment above).
+        # Comparing a fresh pred side against a stale manifest side silently produces wrong
+        # answers even after fixing AXCODES, since the two sides would use different
+        # conventions; comparing fresh-vs-fresh (both through mask_centroid_side here) is the
+        # only internally consistent way to check "does the prediction land on the true side".
+        gt_cs = mask_centroid_side(gt_mask)
+        gt_side_rl = gt_cs[2][RL_AXIS] if gt_cs else None
+
         subject_results[sid]['organs'][organ] = {{
             'label_id': label_id, 'baseline_mask': baseline_mask, 'baseline_embed': baseline_embed,
-            'gt_mask': gt_mask, 'gt_side_axis0': entries[0][0]['gt_side_axis0'],
+            'gt_mask': gt_mask, 'gt_side_rl': gt_side_rl,
             'baseline_centroid': baseline_centroid,
         }}
 
@@ -609,7 +636,9 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
             n_vox = int(mask.sum())
             volume_val = float(n_vox - baseline_n_voxels)
             cs = mask_centroid_side(mask)
-            centroid_shift_val = float(cs[0][0] - baseline_centroid[0]) if (cs and baseline_centroid is not None) else 0.0
+            # RL_AXIS, not axis0 -- see the AXCODES comment above (row 10's whole point is
+            # measuring L/R shift, so this must be the actual Right-Left axis).
+            centroid_shift_val = float(cs[0][RL_AXIS] - baseline_centroid[RL_AXIS]) if (cs and baseline_centroid is not None) else 0.0
 
             v_dice_gt[subset] = dice_gt_val
             v_dice_self[subset] = dice_self_val
@@ -676,13 +705,16 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
             'pred_bbox_vox_0min': None, 'pred_bbox_vox_1min': None, 'pred_bbox_vox_2min': None,
             'pred_bbox_vox_0max': None, 'pred_bbox_vox_1max': None, 'pred_bbox_vox_2max': None,
             'pred_side_axis0': None, 'pred_side_axis1': None, 'pred_side_axis2': None,
-            'gt_centroid_vox_0': manifest_row['gt_centroid_vox_0'], 'gt_centroid_vox_1': manifest_row['gt_centroid_vox_1'],
-            'gt_centroid_vox_2': manifest_row['gt_centroid_vox_2'],
-            'gt_bbox_vox_0min': manifest_row['gt_bbox_vox_0min'], 'gt_bbox_vox_1min': manifest_row['gt_bbox_vox_1min'],
-            'gt_bbox_vox_2min': manifest_row['gt_bbox_vox_2min'], 'gt_bbox_vox_0max': manifest_row['gt_bbox_vox_0max'],
-            'gt_bbox_vox_1max': manifest_row['gt_bbox_vox_1max'], 'gt_bbox_vox_2max': manifest_row['gt_bbox_vox_2max'],
-            'gt_side_axis0': manifest_row['gt_side_axis0'], 'gt_side_axis1': manifest_row['gt_side_axis1'],
-            'gt_side_axis2': manifest_row['gt_side_axis2'],
+            'gt_centroid_vox_0': None, 'gt_centroid_vox_1': None, 'gt_centroid_vox_2': None,
+            'gt_bbox_vox_0min': None, 'gt_bbox_vox_1min': None, 'gt_bbox_vox_2min': None,
+            'gt_bbox_vox_0max': None, 'gt_bbox_vox_1max': None, 'gt_bbox_vox_2max': None,
+            'gt_side_axis0': None, 'gt_side_axis1': None, 'gt_side_axis2': None, 'rl_axis': RL_AXIS,
+            'manifest_gt_centroid_vox_0': manifest_row['gt_centroid_vox_0'],
+            'manifest_gt_centroid_vox_1': manifest_row['gt_centroid_vox_1'],
+            'manifest_gt_centroid_vox_2': manifest_row['gt_centroid_vox_2'],
+            'manifest_gt_side_axis0': manifest_row['gt_side_axis0'],
+            'manifest_gt_side_axis1': manifest_row['gt_side_axis1'],
+            'manifest_gt_side_axis2': manifest_row['gt_side_axis2'],
         }}
         if baseline_cs is not None:
             (cx, cy, cz), (bx0, by0, bz0, bx1, by1, bz1), (s0, s1, s2) = baseline_cs
@@ -691,6 +723,14 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
                 'pred_bbox_vox_0min': bx0, 'pred_bbox_vox_1min': by0, 'pred_bbox_vox_2min': bz0,
                 'pred_bbox_vox_0max': bx1, 'pred_bbox_vox_1max': by1, 'pred_bbox_vox_2max': bz1,
                 'pred_side_axis0': s0, 'pred_side_axis1': s1, 'pred_side_axis2': s2,
+            }})
+        if gt_cs is not None:
+            (gcx, gcy, gcz), (gbx0, gby0, gbz0, gbx1, gby1, gbz1), (gs0, gs1, gs2) = gt_cs
+            bp_row.update({{
+                'gt_centroid_vox_0': gcx, 'gt_centroid_vox_1': gcy, 'gt_centroid_vox_2': gcz,
+                'gt_bbox_vox_0min': gbx0, 'gt_bbox_vox_1min': gby0, 'gt_bbox_vox_2min': gbz0,
+                'gt_bbox_vox_0max': gbx1, 'gt_bbox_vox_1max': gby1, 'gt_bbox_vox_2max': gbz1,
+                'gt_side_axis0': gs0, 'gt_side_axis1': gs1, 'gt_side_axis2': gs2,
             }})
         bp_rows_out.append(bp_row)
 
@@ -774,17 +814,20 @@ for sid, res in subject_results.items():
         e_l, e_r = L['baseline_embed'], R['baseline_embed']
         cos_dist = 1.0 - float(np.dot(e_l, e_r) / (np.linalg.norm(e_l) * np.linalg.norm(e_r) + 1e-8))
         dice_diff = 1.0 - dice_score(L['baseline_mask'], R['baseline_mask'])
-        centroid_dist = (abs(L['baseline_centroid'][0] - R['baseline_centroid'][0])
+        centroid_dist = (abs(L['baseline_centroid'][RL_AXIS] - R['baseline_centroid'][RL_AXIS])
                           if L['baseline_centroid'] and R['baseline_centroid'] else None)
         row2_rows.append({{'dataset': DATASET_NAME, 'person': person, 'subject_id': sid,
                             'organ_pair': f'{{left_name}}/{{right_name}}',
                             'text_embed_cos_dist': round(cos_dist, 4), 'output_dice_dist': round(dice_diff, 4),
                             'output_centroid_dist_vox': round(centroid_dist, 2) if centroid_dist is not None else None}})
 
-        # Row 3: causal side-agreement (left-prompt -> left side, right-prompt -> right side)
+        # Row 3: causal side-agreement (left-prompt -> left side, right-prompt -> right side).
+        # Compares fresh-computed pred side against fresh-computed gt side (gt_side_rl, both
+        # via mask_centroid_side/RL_AXIS) -- never the manifest's gt_side_axis0 column, which
+        # uses a different axis convention (see the AXCODES/gt_side_rl comments above).
         L_cs, R_cs = mask_centroid_side(L['baseline_mask']), mask_centroid_side(R['baseline_mask'])
-        left_pred_matches_left_gt = bool(L['gt_side_axis0'] and L_cs and L_cs[2][0] == L['gt_side_axis0'])
-        right_pred_matches_right_gt = bool(R['gt_side_axis0'] and R_cs and R_cs[2][0] == R['gt_side_axis0'])
+        left_pred_matches_left_gt = bool(L['gt_side_rl'] and L_cs and L_cs[2][RL_AXIS] == L['gt_side_rl'])
+        right_pred_matches_right_gt = bool(R['gt_side_rl'] and R_cs and R_cs[2][RL_AXIS] == R['gt_side_rl'])
         row3_rows.append({{'dataset': DATASET_NAME, 'person': person, 'subject_id': sid,
                             'organ_pair': f'{{left_name}}/{{right_name}}',
                             'left_prompt_predicts_left_side': bool(left_pred_matches_left_gt),
@@ -796,11 +839,11 @@ for sid, res in subject_results.items():
         n_diff = int(diff.sum())
         n_total = int(L['baseline_mask'].sum() + R['baseline_mask'].sum())
         diff_coords = np.nonzero(diff)
-        diff_centroid_axis0 = float(diff_coords[0].mean()) if len(diff_coords[0]) else None
+        diff_centroid_rl = float(diff_coords[RL_AXIS].mean()) if len(diff_coords[0]) else None
         row4_rows.append({{'dataset': DATASET_NAME, 'person': person, 'subject_id': sid,
                             'organ_pair': f'{{left_name}}/{{right_name}}',
                             'diff_voxels': n_diff, 'diff_fraction_of_union': round(n_diff / max(n_total, 1), 4),
-                            'diff_centroid_axis0': round(diff_centroid_axis0, 2) if diff_centroid_axis0 is not None else None}})
+                            'diff_centroid_rl_axis': round(diff_centroid_rl, 2) if diff_centroid_rl is not None else None}})
 
 for name, rows_out in [('row1_image_text_alignment', row1_rows), ('row2_embedding_output_regression', row2_rows),
                          ('row3_causal_embedding_swap', row3_rows), ('row4_fused_feature_diff', row4_rows)]:

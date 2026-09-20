@@ -812,16 +812,27 @@ for name, rows_out in [('row1_image_text_alignment', row1_rows), ('row2_embeddin
             writer.writerows(rows_out)
         print(f'wrote {{path}} ({{len(rows_out)}} rows)')
 
-# Row 2's regression slope (embedding distance -> output distance)
+# Row 2's regression slope (embedding distance -> output distance). output_dice_dist
+# is NOT used here -- left/right organs never spatially overlap, so 1-dice(left,right)
+# is trivially ~1.0 for every pair regardless of grounding, giving zero variance to
+# regress against (this is what produced the "R^2=nan" you may have seen). The
+# meaningful "output distance" for bilateral organs is centroid distance -- how far
+# apart the two predicted locations actually are.
 if row2_rows:
-    xs = np.array([r['text_embed_cos_dist'] for r in row2_rows])
-    ys = np.array([r['output_dice_dist'] for r in row2_rows])
-    if len(xs) >= 2 and xs.std() > 0:
+    pairs = [(r['text_embed_cos_dist'], r['output_centroid_dist_vox']) for r in row2_rows
+             if r['output_centroid_dist_vox'] is not None]
+    xs = np.array([p[0] for p in pairs])
+    ys = np.array([p[1] for p in pairs])
+    if len(xs) >= 2 and xs.std() > 0 and ys.std() > 0:
         slope, intercept = np.polyfit(xs, ys, 1)
         r2 = np.corrcoef(xs, ys)[0, 1] ** 2
-        print(f'\\nRow 2 regression: output_dice_dist = {{slope:.3f}} * cos_dist + {{intercept:.3f}} (R^2={{r2:.3f}})')
-        print('  positive slope -> differing text understanding translates into differing output (genuine grounding)')
-        print('  flat/near-zero slope -> text difference does not predict output difference (shortcut/memorized)')
+        print(f'\\nRow 2 regression: output_centroid_dist_vox = {{slope:.3f}} * cos_dist + {{intercept:.3f}} (R^2={{r2:.3f}})')
+        print('  positive slope -> differing text understanding translates into differing predicted location (genuine grounding)')
+        print('  flat/near-zero slope -> text difference does not predict where the model points (shortcut/memorized)')
+        print('  (output_dice_dist is NOT used for this regression -- always ~1.0 for non-overlapping left/right organs, no signal)')
+    else:
+        print('\\nRow 2 regression skipped -- not enough variance in cos_dist or centroid_dist to fit '
+              '(check row2_embedding_output_regression_{dataset_name}.csv directly for the raw points instead)')
 """)
 
     # ---- Cell: Row 6 -- LIME (genuinely new inference, unlike SHAP above) ---------------

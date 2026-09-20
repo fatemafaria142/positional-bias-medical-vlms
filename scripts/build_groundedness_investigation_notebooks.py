@@ -259,13 +259,40 @@ def decode_mask_rle(encoded: str, shape) -> np.ndarray:
 Both are pure-Python (numpy/scikit-learn/scikit-image for LIME; numpy/pandas/numba for SHAP)
 -- no torch/CUDA version pins involved, safe to install after the careful torch+voxtell
 reinstall above without disturbing it.
+
+`shap` pulls in `numba`, which can lag behind whatever NumPy is already installed in the
+Kaggle image (observed failure: `"Numba needs NumPy 2.0 or less. Got NumPy 2.x"` at `import
+shap` time) -- fixed by upgrading `numba` specifically (NOT `numpy`, which is already loaded
+and used by torch/voxtell elsewhere in this kernel; swapping it now would hit the exact same
+"can't safely reload a loaded C extension" problem the very first install cell's comment block
+describes for torch). If `shap` still can't be imported after that, this cell degrades
+gracefully -- `SHAP_AVAILABLE=False` -- so the rest of the notebook (rows 1-6, 8-11) still
+runs; only row 7 depends on it.
 """)
     add_cell(nb, "code", """import subprocess, sys
 subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'lime', 'shap'], check=True)
-import lime
-import lime.lime_text
-import shap
-print('lime', lime.__version__, '/ shap', shap.__version__, 'installed')
+subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', '-U', 'numba'], check=True)
+
+try:
+    import lime
+    import lime.lime_text
+    LIME_AVAILABLE = True
+    print('lime', lime.__version__, 'installed')
+except ImportError as e:
+    LIME_AVAILABLE = False
+    print(f'!! lime failed to import: {e}')
+    print('!! continuing WITHOUT row 6 (LIME) -- rows 1-5, 7-11 are unaffected.')
+
+try:
+    import shap
+    SHAP_AVAILABLE = True
+    print('shap', shap.__version__, 'installed')
+except ImportError as e:
+    SHAP_AVAILABLE = False
+    print(f'!! shap failed to import even after upgrading numba: {e}')
+    print('!! continuing WITHOUT row 7 (SHAP) -- rows 1-6, 8-11 (including exact Shapley, row 5) are unaffected.')
+    print('!! to retry: check the exact numba/numpy versions with `pip show numba numpy`, or try a Kaggle')
+    print('!!   session restart (Run All from a fresh kernel) in case a stale numba wheel got cached.')
 """)
 
     # ---- Cell 16/17: dataset config (fixed subjects, no PERSON toggle) ------------------
@@ -592,19 +619,22 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
             # with this few features (n<=6) shap internally enumerates the full 2^n space, so
             # its values should match exact_shap_vals above (printed as a sanity check in the
             # summary section) -- this is what satisfies "must use SHAP" for the paper comparison.
-            def _shap_value_fn(X, _v=v, _roles=roles_sorted):
-                return np.array([_v[frozenset(r for r, b in zip(_roles, row) if b)] for row in X])
-            _background = np.zeros((1, len(roles_sorted)))
-            _explainer = shap.KernelExplainer(_shap_value_fn, _background)
-            _shap_out = _explainer.shap_values(np.ones((1, len(roles_sorted))), nsamples=2 ** len(roles_sorted), silent=True)
-            _shap_out = np.asarray(_shap_out).reshape(-1)
-            for role, val in zip(roles_sorted, _shap_out):
-                shap_rows_out.append({{
-                    'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
-                    'is_bilateral': 'position' in roles, 'n_roles': len(roles), 'n_combos': 2 ** len(roles),
-                    'role': role, 'metric': metric_name, 'shap_value': round(float(val), 6),
-                    'matches_exact_shapley': bool(abs(float(val) - exact_shap_vals[role]) < 1e-4),
-                }})
+            # Skipped gracefully (SHAP_AVAILABLE=False) if the shap import failed earlier --
+            # rows 1-6, 8-11 (including exact Shapley, row 5) are unaffected either way.
+            if SHAP_AVAILABLE:
+                def _shap_value_fn(X, _v=v, _roles=roles_sorted):
+                    return np.array([_v[frozenset(r for r, b in zip(_roles, row) if b)] for row in X])
+                _background = np.zeros((1, len(roles_sorted)))
+                _explainer = shap.KernelExplainer(_shap_value_fn, _background)
+                _shap_out = _explainer.shap_values(np.ones((1, len(roles_sorted))), nsamples=2 ** len(roles_sorted), silent=True)
+                _shap_out = np.asarray(_shap_out).reshape(-1)
+                for role, val in zip(roles_sorted, _shap_out):
+                    shap_rows_out.append({{
+                        'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
+                        'is_bilateral': 'position' in roles, 'n_roles': len(roles), 'n_combos': 2 ** len(roles),
+                        'role': role, 'metric': metric_name, 'shap_value': round(float(val), 6),
+                        'matches_exact_shapley': bool(abs(float(val) - exact_shap_vals[role]) < 1e-4),
+                    }})
 
         bp_row = {{
             'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
@@ -800,7 +830,7 @@ def make_lime_classifier_fn(data, orig_shape, bbox, gt_mask):
         return np.stack([1.0 - scores, scores], axis=1)
     return classifier_fn
 
-lime_explainer = lime.lime_text.LimeTextExplainer(class_names=['not_organ', 'dice_gt'])
+lime_explainer = lime.lime_text.LimeTextExplainer(class_names=['not_organ', 'dice_gt']) if LIME_AVAILABLE else None
 
 lime_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'is_bilateral', 'prompt_text',
                     'word', 'lime_weight', 'num_samples']
@@ -810,37 +840,41 @@ lime_writer = csv.DictWriter(lime_f, fieldnames=lime_fieldnames)
 lime_writer.writeheader()
 lime_n_written = 0
 
-for si, (sid, info) in enumerate(subject_organs.items(), 1):
-    person, rows = info['person'], info['rows']
-    print(f'[{{si}}/{{len(subject_organs)}}] {{person}}/{{sid}}: LIME (row 6)...')
-    image_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['image_path']
-    label_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['label_path']
-    img_arr, _ = load_volume_ras(image_path)
-    label_vol, _ = load_seg_ras(label_path)
-    data, bbox, orig_shape = predictor.preprocess(img_arr)
+if not LIME_AVAILABLE:
+    print('LIME_AVAILABLE=False (import failed earlier) -- skipping row 6, '
+          f'writing an empty {{lime_csv_path.name}}. Rows 1-5, 7-11 are unaffected.')
+else:
+    for si, (sid, info) in enumerate(subject_organs.items(), 1):
+        person, rows = info['person'], info['rows']
+        print(f'[{{si}}/{{len(subject_organs)}}] {{person}}/{{sid}}: LIME (row 6)...')
+        image_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['image_path']
+        label_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['label_path']
+        img_arr, _ = load_volume_ras(image_path)
+        label_vol, _ = load_seg_ras(label_path)
+        data, bbox, orig_shape = predictor.preprocess(img_arr)
 
-    for row0 in rows:
-        organ = row0['organ']
-        label_id = int(row0['label_id'])
-        prompt_text = row0['prompt_text']
-        gt_mask = (label_vol == label_id)
-        roles = role_names_for(organ)
+        for row0 in rows:
+            organ = row0['organ']
+            label_id = int(row0['label_id'])
+            prompt_text = row0['prompt_text']
+            gt_mask = (label_vol == label_id)
+            roles = role_names_for(organ)
 
-        classifier_fn = make_lime_classifier_fn(data, orig_shape, bbox, gt_mask)
-        t0 = time.time()
-        exp = lime_explainer.explain_instance(
-            prompt_text, classifier_fn, labels=[1],
-            num_features=len(prompt_text.split()), num_samples=LIME_NUM_SAMPLES)
-        elapsed = time.time() - t0
-        for word, weight in exp.as_list(label=1):
-            lime_writer.writerow({{
-                'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
-                'is_bilateral': 'position' in roles, 'prompt_text': prompt_text,
-                'word': word, 'lime_weight': round(float(weight), 6), 'num_samples': LIME_NUM_SAMPLES,
-            }})
-            lime_n_written += 1
-        lime_f.flush()
-        print(f'    {{organ}}: {{elapsed:.1f}}s for {{LIME_NUM_SAMPLES}} samples')
+            classifier_fn = make_lime_classifier_fn(data, orig_shape, bbox, gt_mask)
+            t0 = time.time()
+            exp = lime_explainer.explain_instance(
+                prompt_text, classifier_fn, labels=[1],
+                num_features=len(prompt_text.split()), num_samples=LIME_NUM_SAMPLES)
+            elapsed = time.time() - t0
+            for word, weight in exp.as_list(label=1):
+                lime_writer.writerow({{
+                    'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
+                    'is_bilateral': 'position' in roles, 'prompt_text': prompt_text,
+                    'word': word, 'lime_weight': round(float(weight), 6), 'num_samples': LIME_NUM_SAMPLES,
+                }})
+                lime_n_written += 1
+            lime_f.flush()
+            print(f'    {{organ}}: {{elapsed:.1f}}s for {{LIME_NUM_SAMPLES}} samples')
 
 lime_f.close()
 print(f'\\nwrote {{lime_csv_path}} ({{lime_n_written}} rows)')

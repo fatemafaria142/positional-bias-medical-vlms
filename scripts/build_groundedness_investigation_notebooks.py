@@ -1251,15 +1251,13 @@ interactive "Run All" in the editor session.
     print(f"[ok] wrote {out_path}")
 
 
-# Top 7 bilateral pairs (14 organs) by ground-truth bbox volume, ranked from the existing
-# per-person manifests -- drops the 9 smallest pairs (caudate, putamen, thalamus, ventral DC,
-# inferior lateral ventricle, amygdala, pallidum, accumbens, vessel; vessel averaged ~200
-# voxels). 14 (not 15) because organs come in left/right pairs -- rows 1/3/4 need both sides
-# of a pair to compute, so an odd count would leave one organ unusable for those rows.
+# Top 5 bilateral pairs (10 organs) by ground-truth bbox volume, ranked from the existing
+# per-person manifests -- drops the 11 smallest pairs (cerebellum white matter, hippocampus,
+# caudate, putamen, thalamus, ventral DC, inferior lateral ventricle, amygdala, pallidum,
+# accumbens, vessel; vessel averaged ~200 voxels).
 OASIS_ORGAN_WHITELIST = [
     "cerebral cortex", "cerebral white matter", "cerebellum cortex",
-    "lateral ventricle", "choroid plexus", "cerebellum white matter",
-    "hippocampus",
+    "lateral ventricle", "choroid plexus",
 ]
 
 if __name__ == "__main__":

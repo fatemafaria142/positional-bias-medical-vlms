@@ -117,11 +117,13 @@ the prompt, or by a shortcut/memorized prior (organ identity, image content, fix
 
 - Image-Text Alignment (row 1), Fusion (rows 2-4), Word Attribution (rows 5-11).
 - **Positional-bias-focused scope, not general word-grounding:** only **bilateral (left/right)
-  organs** are used, and the only word ever ablated is **`position`** -- 2 prompts/organ
-  (baseline + position-removed), not the full word-role combinatorics.
+  organs** are used, and only two words are ever ablated -- **`position`** (left/right) and
+  **`organ`** (the organ name itself) -- 4 prompts/organ (both present, position-only-removed,
+  organ-only-removed, both removed), not the full word-role combinatorics (the/in/this/image
+  stay fixed). This directly answers whether the model needs the position word, the organ
+  word, both, or neither -- not just "does position matter".
 - Fixed scope: **{len(subjects)} subject(s), no rotation** (rot000 only) -- {subj_list_str}.
-- Word attribution uses **exact Shapley** (row 5's recommended default) -- with only 1 word in
-  question, this is just the direct baseline-vs-ablated difference, computed exactly.
+- Word attribution uses **exact Shapley** (row 5's recommended default) over these 2 words.
 - Rows 1, 3, 4 need **no `forward_hook`** -- verified directly against the installed
   `voxtell` v0.1.0 source. `predictor.predict_sliding_window_return_logits(image,
   text_embeddings)` already returns the raw spatial pre-sigmoid logits (exactly "the internal
@@ -358,15 +360,18 @@ for sid, info in subject_organs.items():
 """)
 
     # ---- Cell 18/19: role-aware ablation + exact Shapley helpers ------------------------
-    add_cell(nb, "markdown", """## 8. Position-word ablation (rows 5-11 method) -- positional-bias scope only
+    add_cell(nb, "markdown", """## 8. Position + organ word ablation (rows 5-11 method) -- positional-bias scope only
 
 Narrowed to the actual research question (positional bias), not general word-grounding: only
 **bilateral organs** are used (organs with no left/right don't test positional bias, so they're
-filtered out entirely below), and the only word ever ablated is **`position`** (`"left"`/
-`"right"`) -- not the organ name or function words. That means exactly **2 prompts per organ**:
-baseline (`"Segment the left kidney in this image."`) and position-removed (`"Segment the kidney
-in this image."`). With only one word in question, "exact Shapley" (row 5) is just that one
-before/after difference -- no combinatorial explosion, same for SHAP (row 7).
+filtered out entirely below), and only **two** words are ever ablated -- **`position`**
+(`"left"`/`"right"`) and **`organ`** (the organ name, replaced with a generic "structure" when
+"removed") -- not the function words (the/in/this/image). That means exactly **4 prompts per
+organ** (2^2 combinations): both present (`"Segment the left kidney in this image."`),
+position-only-removed (`"Segment the kidney in this image."`), organ-only-removed (`"Segment
+the left structure in this image."`), and both removed (`"Segment the structure in this
+image."`). This is small enough that "exact Shapley" (row 5) is computed exhaustively over all
+4 combinations -- no approximation needed, same for SHAP (row 7).
 """)
     add_cell(nb, "code", """import itertools
 from math import factorial
@@ -390,6 +395,7 @@ def predict_logits_chunked(data, embeddings, chunk_size=PROMPT_CHUNK_SIZE):
     return torch.cat(chunks, dim=0)
 
 POSITION_WORDS = {'left', 'right'}
+GENERIC_ORGAN_WORD = 'structure'
 
 def parse_organ_roles(organ_name):
     \"\"\"'left kidney' -> ('left', 'kidney'); 'spleen' -> (None, 'spleen').\"\"\"
@@ -399,19 +405,27 @@ def parse_organ_roles(organ_name):
     return None, organ_name
 
 def role_names_for(organ_name):
-    \"\"\"Only role ever ablated is 'position' -- organ name and function words (the/in/
-    this/image) stay fixed. Every organ reaching this point is already bilateral (see
-    the dataset-config filter above), so this always returns ['position'].\"\"\"
-    return ['position']
+    \"\"\"Two roles ever ablated: 'position' (left/right) and 'organ' (the organ name itself,
+    replaced with a generic placeholder when 'removed' -- see build_prompt). This directly
+    answers "does the model need the position word, the organ word, both, or neither to
+    segment something": is it segmenting via position only, organ only, both, or has it
+    collapsed to a fixed shortcut that needs neither? Every organ reaching this point is
+    already bilateral (see the dataset-config filter above), so this always returns both
+    roles -- function words (the/in/this/image) stay fixed either way, out of scope for
+    this positional-bias-focused investigation.\"\"\"
+    return ['position', 'organ']
 
 def build_prompt(organ_name, present):
-    \"\"\"present: dict with key 'position' -> bool. Organ name and function words are
-    always kept -- only the position word is ever dropped.\"\"\"
+    \"\"\"present: dict with keys 'position' -> bool, 'organ' -> bool. 'organ' False means
+    the real organ name is replaced with a generic placeholder ("structure") -- the organ
+    slot is grammatically required, so it's never truly absent, matching the plan's
+    supporting note on role-aware (not raw-token) ablation.\"\"\"
     position, organ_core = parse_organ_roles(organ_name)
     words = ['Segment', 'the']
     if present.get('position', True):
         words.append(position)
-    words += [organ_core, 'in', 'this', 'image']
+    words.append(organ_core if present.get('organ', True) else GENERIC_ORGAN_WORD)
+    words += ['in', 'this', 'image']
     sentence = ' '.join(words)
     return sentence[0].upper() + sentence[1:] + '.'
 
@@ -895,28 +909,30 @@ if row2_rows:
     add_cell(nb, "markdown", f"""## 12. Row 6 -- LIME (`lime.lime_text.LimeTextExplainer`)
 
 Unlike SHAP above (which reused the already-computed exact combos at zero extra cost), LIME
-generates its OWN perturbed prompts, so this requires genuinely new model inference. To match
-the positional-bias-only scope (not general word-grounding), LIME is asked to explain just the
-**position word itself** (`"left"`/`"right"`) as a 1-word "document" -- not the full 7-word
-sentence -- so it only ever has 2 real states to consider (word present -> real prompt, word
-absent -> position-removed prompt), same as exact Shapley/SHAP above. This also avoids LIME's
-default behavior of perturbing every word in the sentence (`Segment`/`the`/`organ name`/etc.),
-which would silently reintroduce the general-word-grounding scope this notebook deliberately
+generates its OWN perturbed prompts, so this requires genuinely new model inference. LIME is
+asked to explain **two separate 1-word "documents"** per organ -- the position word
+(`"left"`/`"right"`) and the organ-name phrase (e.g. `"kidney"`) -- rather than the full
+7-word sentence, so each explanation only ever has 2 real states to consider (word present ->
+real prompt, word absent -> that word's ablated prompt), matching exact Shapley/SHAP's 4-combo
+(position x organ) space above. This directly answers "does the model need the position word,
+the organ word, both, or neither" -- not just "does position matter" -- and avoids LIME's
+default behavior of perturbing every word in the sentence (`Segment`/`the`/`in`/etc.), which
+would silently reintroduce the general-word-grounding scope this notebook deliberately
 narrowed away from.
 
 Target metric: Dice vs. ground truth for each perturbed prompt (LIME's `classifier_fn` must
 return a 2-column pseudo-probability array `[1 - dice, dice]`, since `LimeTextExplainer` is
 built for classification -- this is the standard workaround for using it in a regression-like
-setting). Output: `lime_attribution_{dataset_name}.csv`, one row per (subject, organ) with
-LIME's weight for the position word.
+setting). Output: `lime_attribution_{dataset_name}.csv`, one row per (subject, organ, role)
+with LIME's weight for that word.
 """)
-    add_cell(nb, "code", f"""LIME_NUM_SAMPLES = 10  # only 2 real prompt variants exist (position present/absent);
+    add_cell(nb, "code", f"""LIME_NUM_SAMPLES = 10  # only 2 real prompt variants exist per word (present/absent);
 # 10 repeats is enough for LIME's internal regression to be stable without wasting GPU runs.
 
 def make_lime_classifier_fn(data, orig_shape, bbox, gt_mask, prompt_with, prompt_without):
-    \"\"\"text_list: LIME's perturbations of the 1-word 'document' (the position word itself)
+    \"\"\"text_list: LIME's perturbations of the 1-word 'document' (the word being explained)
     -- non-empty means the word is present, so map back to the real full prompt with/without
-    the position word, rather than sending LIME's raw (single-word) text to the model.\"\"\"
+    that word, rather than sending LIME's raw (single-word) text to the model.\"\"\"
     def classifier_fn(text_list):
         prompts = [prompt_with if t.strip() else prompt_without for t in text_list]
         embeddings = predictor.embed_text_prompts(prompts)
@@ -931,7 +947,7 @@ def make_lime_classifier_fn(data, orig_shape, bbox, gt_mask, prompt_with, prompt
 
 lime_explainer = lime.lime_text.LimeTextExplainer(class_names=['not_organ', 'dice_gt']) if LIME_AVAILABLE else None
 
-lime_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'position_word', 'prompt_text',
+lime_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'role', 'word', 'prompt_text',
                     'lime_weight', 'num_samples']
 lime_csv_path = RESULTS_ROOT / f'lime_attribution_{dataset_name}.csv'
 lime_f = open(lime_csv_path, 'w', newline='')
@@ -958,22 +974,24 @@ else:
             prompt_text = row0['prompt_text']
             gt_mask = (label_vol == label_id)
             position, organ_core = parse_organ_roles(organ)
-            prompt_without = build_prompt(organ, {{'position': False}})
 
-            classifier_fn = make_lime_classifier_fn(data, orig_shape, bbox, gt_mask, prompt_text, prompt_without)
-            t0 = time.time()
-            exp = lime_explainer.explain_instance(
-                position, classifier_fn, labels=[1], num_features=1, num_samples=LIME_NUM_SAMPLES)
-            elapsed = time.time() - t0
-            weight = dict(exp.as_list(label=1)).get(position, 0.0)
-            lime_writer.writerow({{
-                'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
-                'position_word': position, 'prompt_text': prompt_text,
-                'lime_weight': round(float(weight), 6), 'num_samples': LIME_NUM_SAMPLES,
-            }})
-            lime_n_written += 1
-            lime_f.flush()
-            print(f'    {{organ}}: {{elapsed:.1f}}s for {{LIME_NUM_SAMPLES}} samples')
+            words_to_explain = [('position', position), ('organ', organ_core)]
+            for role, word in words_to_explain:
+                prompt_ablated = build_prompt(organ, {{role: False}})
+                classifier_fn = make_lime_classifier_fn(data, orig_shape, bbox, gt_mask, prompt_text, prompt_ablated)
+                t0 = time.time()
+                exp = lime_explainer.explain_instance(
+                    word, classifier_fn, labels=[1], num_features=1, num_samples=LIME_NUM_SAMPLES)
+                elapsed = time.time() - t0
+                weight = dict(exp.as_list(label=1)).get(word, 0.0)
+                lime_writer.writerow({{
+                    'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
+                    'role': role, 'word': word, 'prompt_text': prompt_text,
+                    'lime_weight': round(float(weight), 6), 'num_samples': LIME_NUM_SAMPLES,
+                }})
+                lime_n_written += 1
+                lime_f.flush()
+                print(f'    {{organ}} / {{role}} ("{{word}}"): {{elapsed:.1f}}s for {{LIME_NUM_SAMPLES}} samples')
 
         # Free this subject's data before moving to the next one.
         del img_arr, label_vol, data
@@ -1154,11 +1172,14 @@ print(f'Row 7 (SHAP KernelExplainer) -- {{(~shap_df["matches_exact_shapley"]).su
       'differ from exact Shapley by > 1e-4 (expect 0). Mean |shap_value| by role, f_dice_gt metric:')
 print(shap_df[shap_df['metric'] == 'f_dice_gt'].groupby('role')['shap_value'].apply(lambda s: s.abs().mean()).sort_values(ascending=False).round(4))
 print()
-print(f'Row 6 (LIME) -- {{len(lime_df)}} (subject, organ) rows, position-word weight only. Mean |lime_weight|:')
-print(lime_df['lime_weight'].abs().mean().round(4))
+print(f'Row 6 (LIME) -- {{len(lime_df)}} (subject, organ, role) rows. Mean |lime_weight| by role:')
+print(lime_df.groupby('role')['lime_weight'].apply(lambda s: s.abs().mean()).sort_values(ascending=False).round(6))
 print()
-print('  -- do exact Shapley, SHAP, and LIME agree the position word has non-trivial weight?')
-print('     Agreement across all three methods is the strongest version of this evidence for the paper comparison.')
+print('  -- position vs. organ, compared across all three methods (Shapley/SHAP/LIME): does the model')
+print('     need BOTH words, or is it really relying on just one (a shortcut) while the other barely')
+print('     matters? If organ >> position: shortcut/memorized-organ reading. If position >> organ:')
+print('     the model may be finding "a blob" via position with little regard for which organ was')
+print('     named. If both are substantial and comparable: genuine use of both words together.')
 
 for name in ['row1_image_text_alignment', 'row2_embedding_output_regression',
              'row3_causal_embedding_swap', 'row4_fused_feature_diff']:
@@ -1196,22 +1217,24 @@ LIME/SHAP values doesn't need those libraries installed locally either, just the
   `pred_centroid_vox_0/1/2`, `pred_bbox_vox_{{0,1,2}}{{min,max}}`, `pred_side_axis0/1/2`, and the
   matching `gt_centroid_vox_*` / `gt_bbox_vox_*` / `gt_side_axis*` columns. Use with
   `scripts/plot_groundedness_results.py`.
-- **`ablation_masks_{dataset_name}.csv`** -- **both prompt variants' masks (baseline and
-  position-removed), not just the baseline.** One row per (subject, organ, variant):
-  `roles_present`/`roles_dropped` (just `position` or empty, at this scope), `prompt_text`,
+- **`ablation_masks_{dataset_name}.csv`** -- **all 4 prompt-combo masks (both present, each word
+  removed alone, both removed), not just the baseline.** One row per (subject, organ, combo):
+  `roles_present`/`roles_dropped` (`position`/`organ`, any subset), `prompt_text`,
   `f_dice_gt`/`f_dice_self`/`f_centroid_shift`/`f_volume` (rows 8-11's metrics), `n_pred_voxels`,
-  `volume_shape_ras`, and **`mask_rle_b64`** -- that variant's actual predicted mask, decodable
+  `volume_shape_ras`, and **`mask_rle_b64`** -- that combo's actual predicted mask, decodable
   the same way. `is_baseline=True` marks the real-prompt row, identical to that organ's row in
   `baseline_predictions_{dataset_name}.csv`.
-- `word_attribution_{dataset_name}.csv` -- row 5 (exact Shapley value for the position word,
-  per organ x subject x metric).
+- `word_attribution_{dataset_name}.csv` -- row 5 (exact Shapley value for **both** the position
+  word and the organ word, separately, per organ x subject x metric -- compare the two to see
+  which the model actually relies on more).
 - **`shap_attribution_{dataset_name}.csv`** -- row 7, real `shap.KernelExplainer` output over
-  the same 2-state space, plus a `matches_exact_shapley` boolean per row (should be all `True`
+  the same 4-combo space, plus a `matches_exact_shapley` boolean per row (should be all `True`
   -- SHAP is mathematically expected to agree with row 5 here; the agreement itself is evidence
   worth citing).
 - **`lime_attribution_{dataset_name}.csv`** -- row 6, real `lime.lime_text.LimeTextExplainer`
-  output, explaining just the position word (not the full sentence, to match this notebook's
-  positional-bias-only scope) -- one row per (subject, organ) with LIME's weight for it.
+  output, explaining the position word and the organ word **separately** (not the full sentence,
+  to match this notebook's positional-bias-only scope) -- one row per (subject, organ, role)
+  with LIME's weight for that word.
 - `row1_image_text_alignment_{dataset_name}.csv` -- row 1 (matched vs. mismatched IoU)
 - `row2_embedding_output_regression_{dataset_name}.csv` -- row 2 (embedding-distance vs.
   output-distance points; fit the regression slope from these, or use the number printed in

@@ -96,7 +96,7 @@ def add_cell(nb, cell_type, text):
     nb["cells"].append(c)
 
 
-def build(template_name, dataset_name, title, subjects, out_name):
+def build(template_name, dataset_name, title, subjects, out_name, organ_whitelist=None):
     nb = json.loads((REPO_ROOT / template_name).read_text(encoding="utf-8"))
     nb["cells"] = nb["cells"][:16]  # keep cells 0-15 only (install/model-load/helpers)
 
@@ -302,13 +302,24 @@ except ImportError as e:
 
     # ---- Cell 16/17: dataset config (fixed subjects, no PERSON toggle) ------------------
     subjects_py = ",\n    ".join(f'("{p}", "{sid}")' for p, sid in subjects)
+    whitelist_note = ""
+    whitelist_filter_line = ""
+    if organ_whitelist:
+        whitelist_py = ", ".join(f'"{o}"' for o in organ_whitelist)
+        whitelist_note = (f"\nFurther narrowed to the **{len(organ_whitelist)} largest bilateral pairs** "
+                           "by ground-truth voxel volume (dropping the smallest, noise-prone ones like "
+                           "vessel/accumbens) -- ranked from your existing manifest bbox data.\n")
+        whitelist_filter_line = (
+            f"\n    _organ_cores = {{{whitelist_py}}}  # only the largest bilateral pairs (by GT voxel volume)"
+            f"\n    rows = [r for r in rows if r['organ'].split(None, 1)[1] in _organ_cores]"
+        )
     add_cell(nb, "markdown", f"""## 7. Dataset config -- {title}, fixed {len(subjects)}-subject ablation study (no rotation)
 
 No `PERSON` toggle here (unlike the rotation notebooks) -- this investigation is a fixed
 scope of {len(subjects)} subject(s), read directly. **Positional-bias scope: only bilateral
 (left/right) organs are kept** -- organs with no left/right can't test positional bias, so
 they're filtered out here rather than carried through the whole notebook unused.
-""")
+{whitelist_note}""")
     add_cell(nb, "code", f"""DATASET_NAME = '{dataset_name}'
 
 # vvv fixed scope for this investigation -- (person, subject_id) vvv
@@ -320,7 +331,7 @@ SUBJECTS = [
 subject_organs = {{}}  # subject_id -> {{'person':..., 'rows': [manifest rows for this subject]}}
 for person, sid in SUBJECTS:
     rows = [r for r in load_manifest_rot000(person, DATASET_NAME) if r['subject_id'] == sid]
-    rows = [r for r in rows if r['organ'].split()[0].lower() in ('left', 'right')]  # bilateral only
+    rows = [r for r in rows if r['organ'].split()[0].lower() in ('left', 'right')]  # bilateral only{whitelist_filter_line}
     assert rows, f'no bilateral-organ rot000 rows found for {{person}}/{{sid}} in {{DATASET_NAME}}'
     subject_organs[sid] = {{'person': person, 'rows': rows}}
 
@@ -991,6 +1002,16 @@ interactive "Run All" in the editor session.
     print(f"[ok] wrote {out_path}")
 
 
+# Top 8 bilateral pairs (16 organs) by ground-truth bbox volume, ranked from the existing
+# per-person manifests (scripts/build_groundedness_investigation_notebooks.py commit history
+# has the ranking) -- drops the 8 smallest pairs (putamen, thalamus, ventral DC, inferior
+# lateral ventricle, amygdala, pallidum, accumbens, vessel; vessel averaged ~200 voxels).
+OASIS_ORGAN_WHITELIST = [
+    "cerebral cortex", "cerebral white matter", "cerebellum cortex",
+    "lateral ventricle", "choroid plexus", "cerebellum white matter",
+    "hippocampus", "caudate",
+]
+
 if __name__ == "__main__":
     build(
         "voxtell-amos-rotation-multiangle-kaggle.ipynb", "amos22_mri", "AMOS22 MRI",
@@ -999,4 +1020,5 @@ if __name__ == "__main__":
     build(
         "voxtell-oasis-rotation-multiangle-kaggle.ipynb", "neurite_oasis", "Neurite OASIS",
         OASIS_SUBJECTS, "voxtell-oasis-groundedness-investigation-kaggle.ipynb",
+        organ_whitelist=OASIS_ORGAN_WHITELIST,
     )

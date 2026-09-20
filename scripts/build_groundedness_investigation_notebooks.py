@@ -4,8 +4,9 @@ Generator for the two VoxTell model-internals investigation Kaggle notebooks
 voxtell-oasis-groundedness-investigation-kaggle.ipynb).
 
 Implements every row of voxtell-model-internals-investigation-plan.md (rows 1-11:
-image-text alignment, fusion, word-attribution) for a FIXED set of 3 subjects per
-dataset, no rotation (rot000 only), in ONE notebook per dataset.
+image-text alignment, fusion, word-attribution) for a FIXED, small subject scope per
+dataset (see AMOS_SUBJECTS/OASIS_SUBJECTS below), no rotation (rot000 only), in ONE
+notebook per dataset.
 
 Starts from the existing voxtell-{amos,oasis}-rotation-multiangle-kaggle.ipynb
 (cells 0-15: GPU check, working dirs, install voxtell, clone repo, load model,
@@ -58,14 +59,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 BRANCH = "faria/voxtell3d-rotation-medical-segmentation"
 
-# Fixed 3-subject scope per dataset -- reuses subjects that already have
-# rot000 volumes committed to the repo (no new data staging needed).
-AMOS_SUBJECTS = [("nipu", "amos_0508"), ("faria", "amos_0530"), ("hridoy", "amos_0555")]
-OASIS_SUBJECTS = [
-    ("faria", "OASIS_OAS1_0014_MR1"),
-    ("hridoy", "OASIS_OAS1_0123_MR1"),
-    ("nipu", "OASIS_OAS1_0062_MR1"),
-]
+# Fixed 1-subject scope per dataset (reduced from 3 -- decoder cost scales with
+# prompts x patches x subjects, so this is the lever that actually cuts runtime,
+# unlike chunk size). Reuses a subject that already has rot000 volumes committed
+# to the repo (no new data staging needed) -- amos_0508 / OASIS_OAS1_0014_MR1 are
+# also the ones already smoke-tested in the Kaggle session so far.
+AMOS_SUBJECTS = [("nipu", "amos_0508")]
+OASIS_SUBJECTS = [("faria", "OASIS_OAS1_0014_MR1")]
 
 
 def cell(nb, i):
@@ -107,7 +107,7 @@ Implements the full 11-row investigation from `voxtell-model-internals-investiga
 the prompt, or by a shortcut/memorized prior (organ identity, image content, fixed pose)?**
 
 - Image-Text Alignment (row 1), Fusion (rows 2-4), Word Attribution (rows 5-11).
-- Fixed scope: **3 subjects, no rotation** (rot000 only) -- {subj_list_str}.
+- Fixed scope: **{len(subjects)} subject(s), no rotation** (rot000 only) -- {subj_list_str}.
 - Word attribution uses **exact Shapley** (row 5's recommended default) over role-aware word
   slots (position / organ / "the" / "in" / "this" / "image"), not raw token deletion.
 - Rows 1, 3, 4 need **no `forward_hook`** -- verified directly against the installed
@@ -120,7 +120,7 @@ the prompt, or by a shortcut/memorized prior (organ identity, image content, fix
   predictions + embeddings already produced for rows 5-11 -- no extra model calls needed.
 
 This notebook is self-contained (unlike the rotation-sweep notebooks, it doesn't loop over a
-`PERSON` variable) -- the 3 subjects above span different annotators' folders directly.
+`PERSON` variable) -- the subject(s) above are read directly, no per-annotator looping.
 """)
 
     # ---- Cell 9: clone step -- restore Kaggle-Secrets-only version (no hardcoded token) --
@@ -297,10 +297,10 @@ except ImportError as e:
 
     # ---- Cell 16/17: dataset config (fixed subjects, no PERSON toggle) ------------------
     subjects_py = ",\n    ".join(f'("{p}", "{sid}")' for p, sid in subjects)
-    add_cell(nb, "markdown", f"""## 7. Dataset config -- {title}, fixed 3-subject ablation study (no rotation)
+    add_cell(nb, "markdown", f"""## 7. Dataset config -- {title}, fixed {len(subjects)}-subject ablation study (no rotation)
 
 No `PERSON` toggle here (unlike the rotation notebooks) -- this investigation is a fixed
-scope of 3 subjects spanning different annotators' folders, read directly.
+scope of {len(subjects)} subject(s), read directly.
 """)
     add_cell(nb, "code", f"""DATASET_NAME = '{dataset_name}'
 
@@ -523,7 +523,7 @@ bp_rows_out = []
 
 # EVERY ablation combo's mask -- no experiment left out. For a bilateral organ this is
 # 2^6=64 rows (combo), for a non-bilateral organ 2^5=32 rows -- written incrementally
-# (flushed per row) since this file gets large (thousands of masks across 3 subjects x
+# (flushed per row) since this file gets large (many masks across all subjects x
 # every organ x every combo). 'is_baseline' marks the all-roles-present (real prompt) row,
 # which is the same mask as in baseline_predictions_{dataset_name}.csv.
 am_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'label_id', 'image_path', 'label_path',
@@ -833,7 +833,7 @@ built for classification -- this is the standard workaround for using it in a re
 setting). Output: `lime_attribution_{dataset_name}.csv`, one row per (subject, organ, word)
 with LIME's regression-coefficient-style weight for that word.
 """)
-    add_cell(nb, "code", f"""LIME_NUM_SAMPLES = 100  # perturbed prompts per organ -- keeps runtime bounded (~13-35 organs x 3 subjects)
+    add_cell(nb, "code", f"""LIME_NUM_SAMPLES = 100  # perturbed prompts per organ -- keeps runtime bounded (~13-35 organs x {len(subjects)} subject(s))
 
 def make_lime_classifier_fn(data, orig_shape, bbox, gt_mask):
     def classifier_fn(text_list):

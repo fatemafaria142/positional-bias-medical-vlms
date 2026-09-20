@@ -341,10 +341,10 @@ from math import factorial
 # fp16 tensor for ALL prompts passed in at once -- for a bilateral-heavy organ (64 combos)
 # times many organs, that's 500+ prompts x a full volume, easily 15-20GB. Run prompts in
 # batches instead of all at once. Each chunk re-runs the (expensive) image encoder, so a
-# smaller chunk_size means more repeated encoder passes and a much slower run -- 64 keeps
-# per-chunk memory low (~2GB even on a large volume, measured) while cutting that repeated
-# work ~4x vs. a smaller chunk size. Lower this only if you still OOM.
-PROMPT_CHUNK_SIZE = 64
+# smaller chunk_size means more repeated encoder passes and a slower run -- 32 keeps
+# per-chunk memory low (~1GB even on a large volume, measured) while cutting the original
+# chunk_size=16 run's repeated work ~2x. Lower this only if you still OOM.
+PROMPT_CHUNK_SIZE = 32
 
 def predict_logits_chunked(data, embeddings, chunk_size=PROMPT_CHUNK_SIZE):
     n = embeddings.shape[1]

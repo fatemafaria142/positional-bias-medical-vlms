@@ -992,13 +992,20 @@ else:
 
             words_to_explain = [('position', position), ('organ', organ_core)]
             for role, word in words_to_explain:
+                # LIME's IndexedString splits on whitespace -- a 2+ word organ name (e.g.
+                # "adrenal gland") becomes 2 separate features, not 1, breaking the
+                # present/absent logic (a perturbation can drop just one of the two words,
+                # which our classifier_fn's non-empty check still treats as "word present").
+                # Join with '_' so LIME treats a multi-word organ name as ONE atomic token --
+                # verified directly against lime.lime_text.IndexedString before applying this.
+                word_for_lime = word.replace(' ', '_')
                 prompt_ablated = build_prompt(organ, {{role: False}})
                 classifier_fn = make_lime_classifier_fn(data, orig_shape, bbox, gt_mask, prompt_text, prompt_ablated)
                 t0 = time.time()
                 exp = lime_explainer.explain_instance(
-                    word, classifier_fn, labels=[1], num_features=1, num_samples=LIME_NUM_SAMPLES)
+                    word_for_lime, classifier_fn, labels=[1], num_features=1, num_samples=LIME_NUM_SAMPLES)
                 elapsed = time.time() - t0
-                weight = dict(exp.as_list(label=1)).get(word, 0.0)
+                weight = dict(exp.as_list(label=1)).get(word_for_lime, 0.0)
                 lime_writer.writerow({{
                     'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
                     'role': role, 'word': word, 'prompt_text': prompt_text,

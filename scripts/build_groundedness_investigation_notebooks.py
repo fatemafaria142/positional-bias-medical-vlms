@@ -1075,12 +1075,16 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
     text_embeddings = predictor.embed_text_prompts(prompts)  # (1, n_organs, dim) -- raw, pre-fusion
     _captured_fused.clear()
     _ = predict_logits_chunked(data, text_embeddings)  # hook fires once per sliding-window patch
-    fused_avg = torch.stack(_captured_fused, dim=0).mean(dim=0)  # stack over patches (new dim), then average -> (1, n_organs, query_dim)
+    # TransformerDecoder.forward() returns output shaped (N, B, C) -- N=n_prompts, B=batch(1) --
+    # the (B, N, C) rearrange happens AFTER this call, in voxtell_model.py's own forward(), not
+    # inside transformer_decoder itself. So each captured tensor is (n_organs, 1, query_dim),
+    # NOT (1, n_organs, query_dim) -- stacking over patches and averaging keeps that same shape.
+    fused_avg = torch.stack(_captured_fused, dim=0).mean(dim=0)  # -> (n_organs, 1, query_dim)
 
     for i, row0 in enumerate(rows):
         organ = row0['organ']
         text_vec = text_embeddings[0, i].detach().cpu().numpy()
-        fused_vec = fused_avg[0, i].numpy()
+        fused_vec = fused_avg[i, 0].numpy()
         ir_vectors[(sid, organ)] = {{'text': text_vec, 'fused': fused_vec}}
         ir_writer.writerow({{
             'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,

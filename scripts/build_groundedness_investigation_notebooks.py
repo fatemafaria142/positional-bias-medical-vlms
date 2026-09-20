@@ -1085,7 +1085,8 @@ print(f'\\nwrote {{ir_csv_path}} ({{len(ir_vectors)}} rows)')
 
 # Sidedness-direction analysis: for each bilateral organ-pair, the (right - left) difference
 # vector, in both text and fused embedding space; then pairwise cosine similarity between
-# different organ-pairs' direction vectors, per subject.
+# different organ-pairs' direction vectors, per subject. Saved to CSV (not just printed) so
+# stages 2-3, like every other row in this notebook, have a downloadable, analyzable result.
 def _cos(a, b):
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8))
 
@@ -1099,6 +1100,10 @@ STAGE 1 -- IMAGE ENCODER: architecturally prompt-independent by construction.
   necessarily originates at or after the fusion step below, not before it. (Not a probe --
   a structural fact confirmed by reading the source.)
 ''')
+
+sidedness_fieldnames = ['dataset', 'subject_id', 'space', 'organ_pair_a', 'organ_pair_b', 'cosine_similarity']
+sidedness_csv_path = RESULTS_ROOT / f'sidedness_analysis_{dataset_name}.csv'
+sidedness_rows_out = []
 
 all_sims = {{'text': [], 'fused': []}}
 for space in ['text', 'fused']:
@@ -1118,25 +1123,47 @@ for space in ['text', 'fused']:
             for j in range(i + 1, len(cores)):
                 sim = _cos(directions[cores[i]], directions[cores[j]])
                 all_sims[space].append(sim)
+                sidedness_rows_out.append({{
+                    'dataset': DATASET_NAME, 'subject_id': sid, 'space': space,
+                    'organ_pair_a': cores[i], 'organ_pair_b': cores[j], 'cosine_similarity': round(sim, 6),
+                }})
                 print(f'  {{sid}}: cos_sim(sidedness_direction[{{cores[i]}}], sidedness_direction[{{cores[j]}}]) = {{sim:.4f}}')
     print()
 
+with open(sidedness_csv_path, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=sidedness_fieldnames)
+    writer.writeheader()
+    writer.writerows(sidedness_rows_out)
+print(f'wrote {{sidedness_csv_path}} ({{len(sidedness_rows_out)}} rows)')
+
+sidedness_summary_fieldnames = ['dataset', 'mean_cos_sim_text', 'mean_cos_sim_fused', 'delta', 'interpretation']
+sidedness_summary_path = RESULTS_ROOT / f'sidedness_summary_{dataset_name}.csv'
 if all_sims['text'] and all_sims['fused']:
     mean_text = float(np.mean(all_sims['text']))
     mean_fused = float(np.mean(all_sims['fused']))
     delta = mean_fused - mean_text
     print(f'Mean cross-organ sidedness consistency: text-only = {{mean_text:.4f}}, after fusion = {{mean_fused:.4f}} (delta = {{delta:+.4f}})')
     if delta > 0.05:
-        print('  -> fusion INCREASES sidedness consistency beyond what raw language already has: the')
-        print('     segmentation network learned to sharpen/construct a more general "left vs right"')
-        print('     concept during training, not just inherit one from language pretraining.')
+        interpretation = ('fusion INCREASES sidedness consistency beyond what raw language already has: the '
+                           'segmentation network learned to sharpen/construct a more general left-vs-right '
+                           'concept during training, not just inherit one from language pretraining.')
     elif delta < -0.05:
-        print('  -> fusion DECREASES sidedness consistency relative to raw text: whatever general')
-        print('     direction exists in language gets partially organ-specific after fusion --')
-        print('     more consistent with per-organ adaptation than a single shared spatial concept.')
+        interpretation = ('fusion DECREASES sidedness consistency relative to raw text: whatever general '
+                           'direction exists in language gets partially organ-specific after fusion -- more '
+                           'consistent with per-organ adaptation than a single shared spatial concept.')
     else:
-        print('  -> fusion leaves sidedness consistency roughly unchanged from text alone -- the')
-        print('     "left vs right" signal mostly comes from language pretraining, passed through.')
+        interpretation = ('fusion leaves sidedness consistency roughly unchanged from text alone -- the '
+                           'left-vs-right signal mostly comes from language pretraining, passed through.')
+    print(f'  -> {{interpretation}}')
+    with open(sidedness_summary_path, 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=sidedness_summary_fieldnames)
+        writer.writeheader()
+        writer.writerow({{
+            'dataset': DATASET_NAME, 'mean_cos_sim_text': round(mean_text, 6),
+            'mean_cos_sim_fused': round(mean_fused, 6), 'delta': round(delta, 6),
+            'interpretation': interpretation,
+        }})
+    print(f'wrote {{sidedness_summary_path}}')
 
 print()
 print('STAGE 4 -- OUTPUT: see rows 1/3/4/8-11 above/earlier in this notebook for the definitive')
@@ -1197,17 +1224,22 @@ print("This zip file will appear directly in Kaggle's Output panel.")
     # ---- Cell 28: download instructions --------------------------------------------------
     add_cell(nb, "markdown", f"""## 15. Downloading the results -- everything you need for LOCAL analysis/plotting
 
-Ten CSVs in the Kaggle **Output** tab (after a **Save Version** run finishes), all under
+Twelve CSVs in the Kaggle **Output** tab (after a **Save Version** run finishes), all under
 `results/`. None of the local analysis below needs a GPU or `voxtell`/`torch` installed --
 just `numpy`/`pandas`/`matplotlib` (`decode_mask_rle()` is pure Python/numpy/zlib; plotting
 LIME/SHAP values doesn't need those libraries installed locally either, just their CSV output).
 
 - **`internal_representations_{dataset_name}.csv`** -- raw text embeddings and fused (post
   cross-attention) query embeddings, one row per (subject, organ), captured via a real
-  `forward_hook` on `predictor.network.transformer_decoder`. Use to check whether the model
-  learned a single, shared "sidedness direction" (cosine similarity between different organ
-  pairs' (right - left) embedding-difference vectors, printed in the notebook's own output, or
-  recompute locally from this CSV).
+  `forward_hook` on `predictor.network.transformer_decoder`. The raw vectors, for your own
+  further analysis.
+- **`sidedness_analysis_{dataset_name}.csv`** -- stages 2-3's actual computed result (not just
+  printed): one row per (subject, organ-pair-A, organ-pair-B, space), the cosine similarity
+  between their (right - left) embedding-difference vectors, in both `text` (stage 2) and
+  `fused` (stage 3) space.
+- **`sidedness_summary_{dataset_name}.csv`** -- one row: mean cosine similarity in each space,
+  the delta between them, and a plain-language interpretation string -- the direct answer to
+  "did fusion learn something beyond what the language model already had".
 
 - **`baseline_predictions_{dataset_name}.csv`** -- **the one to download for plotting the real
   (unablated) prediction.** One row per (subject, organ): `prompt_text`, `dice_gt`,

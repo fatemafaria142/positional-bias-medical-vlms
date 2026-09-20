@@ -164,9 +164,10 @@ def plot_row(row: pd.Series, out_dir: Path, volume_cache: dict):
     title = f'"{row["prompt_text"]}"  (subject={row["subject_id"]})'
     organ_slug = str(row["organ"]).replace(" ", "_")
     if is_ablation_row:
-        dropped = row["roles_dropped"] or "(none -- baseline)"
+        dropped_raw = row["roles_dropped"]
+        dropped = "(none -- baseline)" if pd.isna(dropped_raw) or not str(dropped_raw).strip() else dropped_raw
         title += f"\ndropped roles: {dropped}"
-        combo_tag = "baseline" if row["is_baseline"] else f"drop-{str(row['roles_dropped']).replace(',', '-') or 'none'}"
+        combo_tag = "baseline" if row["is_baseline"] else f"drop-{str(dropped_raw).replace(',', '-')}"
         out_name = f"{row['subject_id']}_{organ_slug}_{combo_tag}.png"
     else:
         out_name = f"{row['subject_id']}_{organ_slug}.png"

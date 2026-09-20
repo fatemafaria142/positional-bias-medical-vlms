@@ -888,6 +888,8 @@ for name, rows_out in [('row1_image_text_alignment', row1_rows), ('row2_embeddin
 # regress against (this is what produced the "R^2=nan" you may have seen). The
 # meaningful "output distance" for bilateral organs is centroid distance -- how far
 # apart the two predicted locations actually are.
+row2_regression_fieldnames = ['dataset', 'slope', 'intercept', 'r_squared', 'n_points', 'interpretation']
+row2_regression_path = RESULTS_ROOT / f'row2_regression_fit_{dataset_name}.csv'
 if row2_rows:
     pairs = [(r['text_embed_cos_dist'], r['output_centroid_dist_vox']) for r in row2_rows
              if r['output_centroid_dist_vox'] is not None]
@@ -900,9 +902,24 @@ if row2_rows:
         print('  positive slope -> differing text understanding translates into differing predicted location (genuine grounding)')
         print('  flat/near-zero slope -> text difference does not predict where the model points (shortcut/memorized)')
         print('  (output_dice_dist is NOT used for this regression -- always ~1.0 for non-overlapping left/right organs, no signal)')
+        interpretation = ('positive slope: differing text understanding translates into differing predicted '
+                           'location (genuine grounding)' if slope > 0 else
+                           'flat/negative slope: text difference does not predict where the model points (shortcut/memorized)')
+        with open(row2_regression_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=row2_regression_fieldnames)
+            writer.writeheader()
+            writer.writerow({{'dataset': DATASET_NAME, 'slope': round(float(slope), 6),
+                               'intercept': round(float(intercept), 6), 'r_squared': round(float(r2), 6),
+                               'n_points': len(xs), 'interpretation': interpretation}})
+        print(f'wrote {{row2_regression_path}}')
     else:
         print('\\nRow 2 regression skipped -- not enough variance in cos_dist or centroid_dist to fit '
               '(check row2_embedding_output_regression_{dataset_name}.csv directly for the raw points instead)')
+        with open(row2_regression_path, 'w', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=row2_regression_fieldnames)
+            writer.writeheader()
+            writer.writerow({{'dataset': DATASET_NAME, 'slope': None, 'intercept': None, 'r_squared': None,
+                               'n_points': len(xs), 'interpretation': 'skipped -- not enough variance to fit'}})
 """)
 
     # ---- Cell: Row 6 -- LIME (genuinely new inference, unlike SHAP above) ---------------
@@ -1224,7 +1241,7 @@ print("This zip file will appear directly in Kaggle's Output panel.")
     # ---- Cell 28: download instructions --------------------------------------------------
     add_cell(nb, "markdown", f"""## 15. Downloading the results -- everything you need for LOCAL analysis/plotting
 
-Twelve CSVs in the Kaggle **Output** tab (after a **Save Version** run finishes), all under
+Thirteen CSVs in the Kaggle **Output** tab (after a **Save Version** run finishes), all under
 `results/`. None of the local analysis below needs a GPU or `voxtell`/`torch` installed --
 just `numpy`/`pandas`/`matplotlib` (`decode_mask_rle()` is pure Python/numpy/zlib; plotting
 LIME/SHAP values doesn't need those libraries installed locally either, just their CSV output).
@@ -1268,9 +1285,10 @@ LIME/SHAP values doesn't need those libraries installed locally either, just the
   to match this notebook's positional-bias-only scope) -- one row per (subject, organ, role)
   with LIME's weight for that word.
 - `row1_image_text_alignment_{dataset_name}.csv` -- row 1 (matched vs. mismatched IoU)
-- `row2_embedding_output_regression_{dataset_name}.csv` -- row 2 (embedding-distance vs.
-  output-distance points; fit the regression slope from these, or use the number printed in
-  section 11)
+- `row2_embedding_output_regression_{dataset_name}.csv` -- row 2's raw (embedding-distance,
+  output-distance) points, one per organ-pair x subject.
+- **`row2_regression_fit_{dataset_name}.csv`** -- the fitted slope/intercept/R² from those
+  points, plus a plain-language interpretation -- previously only printed, now saved.
 - `row3_causal_embedding_swap_{dataset_name}.csv` -- row 3 (causal side-agreement)
 - `row4_fused_feature_diff_{dataset_name}.csv` -- row 4 (spatial diff map summary)
 

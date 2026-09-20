@@ -59,14 +59,21 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 BRANCH = "faria/voxtell3d-rotation-medical-segmentation"
 
-# Fixed 3-subject scope, SAME for both datasets (same RAM/GPU budget either way).
-# Combined with the bilateral-organ-only filter and position-only ablation below,
-# this keeps both notebooks small: ~264 total prompts for AMOS, ~2112 for OASIS.
-AMOS_SUBJECTS = [("nipu", "amos_0508"), ("faria", "amos_0530"), ("hridoy", "amos_0555")]
+# All 10 subjects per dataset (every subject available in data/raw/, staged via
+# scripts/stage_extra_subjects.py). Processed strictly one subject at a time, with
+# explicit GPU memory cleanup between subjects (see torch.cuda.empty_cache() calls in
+# the main loops below) to avoid CUDA OOM / RAM buildup across the longer 10-subject run.
+AMOS_SUBJECTS = [
+    ("nipu", "amos_0508"), ("faria", "amos_0530"), ("hridoy", "amos_0555"),
+    ("faria", "amos_0544"), ("nipu", "amos_0553"), ("hridoy", "amos_0558"),
+    ("nipu", "amos_0522"), ("faria", "amos_0532"), ("hridoy", "amos_0554"), ("nipu", "amos_0575"),
+]
 OASIS_SUBJECTS = [
-    ("faria", "OASIS_OAS1_0014_MR1"),
-    ("hridoy", "OASIS_OAS1_0123_MR1"),
-    ("nipu", "OASIS_OAS1_0062_MR1"),
+    ("faria", "OASIS_OAS1_0014_MR1"), ("faria", "OASIS_OAS1_0057_MR1"),
+    ("hridoy", "OASIS_OAS1_0123_MR1"), ("hridoy", "OASIS_OAS1_0135_MR1"),
+    ("nipu", "OASIS_OAS1_0062_MR1"), ("nipu", "OASIS_OAS1_0076_MR1"),
+    ("nipu", "OASIS_OAS1_0151_MR1"), ("faria", "OASIS_OAS1_0363_MR1"),
+    ("hridoy", "OASIS_OAS1_0419_MR1"), ("nipu", "OASIS_OAS1_0421_MR1"),
 ]
 
 
@@ -734,6 +741,12 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
             }})
         bp_rows_out.append(bp_row)
 
+    # Free this subject's large per-organ arrays before moving to the next one -- processed
+    # strictly one subject at a time, so nothing here should carry GPU/RAM usage forward.
+    del masks, masks_cropped, logits, embeddings, img_arr, label_vol
+    import gc; gc.collect()
+    torch.cuda.empty_cache()
+
 with open(wa_csv_path, 'w', newline='') as f:
     writer = csv.DictWriter(f, fieldnames=wa_fieldnames)
     writer.writeheader()
@@ -962,6 +975,11 @@ else:
             lime_f.flush()
             print(f'    {{organ}}: {{elapsed:.1f}}s for {{LIME_NUM_SAMPLES}} samples')
 
+        # Free this subject's data before moving to the next one.
+        del img_arr, label_vol, data
+        import gc; gc.collect()
+        torch.cuda.empty_cache()
+
 lime_f.close()
 print(f'\\nwrote {{lime_csv_path}} ({{lime_n_written}} rows)')
 """)
@@ -1038,6 +1056,11 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
         }})
     ir_f.flush()
 
+    # Free this subject's data before moving to the next one.
+    del img_arr, data, text_embeddings, fused_avg
+    import gc; gc.collect()
+    torch.cuda.empty_cache()
+
 _hook_handle.remove()
 ir_f.close()
 print(f'\\nwrote {{ir_csv_path}} ({{len(ir_vectors)}} rows)')
@@ -1048,9 +1071,21 @@ print(f'\\nwrote {{ir_csv_path}} ({{len(ir_vectors)}} rows)')
 def _cos(a, b):
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8))
 
-print('\\n=== Sidedness-direction analysis ===')
+print('''
+=== Four-stage interpretation: image -> text -> fusion -> output ===
+
+STAGE 1 -- IMAGE ENCODER: architecturally prompt-independent by construction.
+  self.encoder(img) in voxtell_model.py takes ONLY the image, never the text -- the same
+  image features feed every prompt's fusion step. This means the image encoder alone cannot
+  be "the reason" the model gets left/right right or wrong: any position-related behavior
+  necessarily originates at or after the fusion step below, not before it. (Not a probe --
+  a structural fact confirmed by reading the source.)
+''')
+
+all_sims = {{'text': [], 'fused': []}}
 for space in ['text', 'fused']:
-    print(f'\\n--- {{space}} embedding space ---')
+    stage_label = 'STAGE 2 -- TEXT (Qwen, before any image fusion)' if space == 'text' else 'STAGE 3 -- FUSION (after cross-attention to the image)'
+    print(f'{{stage_label}}')
     for sid in subject_organs:
         organs_here = [o for (s, o) in ir_vectors if s == sid]
         pairs_here = bilateral_pairs(organs_here)
@@ -1064,8 +1099,32 @@ for space in ['text', 'fused']:
         for i in range(len(cores)):
             for j in range(i + 1, len(cores)):
                 sim = _cos(directions[cores[i]], directions[cores[j]])
+                all_sims[space].append(sim)
                 print(f'  {{sid}}: cos_sim(sidedness_direction[{{cores[i]}}], sidedness_direction[{{cores[j]}}]) = {{sim:.4f}}')
+    print()
+
+if all_sims['text'] and all_sims['fused']:
+    mean_text = float(np.mean(all_sims['text']))
+    mean_fused = float(np.mean(all_sims['fused']))
+    delta = mean_fused - mean_text
+    print(f'Mean cross-organ sidedness consistency: text-only = {{mean_text:.4f}}, after fusion = {{mean_fused:.4f}} (delta = {{delta:+.4f}})')
+    if delta > 0.05:
+        print('  -> fusion INCREASES sidedness consistency beyond what raw language already has: the')
+        print('     segmentation network learned to sharpen/construct a more general "left vs right"')
+        print('     concept during training, not just inherit one from language pretraining.')
+    elif delta < -0.05:
+        print('  -> fusion DECREASES sidedness consistency relative to raw text: whatever general')
+        print('     direction exists in language gets partially organ-specific after fusion --')
+        print('     more consistent with per-organ adaptation than a single shared spatial concept.')
+    else:
+        print('  -> fusion leaves sidedness consistency roughly unchanged from text alone -- the')
+        print('     "left vs right" signal mostly comes from language pretraining, passed through.')
+
 print()
+print('STAGE 4 -- OUTPUT: see rows 1/3/4/8-11 above/earlier in this notebook for the definitive')
+print('  behavioral verdict (matched-vs-mismatched IoU, causal side-agreement, Dice/centroid/volume')
+print('  deltas) -- that is the ground truth for "does the model actually get it right", and stages')
+print('  1-3 above explain the mechanism behind that verdict, not a substitute for it.')
 print('  close to 1.0 -> a shared, general "sidedness direction" exists across organs (the model')
 print('    learned one reusable left/right concept, not per-organ memorization)')
 print('  close to 0.0 -> each organ pair has its own, unrelated direction (more consistent with')

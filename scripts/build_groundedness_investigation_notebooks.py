@@ -340,9 +340,11 @@ from math import factorial
 # GPU OOM fix: predict_sliding_window_return_logits allocates one (n_prompts, X, Y, Z)
 # fp16 tensor for ALL prompts passed in at once -- for a bilateral-heavy organ (64 combos)
 # times many organs, that's 500+ prompts x a full volume, easily 15-20GB. Run prompts in
-# small batches instead; lower this if you still OOM, raise it (slower per-prompt, but
-# fewer repeated encoder passes) if you have headroom.
-PROMPT_CHUNK_SIZE = 16
+# batches instead of all at once. Each chunk re-runs the (expensive) image encoder, so a
+# smaller chunk_size means more repeated encoder passes and a much slower run -- 64 keeps
+# per-chunk memory low (~2GB even on a large volume, measured) while cutting that repeated
+# work ~4x vs. a smaller chunk size. Lower this only if you still OOM.
+PROMPT_CHUNK_SIZE = 64
 
 def predict_logits_chunked(data, embeddings, chunk_size=PROMPT_CHUNK_SIZE):
     n = embeddings.shape[1]

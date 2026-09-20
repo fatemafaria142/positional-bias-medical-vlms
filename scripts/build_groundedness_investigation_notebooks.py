@@ -966,8 +966,114 @@ lime_f.close()
 print(f'\\nwrote {{lime_csv_path}} ({{lime_n_written}} rows)')
 """)
 
+    # ---- New section: internal-representation analysis (real forward_hook) --------------
+    add_cell(nb, "markdown", f"""## 13. Internal-layer analysis -- does the model have a learned "sidedness direction"?
+
+VoxTell's text side has NO explicit positional/directional embedding -- "left"/"right" are
+ordinary tokens to the Qwen3 text encoder, unlike the image side (which gets an explicit 3D
+sinusoidal positional encoding before cross-attention, see `voxtell_model.py`'s
+`self.pos_embed`). Rows 1-4 already showed the model nonetheless grounds these words correctly
+100% of the time -- so the interesting mechanistic question is *how*: is there a single,
+consistent "sidedness direction" the model learned (shared across organs), or did it memorize a
+separate left/right association per organ with no shared structure?
+
+This needs two internal representations, neither exposed by the public API:
+- **Raw text embedding** (before any image fusion) -- already computed by `embed_text_prompts`,
+  just never saved to CSV until now.
+- **Fused query embedding** (`mask_embedding`, after cross-attending to the image) -- VoxTell's
+  own `voxtell_model.py` forward pass computes this via `self.transformer_decoder(...)`, which
+  actually returns `(mask_embedding, attention_weights)`, but **the model's own code discards
+  the attention weights** (`mask_embedding, _ = self.transformer_decoder(...)`). A
+  `forward_hook` on `predictor.network.transformer_decoder` recovers what's being thrown away,
+  with zero changes to VoxTell's code -- this is the one place in this whole notebook that
+  actually needs a hook (rows 1/3/4 didn't, since the public API already exposed what they
+  needed).
+
+The image is processed via sliding-window patches, so the hook fires once per patch; fused
+embeddings are averaged across patches per prompt (image content varies by patch, but the
+text-driven query identity doesn't, so this gives one representative fused vector per organ).
+
+Output: `internal_representations_{dataset_name}.csv` (one row per subject x organ, with the
+full raw text embedding and fused embedding serialized as space-separated floats), plus a
+printed "sidedness direction" analysis: for each pair of bilateral organ-pairs, the cosine
+similarity between their (right - left) embedding difference vectors -- close to 1.0 means a
+shared, general direction; close to 0 means independent, organ-specific associations.
+""")
+    add_cell(nb, "code", f"""ir_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'text_embedding', 'fused_embedding']
+ir_csv_path = RESULTS_ROOT / f'internal_representations_{dataset_name}.csv'
+ir_f = open(ir_csv_path, 'w', newline='')
+ir_writer = csv.DictWriter(ir_f, fieldnames=ir_fieldnames)
+ir_writer.writeheader()
+
+_captured_fused = []
+def _fusion_hook(module, inp, output):
+    # output = (mask_embedding, attention_weights) -- mask_embedding shape (1, n_prompts, query_dim)
+    _captured_fused.append(output[0].detach().cpu())
+
+_hook_handle = predictor.network.transformer_decoder.register_forward_hook(_fusion_hook)
+
+ir_vectors = {{}}  # (subject_id, organ) -> {{'text': np.array, 'fused': np.array}}
+for si, (sid, info) in enumerate(subject_organs.items(), 1):
+    person, rows = info['person'], info['rows']
+    print(f'[{{si}}/{{len(subject_organs)}}] {{person}}/{{sid}}: capturing internal representations...')
+    image_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['image_path']
+    img_arr, _ = load_volume_ras(image_path)
+    data, bbox, orig_shape = predictor.preprocess(img_arr)
+    prompts = [r['prompt_text'] for r in rows]
+
+    text_embeddings = predictor.embed_text_prompts(prompts)  # (1, n_organs, dim) -- raw, pre-fusion
+    _captured_fused.clear()
+    _ = predict_logits_chunked(data, text_embeddings)  # hook fires once per sliding-window patch
+    fused_avg = torch.stack(_captured_fused, dim=0).mean(dim=0)  # stack over patches (new dim), then average -> (1, n_organs, query_dim)
+
+    for i, row0 in enumerate(rows):
+        organ = row0['organ']
+        text_vec = text_embeddings[0, i].detach().cpu().numpy()
+        fused_vec = fused_avg[0, i].numpy()
+        ir_vectors[(sid, organ)] = {{'text': text_vec, 'fused': fused_vec}}
+        ir_writer.writerow({{
+            'dataset': DATASET_NAME, 'person': person, 'subject_id': sid, 'organ': organ,
+            'text_embedding': ' '.join(f'{{x:.6f}}' for x in text_vec),
+            'fused_embedding': ' '.join(f'{{x:.6f}}' for x in fused_vec),
+        }})
+    ir_f.flush()
+
+_hook_handle.remove()
+ir_f.close()
+print(f'\\nwrote {{ir_csv_path}} ({{len(ir_vectors)}} rows)')
+
+# Sidedness-direction analysis: for each bilateral organ-pair, the (right - left) difference
+# vector, in both text and fused embedding space; then pairwise cosine similarity between
+# different organ-pairs' direction vectors, per subject.
+def _cos(a, b):
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8))
+
+print('\\n=== Sidedness-direction analysis ===')
+for space in ['text', 'fused']:
+    print(f'\\n--- {{space}} embedding space ---')
+    for sid in subject_organs:
+        organs_here = [o for (s, o) in ir_vectors if s == sid]
+        pairs_here = bilateral_pairs(organs_here)
+        directions = {{}}
+        for left_o, right_o in pairs_here:
+            l = ir_vectors[(sid, left_o)][space]
+            r = ir_vectors[(sid, right_o)][space]
+            _, core = parse_organ_roles(left_o)
+            directions[core] = r - l
+        cores = list(directions)
+        for i in range(len(cores)):
+            for j in range(i + 1, len(cores)):
+                sim = _cos(directions[cores[i]], directions[cores[j]])
+                print(f'  {{sid}}: cos_sim(sidedness_direction[{{cores[i]}}], sidedness_direction[{{cores[j]}}]) = {{sim:.4f}}')
+print()
+print('  close to 1.0 -> a shared, general "sidedness direction" exists across organs (the model')
+print('    learned one reusable left/right concept, not per-organ memorization)')
+print('  close to 0.0 -> each organ pair has its own, unrelated direction (more consistent with')
+print('    per-organ memorized association than a general spatial concept)')
+""")
+
     # ---- Cell 26/27: summary ------------------------------------------------------------
-    add_cell(nb, "markdown", "## 13. Summary\n")
+    add_cell(nb, "markdown", "## 14. Summary\n")
     add_cell(nb, "code", f"""import shutil
 import pandas as pd
 
@@ -1009,12 +1115,19 @@ print("This zip file will appear directly in Kaggle's Output panel.")
 """)
 
     # ---- Cell 28: download instructions --------------------------------------------------
-    add_cell(nb, "markdown", f"""## 14. Downloading the results -- everything you need for LOCAL analysis/plotting
+    add_cell(nb, "markdown", f"""## 15. Downloading the results -- everything you need for LOCAL analysis/plotting
 
-Nine CSVs in the Kaggle **Output** tab (after a **Save Version** run finishes), all under
+Ten CSVs in the Kaggle **Output** tab (after a **Save Version** run finishes), all under
 `results/`. None of the local analysis below needs a GPU or `voxtell`/`torch` installed --
 just `numpy`/`pandas`/`matplotlib` (`decode_mask_rle()` is pure Python/numpy/zlib; plotting
 LIME/SHAP values doesn't need those libraries installed locally either, just their CSV output).
+
+- **`internal_representations_{dataset_name}.csv`** -- raw text embeddings and fused (post
+  cross-attention) query embeddings, one row per (subject, organ), captured via a real
+  `forward_hook` on `predictor.network.transformer_decoder`. Use to check whether the model
+  learned a single, shared "sidedness direction" (cosine similarity between different organ
+  pairs' (right - left) embedding-difference vectors, printed in the notebook's own output, or
+  recompute locally from this CSV).
 
 - **`baseline_predictions_{dataset_name}.csv`** -- **the one to download for plotting the real
   (unablated) prediction.** One row per (subject, organ): `prompt_text`, `dice_gt`,

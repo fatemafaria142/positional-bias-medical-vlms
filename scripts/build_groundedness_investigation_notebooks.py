@@ -59,10 +59,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 BRANCH = "faria/voxtell3d-rotation-medical-segmentation"
 
-# All 10 subjects per dataset (every subject available in data/raw/, staged via
-# scripts/stage_extra_subjects.py). Processed strictly one subject at a time, with
-# explicit GPU memory cleanup between subjects (see torch.cuda.empty_cache() calls in
-# the main loops below) to avoid CUDA OOM / RAM buildup across the longer 10-subject run.
+# AMOS: all 10 subjects available in data/raw/ (staged via scripts/stage_extra_subjects.py).
+# OASIS: 5 subjects (reduced from 10 -- same organ set, half the subjects, half the prompts).
+# Processed strictly one subject at a time, with explicit GPU memory cleanup between
+# subjects (see torch.cuda.empty_cache() calls in the main loops below).
 AMOS_SUBJECTS = [
     ("nipu", "amos_0508"), ("faria", "amos_0530"), ("hridoy", "amos_0555"),
     ("faria", "amos_0544"), ("nipu", "amos_0553"), ("hridoy", "amos_0558"),
@@ -71,9 +71,7 @@ AMOS_SUBJECTS = [
 OASIS_SUBJECTS = [
     ("faria", "OASIS_OAS1_0014_MR1"), ("faria", "OASIS_OAS1_0057_MR1"),
     ("hridoy", "OASIS_OAS1_0123_MR1"), ("hridoy", "OASIS_OAS1_0135_MR1"),
-    ("nipu", "OASIS_OAS1_0062_MR1"), ("nipu", "OASIS_OAS1_0076_MR1"),
-    ("nipu", "OASIS_OAS1_0151_MR1"), ("faria", "OASIS_OAS1_0363_MR1"),
-    ("hridoy", "OASIS_OAS1_0419_MR1"), ("nipu", "OASIS_OAS1_0421_MR1"),
+    ("nipu", "OASIS_OAS1_0062_MR1"),
 ]
 
 

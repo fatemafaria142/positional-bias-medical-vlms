@@ -1,7 +1,8 @@
 """
 Generator for the two VoxTell model-internals investigation Kaggle notebooks
 (voxtell-amos-groundedness-investigation-kaggle.ipynb,
-voxtell-oasis-groundedness-investigation-kaggle.ipynb).
+voxtell-oasis-groundedness-investigation-batch1-kaggle.ipynb,
+voxtell-oasis-groundedness-investigation-batch2-kaggle.ipynb).
 
 Implements every row of voxtell-model-internals-investigation-plan.md (rows 1-11:
 image-text alignment, fusion, word-attribution) for a FIXED, small subject scope per
@@ -41,11 +42,14 @@ source (voxtell/inference/predictor.py, voxtell/model/voxtell_model.py):
     bilateral organ pair) -- no extra model calls needed beyond that one
     pass per subject.
   - Word attribution (rows 5-11) uses exact Shapley (row 5's "recommended
-    default") over role-aware word slots (position/organ/the/in/this/image),
-    not raw token deletion -- matching the plan's own supporting note that
-    raw per-token ablation breaks grammar. The "organ" role's two states are
-    {real organ name, generic placeholder "structure"} rather than
-    {present, absent}, since the organ slot is grammatically required.
+    default") over two role-aware word slots -- position and organ -- not raw
+    token deletion, matching the plan's own supporting note that raw
+    per-token ablation breaks grammar. The "organ" role's two states are
+    {real organ name, a spatial reference to the nearest other real organ in
+    that scan, e.g. "structure near the liver"} rather than {present, absent}
+    or a vague generic placeholder, since the organ slot is grammatically
+    required and a bare placeholder word conflates "no organ identity" with
+    "unfamiliar/out-of-distribution word".
 
 Usage:
     python scripts/build_groundedness_investigation_notebooks.py
@@ -59,8 +63,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 BRANCH = "faria/voxtell3d-rotation-medical-segmentation"
 
-# AMOS: all 10 subjects available in data/raw/ (staged via scripts/stage_extra_subjects.py).
-# OASIS: 5 subjects (reduced from 10 -- same organ set, half the subjects, half the prompts).
+# AMOS: all 10 subjects available in data/raw/ (staged via scripts/stage_extra_subjects.py),
+# in one notebook. OASIS: all 10 available subjects too, but split across TWO disjoint
+# 5-subject notebooks (OASIS_SUBJECTS + OASIS_SUBJECTS_BATCH2 below) rather than one 10-subject
+# notebook -- see the build() calls at the bottom of this file.
 # Processed strictly one subject at a time, with explicit GPU memory cleanup between
 # subjects (see torch.cuda.empty_cache() calls in the main loops below).
 AMOS_SUBJECTS = [
@@ -72,6 +78,16 @@ OASIS_SUBJECTS = [
     ("faria", "OASIS_OAS1_0014_MR1"), ("faria", "OASIS_OAS1_0057_MR1"),
     ("hridoy", "OASIS_OAS1_0123_MR1"), ("hridoy", "OASIS_OAS1_0135_MR1"),
     ("nipu", "OASIS_OAS1_0062_MR1"),
+]
+# Second, disjoint batch of 5 OASIS subjects -- the only 5 remaining across all three
+# annotators' samples/neurite_oasis/ that aren't already in OASIS_SUBJECTS above (verified:
+# each annotator's manifest has exactly {faria: 3, hridoy: 3, nipu: 4} = 10 subjects total,
+# so these 5 + OASIS_SUBJECTS' 5 = all 10, no overlap). Built into a SEPARATE notebook file
+# (not merged into the first), so each notebook independently covers 5 subjects.
+OASIS_SUBJECTS_BATCH2 = [
+    ("faria", "OASIS_OAS1_0363_MR1"), ("hridoy", "OASIS_OAS1_0419_MR1"),
+    ("nipu", "OASIS_OAS1_0076_MR1"), ("nipu", "OASIS_OAS1_0151_MR1"),
+    ("nipu", "OASIS_OAS1_0421_MR1"),
 ]
 
 
@@ -101,7 +117,14 @@ def add_cell(nb, cell_type, text):
     nb["cells"].append(c)
 
 
-def build(template_name, dataset_name, title, subjects, out_name, organ_whitelist=None):
+def build(template_name, dataset_name, title, subjects, out_name, organ_whitelist=None, output_suffix=None):
+    # output_suffix drives every OUTPUT CSV/zip filename below; dataset_name alone still
+    # drives the on-disk folder lookup (samples/{dataset_name}/...) inside the generated
+    # notebook, via the DATASET_NAME variable it sets. Defaults to dataset_name (single-batch
+    # case). Needed when two notebooks share the same underlying dataset folder (e.g. two
+    # disjoint OASIS subject batches, each its own notebook) -- without this, both notebooks'
+    # downloaded result CSVs would have identical names and silently overwrite each other.
+    output_suffix = output_suffix or dataset_name
     nb = json.loads((REPO_ROOT / template_name).read_text(encoding="utf-8"))
     nb["cells"] = nb["cells"][:16]  # keep cells 0-15 only (install/model-load/helpers)
 
@@ -118,8 +141,12 @@ the prompt, or by a shortcut/memorized prior (organ identity, image content, fix
   organs** are used, and only two words are ever ablated -- **`position`** (left/right) and
   **`organ`** (the organ name itself) -- 4 prompts/organ (both present, position-only-removed,
   organ-only-removed, both removed), not the full word-role combinatorics (the/in/this/image
-  stay fixed). This directly answers whether the model needs the position word, the organ
-  word, both, or neither -- not just "does position matter".
+  stay fixed). When `organ` is "removed", it's replaced with a real spatial reference to
+  another organ actually in the scan (e.g. `"structure near the liver"`, picked by nearest
+  GT centroid), not a vague generic placeholder -- this keeps every ablated prompt
+  grammatical and turns it into a genuine relational/spatial-grounding test. This directly
+  answers whether the model needs the position word, the organ word, both, or neither --
+  not just "does position matter".
 - Fixed scope: **{len(subjects)} subject(s), no rotation** (rot000 only) -- {subj_list_str}.
 - Word attribution uses **exact Shapley** (row 5's recommended default) over these 2 words.
 - Rows 1, 3, 4 need **no `forward_hook`** -- verified directly against the installed
@@ -130,6 +157,8 @@ the prompt, or by a shortcut/memorized prior (organ identity, image content, fix
   just calling the public API with a different embedding, no monkeypatching of voxtell's code.
 - Rows 1, 2, 3, 4 are derived as post-hoc analysis of the SAME per-subject baseline
   predictions + embeddings already produced for rows 5-11 -- no extra model calls needed.
+  Row 4 uses the raw, continuous, pre-sigmoid logit volume (not the thresholded mask), so
+  it's computed inline in the same loop rather than deferred to the rows-1-3 section.
 
 This notebook is self-contained (unlike the rotation-sweep notebooks, it doesn't loop over a
 `PERSON` variable) -- the subject(s) above are read directly, no per-annotator looping.
@@ -335,7 +364,19 @@ No `PERSON` toggle here (unlike the rotation notebooks) -- this investigation is
 scope of {len(subjects)} subject(s), read directly. **Positional-bias scope: only bilateral
 (left/right) organs are kept** -- organs with no left/right can't test positional bias, so
 they're filtered out here rather than carried through the whole notebook unused.
-{whitelist_note}""")
+{whitelist_note}
+Also collects EVERY organ in each subject's scan (not just the non-bilateral ones) as
+`landmark_rows`, used in section 8 below as real anatomical reference points for the
+organ-ablated prompts instead of a vague generic placeholder noun. Restricting landmarks to
+only single-instance organs (liver/spleen/etc., or brain stem/ventricles) was tried first and
+rejected: on Neurite-OASIS, which has only 3 single-instance structures in its whole label set,
+that starved landmark diversity badly -- verified directly against the manifests, 8 of the 10
+bilateral organs in scope always picked the SAME landmark (3rd ventricle) in every single
+subject, making the "organ removed" ablation barely more informative than a fixed placeholder.
+Allowing OTHER bilateral organs as landmarks too (named with their own side, e.g. "near the
+left thalamus", excluding only the target's own left/right pair so the landmark can never leak
+the answer) fixes this -- verified to give real per-organ, per-subject variety on both datasets.
+""")
     add_cell(nb, "code", f"""DATASET_NAME = '{dataset_name}'
 
 # vvv fixed scope for this investigation -- (person, subject_id) vvv
@@ -344,17 +385,23 @@ SUBJECTS = [
 ]
 # ^^^ change here to swap subjects; no rotation is used (rot000 only) ^^^
 
-subject_organs = {{}}  # subject_id -> {{'person':..., 'rows': [manifest rows for this subject]}}
+subject_organs = {{}}  # subject_id -> {{'person':..., 'rows': [...], 'landmark_rows': [...]}}
 for person, sid in SUBJECTS:
-    rows = [r for r in load_manifest_rot000(person, DATASET_NAME) if r['subject_id'] == sid]
-    rows = [r for r in rows if r['organ'].split()[0].lower() in ('left', 'right')]  # bilateral only{whitelist_filter_line}
+    subj_rows = [r for r in load_manifest_rot000(person, DATASET_NAME) if r['subject_id'] == sid]
+    rows = [r for r in subj_rows if r['organ'].split()[0].lower() in ('left', 'right')]  # bilateral only{whitelist_filter_line}
     assert rows, f'no bilateral-organ rot000 rows found for {{person}}/{{sid}} in {{DATASET_NAME}}'
-    subject_organs[sid] = {{'person': person, 'rows': rows}}
+    # EVERY organ in this subject's scan is a landmark candidate (not just single-instance
+    # ones) -- NOT whitelist-filtered, kept for every subject regardless of the bilateral
+    # top-N narrowing above. Per-target exclusion of same-core (own left/right pair) organs
+    # happens at landmark-selection time (nearest_landmark_name, section 8), not here.
+    landmark_rows = subj_rows
+    subject_organs[sid] = {{'person': person, 'rows': rows, 'landmark_rows': landmark_rows}}
 
 n_organs = len(next(iter(subject_organs.values()))['rows'])
 print(f'{{DATASET_NAME}}: {{len(subject_organs)}} subjects {{list(subject_organs)}}, {{n_organs}} organs/subject')
 for sid, info in subject_organs.items():
     print(f"  {{info['person']}}/{{sid}}: organs =", [r['organ'] for r in info['rows']])
+    print(f"    landmark candidates =", [r['organ'] for r in info['landmark_rows']])
 """)
 
     # ---- Cell 18/19: role-aware ablation + exact Shapley helpers ------------------------
@@ -363,13 +410,33 @@ for sid, info in subject_organs.items():
 Narrowed to the actual research question (positional bias), not general word-grounding: only
 **bilateral organs** are used (organs with no left/right don't test positional bias, so they're
 filtered out entirely below), and only **two** words are ever ablated -- **`position`**
-(`"left"`/`"right"`) and **`organ`** (the organ name, replaced with a generic "structure" when
-"removed") -- not the function words (the/in/this/image). That means exactly **4 prompts per
-organ** (2^2 combinations): both present (`"Segment the left kidney in this image."`),
-position-only-removed (`"Segment the kidney in this image."`), organ-only-removed (`"Segment
-the left structure in this image."`), and both removed (`"Segment the structure in this
-image."`). This is small enough that "exact Shapley" (row 5) is computed exhaustively over all
-4 combinations -- no approximation needed, same for SHAP (row 7).
+(`"left"`/`"right"`) and **`organ`** (the organ name) -- not the function words (the/in/this/
+image). That means exactly **4 prompts per organ** (2^2 combinations).
+
+**When the organ word is "removed", it's replaced with a real spatial reference to another
+organ actually visible in this same scan** (e.g. `"structure near the liver"`), picked as the
+nearest OTHER organ (by fresh ground-truth centroid distance, section 10) -- ANY organ in the
+scan, bilateral or not, except the target's own left/right pair (excluded so the "landmark"
+can never just be the answer's other side). NOT a vague generic placeholder like `"structure"`
+on its own, and NOT restricted to single-instance organs only -- that was tried first and
+rejected: Neurite-OASIS has only 3 single-instance structures total, so restricting to those
+made 8 of its 10 bilateral organs always pick the exact same landmark in every subject,
+barely more informative than a fixed placeholder (verified directly against the manifests).
+Allowing any other organ (named with its own side where relevant, e.g. `"the left thalamus"`)
+gives real per-organ, per-subject variety on both datasets. A bare generic noun would also
+conflate two different things: "the model doesn't have organ identity" vs. "the model doesn't
+recognize this out-of-distribution word" -- and a collapsed score couldn't tell you which. The
+landmark-relational phrasing keeps every combo grammatical AND turns the organ-ablated rows into
+a genuine relational/spatial-grounding test: can the model still find the right region when told
+*where* it is relative to a real nearby organ, without being told *what* it is?
+
+- both present: `"Segment the left kidney in this image."`
+- position-only-removed: `"Segment the kidney in this image."`
+- organ-only-removed: `"Segment the left structure near the liver in this image."`
+- both removed: `"Segment the structure near the liver in this image."`
+
+This is small enough that "exact Shapley" (row 5) is computed exhaustively over all 4
+combinations -- no approximation needed, same for SHAP (row 7).
 """)
     add_cell(nb, "code", """import itertools
 from math import factorial
@@ -409,23 +476,66 @@ def role_names_for(organ_name):
     segment something": is it segmenting via position only, organ only, both, or has it
     collapsed to a fixed shortcut that needs neither? Every organ reaching this point is
     already bilateral (see the dataset-config filter above), so this always returns both
-    roles -- function words (the/in/this/image) stay fixed either way, out of scope for
-    this positional-bias-focused investigation.\"\"\"
+    roles -- function words (the/in/this/image) stay fixed either way, deliberately out of
+    scope for this positional-bias-focused investigation (not a general word-grounding study).\"\"\"
     return ['position', 'organ']
 
-def build_prompt(organ_name, present):
+def build_prompt(organ_name, present, landmark=None):
     \"\"\"present: dict with keys 'position' -> bool, 'organ' -> bool. 'organ' False means
-    the real organ name is replaced with a generic placeholder ("structure") -- the organ
-    slot is grammatically required, so it's never truly absent, matching the plan's
-    supporting note on role-aware (not raw-token) ablation.\"\"\"
+    the real organ name is dropped -- the organ slot is grammatically required, so it's
+    never truly absent, matching the plan's supporting note on role-aware (not raw-token)
+    ablation. Instead of a vague generic placeholder ("structure"), which conflates "organ
+    identity removed" with "the model doesn't know this out-of-distribution word", the organ
+    slot is replaced with a REAL spatial reference to another organ actually visible in this
+    subject's scan -- e.g. "the left structure near the liver" -- when `landmark` (a real
+    organ name from this subject's `landmark_rows`, picked by nearest GT centroid -- see
+    section 10) is given. This makes the ablation a genuine relational/spatial-grounding
+    test ("can the model find it via position + a real anatomical reference, without being
+    told what it is") rather than a reaction to an unfamiliar token. Falls back to the
+    generic placeholder only if no landmark is available (e.g. the smoke test, which doesn't
+    compute landmarks).\"\"\"
     position, organ_core = parse_organ_roles(organ_name)
     words = ['Segment', 'the']
     if present.get('position', True):
         words.append(position)
-    words.append(organ_core if present.get('organ', True) else GENERIC_ORGAN_WORD)
+    if present.get('organ', True):
+        words.append(organ_core)
+    elif landmark:
+        _, landmark_core = parse_organ_roles(landmark)
+        words += ['structure', 'near', 'the', landmark_core]
+    else:
+        words.append(GENERIC_ORGAN_WORD)
     words += ['in', 'this', 'image']
     sentence = ' '.join(words)
     return sentence[0].upper() + sentence[1:] + '.'
+
+def compute_landmarks(label_vol, landmark_rows):
+    \"\"\"Fresh GT centroid (via mask_centroid_side, same convention used everywhere else in
+    this notebook) for EVERY organ actually present in this subject's scan (landmark_rows is
+    now the full per-subject organ list, not just single-instance ones -- see the
+    dataset-config cell's note on why single-instance-only landmarks starved diversity on
+    Neurite-OASIS).\"\"\"
+    landmarks = {}
+    for lr in landmark_rows:
+        lmask = (label_vol == int(lr['label_id']))
+        lcs = mask_centroid_side(lmask)
+        if lcs is not None:
+            landmarks[lr['organ']] = np.array(lcs[0])
+    return landmarks
+
+def nearest_landmark_name(organ_name, organ_centroid, landmarks):
+    \"\"\"organ_name: the target organ being ablated -- used ONLY to exclude its own left/right
+    pair from the candidate pool (a bilateral organ can never be its own landmark; that would
+    either be circular or literally leak which side the real answer is on). organ_centroid:
+    the target's own fresh GT centroid. landmarks: output of compute_landmarks(), covering
+    every organ in the scan. Returns the nearest remaining landmark's name (by Euclidean
+    distance in voxel space), or None if nothing is left after exclusion.\"\"\"
+    _, target_core = parse_organ_roles(organ_name)
+    candidates = {name: c for name, c in landmarks.items() if parse_organ_roles(name)[1] != target_core}
+    if not candidates:
+        return None
+    dists = {name: float(np.linalg.norm(np.asarray(organ_centroid) - c)) for name, c in candidates.items()}
+    return min(dists, key=dists.get)
 
 def all_role_combos(roles):
     \"\"\"All 2^n present/absent combinations. Returns list of (frozenset(present roles), present_dict).\"\"\"
@@ -456,7 +566,7 @@ _roles = role_names_for(_check_row['organ'])
 _built = build_prompt(_check_row['organ'], {r: True for r in _roles})
 assert _built == _check_row['prompt_text'], f'role-template mismatch: {_built!r} != {_check_row["prompt_text"]!r}'
 print('role-template sanity check passed:', _built)
-print('every organ here is bilateral, single role ablated (position) -> 2 prompts/organ')
+print('every organ here is bilateral, 2 roles ablated (position/organ) -> 4 prompts/organ')
 """)
 
     # ---- Cell 20/21: smoke test on one subject -------------------------------------------
@@ -467,18 +577,22 @@ covers every organ's baseline prompt AND every one of its Shapley ablation combo
 single sliding-window pass over the volume (confirmed from `voxtell_model.py`: the image
 encoder runs once regardless of prompt count). Time this before committing to the full run.
 """)
-    add_cell(nb, "code", """def build_subject_prompt_records(rows):
-    \"\"\"rows: this subject's manifest rows (one per organ). Returns a flat list of
-    dicts, one per (organ, role-combo) -- the baseline ("all roles present") entry is
-    included as just another combo, keyed by the full role frozenset.\"\"\"
+    add_cell(nb, "code", """def build_subject_prompt_records(rows, landmark_for_organ=None):
+    \"\"\"rows: this subject's manifest rows (one per organ). landmark_for_organ: optional
+    dict organ_name -> nearest landmark organ name (see compute_landmarks/
+    nearest_landmark_name in section 8), used so the organ-ablated combo says "structure
+    near the <landmark>" instead of a vague generic noun. Returns a flat list of dicts, one
+    per (organ, role-combo) -- the baseline ("all roles present") entry is included as just
+    another combo, keyed by the full role frozenset.\"\"\"
     records = []
     for row in rows:
         organ = row['organ']
         roles = role_names_for(organ)
+        landmark = (landmark_for_organ or {}).get(organ)
         for key, present in all_role_combos(roles):
             records.append({
                 'organ': organ, 'label_id': int(row['label_id']), 'roles': roles,
-                'subset': key, 'prompt': build_prompt(organ, present),
+                'subset': key, 'prompt': build_prompt(organ, present, landmark=landmark),
                 'gt_side_axis0': row['gt_side_axis0'],
             })
     return records
@@ -522,22 +636,28 @@ computes all four target metrics from the plan:
 
 then computes exact Shapley values (row 5) for every role, for each of the four metrics.
 Also keeps each organ's baseline (all-roles-present) mask + embedding in memory --
-`subject_results` -- for rows 1-4 in the next section (no extra model calls needed there).
+`subject_results` -- for rows 1-3 in the next section (no extra model calls needed there).
 
-Results: `word_attribution_{dataset_name}.csv` (one row per subject x organ x role x metric).
+**Row 4 is also computed here, not in the next section** -- it needs the raw, continuous,
+pre-sigmoid logit volume (`logits`, before thresholding into a boolean mask) for the LEFT vs.
+RIGHT baseline prediction of every bilateral pair, and that raw volume is deliberately freed at
+the end of each subject's iteration to keep memory bounded, so it has to be consumed right here.
+
+Results: `word_attribution_{output_suffix}.csv` (one row per subject x organ x role x metric),
+`row4_fused_feature_diff_{output_suffix}.csv` (row 4, raw-logit spatial diff per bilateral pair).
 """)
     add_cell(nb, "code", f"""subject_results = {{}}  # subject_id -> {{'person', organ -> {{'baseline_mask','baseline_embed','gt_mask','label_id','centroid','side'}}}}
 
 wa_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'is_bilateral', 'n_roles', 'n_combos',
                   'role', 'metric', 'shapley_value']
-wa_csv_path = RESULTS_ROOT / f'word_attribution_{dataset_name}.csv'
+wa_csv_path = RESULTS_ROOT / f'word_attribution_{output_suffix}.csv'
 wa_rows_out = []
 
 # Row 7: real `shap` library output (KernelExplainer over the exact v(S) lookup table) --
 # same shape as word_attribution.csv, plus a per-row check against the hand-rolled exact value.
 shap_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'is_bilateral', 'n_roles', 'n_combos',
                     'role', 'metric', 'shap_value', 'matches_exact_shapley']
-shap_csv_path = RESULTS_ROOT / f'shap_attribution_{dataset_name}.csv'
+shap_csv_path = RESULTS_ROOT / f'shap_attribution_{output_suffix}.csv'
 shap_rows_out = []
 
 # Baseline (all-roles-present, i.e. the REAL prompt) predictions -- the actual segmentation
@@ -563,35 +683,75 @@ bp_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'label_id', 'is_bil
                   'gt_side_axis0', 'gt_side_axis1', 'gt_side_axis2', 'rl_axis',
                   'manifest_gt_centroid_vox_0', 'manifest_gt_centroid_vox_1', 'manifest_gt_centroid_vox_2',
                   'manifest_gt_side_axis0', 'manifest_gt_side_axis1', 'manifest_gt_side_axis2']
-bp_csv_path = RESULTS_ROOT / f'baseline_predictions_{dataset_name}.csv'
+bp_csv_path = RESULTS_ROOT / f'baseline_predictions_{output_suffix}.csv'
 bp_rows_out = []
 
-# EVERY ablation combo's mask -- no experiment left out. For a bilateral organ this is
-# 2^6=64 rows (combo), for a non-bilateral organ 2^5=32 rows -- written incrementally
-# (flushed per row) since this file gets large (many masks across all subjects x
-# every organ x every combo). 'is_baseline' marks the all-roles-present (real prompt) row,
-# which is the same mask as in baseline_predictions_{dataset_name}.csv.
+# EVERY ablation combo's mask -- no experiment left out. Every organ in this notebook's
+# scope is bilateral (see the dataset-config filter above) with 2 roles ablated
+# (position/organ), so this is uniformly 2^2=4 rows (combo) per organ -- written
+# incrementally (flushed per row) since this file gets large (many masks across all
+# subjects x every organ x every combo). 'is_baseline' marks the all-roles-present (real prompt) row,
+# which is the same mask as in baseline_predictions_{output_suffix}.csv.
 am_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'label_id', 'image_path', 'label_path',
                   'is_bilateral', 'is_baseline', 'roles_present', 'roles_dropped', 'prompt_text',
                   'volume_shape_ras', 'n_pred_voxels', 'f_dice_gt', 'f_dice_self', 'f_centroid_shift',
                   'f_volume', 'mask_rle_b64']
-am_csv_path = RESULTS_ROOT / f'ablation_masks_{dataset_name}.csv'
+am_csv_path = RESULTS_ROOT / f'ablation_masks_{output_suffix}.csv'
 am_f = open(am_csv_path, 'w', newline='')
 am_writer = csv.DictWriter(am_f, fieldnames=am_fieldnames)
 am_writer.writeheader()
 am_n_written = 0
 
+def bilateral_pairs(organs):
+    \"\"\"organ names -> list of (left_name, right_name) pairs sharing the same core noun.\"\"\"
+    by_core = {{}}
+    for o in organs:
+        position, core = parse_organ_roles(o)
+        if position:
+            by_core.setdefault(core, {{}})[position] = o
+    return [(v['left'], v['right']) for v in by_core.values() if 'left' in v and 'right' in v]
+
+# Row 4: TRUE internal-representation spatial diff -- computed HERE (inside the per-subject
+# loop), not deferred to the rows-1-4 section below, because it needs the raw, continuous,
+# pre-sigmoid logit volume `logits` produces below, which is deliberately freed (`del logits`)
+# at the end of each subject's iteration to keep peak RAM bounded (a whole subject's raw float
+# logit volume, one per organ, would otherwise have to stay resident for every subject at once
+# by the time the rows-1-4 section runs). This is strictly more sensitive than diffing the
+# final thresholded masks (what row 4 used to do): two logit maps can differ substantially in
+# a region that still ends up on the same side of the sigmoid>0.5 threshold on both sides --
+# exactly the "signal exists internally but gets washed out before the final output" failure
+# mode the plan's row 4 is designed to catch, which a mask-only XOR cannot see.
+row4_fieldnames = ['dataset', 'person', 'subject_id', 'organ_pair',
+                    'logit_diff_mean_abs', 'logit_diff_max_abs',
+                    'logit_diff_argmax_crop_vox_0', 'logit_diff_argmax_crop_vox_1', 'logit_diff_argmax_crop_vox_2',
+                    'frac_voxels_class_flip', 'crop_bbox_repr']
+row4_csv_path = RESULTS_ROOT / f'row4_fused_feature_diff_{output_suffix}.csv'
+row4_rows_out = []
+
 for si, (sid, info) in enumerate(subject_organs.items(), 1):
     person, rows = info['person'], info['rows']
+    landmark_rows = info.get('landmark_rows', [])
     manifest_by_organ = {{r['organ']: r for r in rows}}
     print(f'[{{si}}/{{len(subject_organs)}}] {{person}}/{{sid}}: building prompt list...')
-    records = build_subject_prompt_records(rows)
-    prompts = [r['prompt'] for r in records]
 
     image_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['image_path']
     label_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['label_path']
     img_arr, _ = load_volume_ras(image_path)
     label_vol, _ = load_seg_ras(label_path)
+
+    # Landmarks need label_vol loaded first (unlike before), since the organ-ablated prompt
+    # now names a real nearby structure instead of a vague placeholder -- see build_prompt's
+    # docstring in section 8.
+    landmarks = compute_landmarks(label_vol, landmark_rows)
+    landmark_for_organ = {{}}
+    for row in rows:
+        organ = row['organ']
+        gt_cs_pre = mask_centroid_side(label_vol == int(row['label_id']))
+        landmark_for_organ[organ] = nearest_landmark_name(organ, gt_cs_pre[0], landmarks) if gt_cs_pre else None
+    print(f'  landmarks: {{ {{o: landmark_for_organ[o] for o in landmark_for_organ}} }}')
+
+    records = build_subject_prompt_records(rows, landmark_for_organ)
+    prompts = [r['prompt'] for r in records]
 
     t0 = time.time()
     data, bbox, orig_shape = predictor.preprocess(img_arr)
@@ -611,6 +771,7 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
 
     subject_results[sid] = {{'person': person, 'organs': {{}}}}
     volume_shape_str = None
+    baseline_idx_by_organ = {{}}
 
     for organ, entries in by_organ.items():
         label_id = entries[0][0]['label_id']
@@ -628,6 +789,7 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
         baseline_centroid = baseline_cs[0] if baseline_cs else None
 
         baseline_idx = next(idx for rec, idx in entries if rec['subset'] == full_key)
+        baseline_idx_by_organ[organ] = baseline_idx
         baseline_embed = embeddings[0, baseline_idx].detach().cpu().numpy()
 
         # Computed FRESH from gt_mask via mask_centroid_side(), NOT taken from the manifest's
@@ -753,6 +915,28 @@ for si, (sid, info) in enumerate(subject_organs.items(), 1):
             }})
         bp_rows_out.append(bp_row)
 
+    # Row 4 (see note above `row4_fieldnames`): raw pre-sigmoid logit diff between the LEFT-
+    # and RIGHT-prompt baseline predictions, for every bilateral pair in THIS subject, while
+    # `logits` (this subject's full raw float volume, all combos) is still resident.
+    for left_name, right_name in bilateral_pairs(list(by_organ)):
+        l_logits = logits[baseline_idx_by_organ[left_name]].float().numpy()
+        r_logits = logits[baseline_idx_by_organ[right_name]].float().numpy()
+        diff = l_logits - r_logits
+        abs_diff = np.abs(diff)
+        argmax_vox = np.unravel_index(int(np.argmax(abs_diff)), abs_diff.shape)
+        class_flip = (l_logits > 0) != (r_logits > 0)
+        row4_rows_out.append({{
+            'dataset': DATASET_NAME, 'person': person, 'subject_id': sid,
+            'organ_pair': f'{{left_name}}/{{right_name}}',
+            'logit_diff_mean_abs': round(float(abs_diff.mean()), 4),
+            'logit_diff_max_abs': round(float(abs_diff.max()), 4),
+            'logit_diff_argmax_crop_vox_0': int(argmax_vox[0]),
+            'logit_diff_argmax_crop_vox_1': int(argmax_vox[1]),
+            'logit_diff_argmax_crop_vox_2': int(argmax_vox[2]),
+            'frac_voxels_class_flip': round(float(class_flip.mean()), 6),
+            'crop_bbox_repr': str(bbox),
+        }})
+
     # Free this subject's large per-organ arrays before moving to the next one -- processed
     # strictly one subject at a time, so nothing here should carry GPU/RAM usage forward.
     del masks, masks_cropped, logits, embeddings, img_arr, label_vol
@@ -783,14 +967,23 @@ print(f'wrote {{bp_csv_path}} ({{len(bp_rows_out)}} rows) -- includes gt_mask_rl
 am_f.close()
 print(f'wrote {{am_csv_path}} ({{am_n_written}} rows) -- EVERY ablation combo\\'s mask (mask_rle_b64), '
       'not just the baseline -- no experiment left out.')
+
+with open(row4_csv_path, 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=row4_fieldnames)
+    writer.writeheader()
+    writer.writerows(row4_rows_out)
+print(f'wrote {{row4_csv_path}} ({{len(row4_rows_out)}} rows) -- row 4, raw pre-sigmoid logit diff '
+      '(NOT a thresholded-mask XOR) between the left-prompt and right-prompt baseline prediction, '
+      'per bilateral organ pair x subject.')
 """)
 
     # ---- Cell 24/25: rows 1-4, hook-free, reusing subject_results -----------------------
-    add_cell(nb, "markdown", """## 11. Rows 1-4 -- image-text alignment & fusion (hook-free, no extra model calls)
+    add_cell(nb, "markdown", """## 11. Rows 1-3 -- image-text alignment & fusion (hook-free, no extra model calls)
 
 Derived entirely from `subject_results` (the baseline masks + embeddings already produced
 above) for every bilateral organ pair (left/right) in each subject -- no `forward_hook`, no
-extra `predict_*` calls.
+extra `predict_*` calls. (Row 4 was already computed and written in section 10 above -- it
+needed the raw pre-sigmoid logit volume, which is freed before this section runs.)
 
 - **Row 1** (matched vs. mismatched spatial overlap): IoU of the LEFT-prompt's predicted
   mask against the true left-side location (matched) vs. IoU of the RIGHT-prompt's predicted
@@ -806,19 +999,8 @@ extra `predict_*` calls.
   side against ground truth, and the RIGHT-prompt baseline prediction's side against ground
   truth, on the same image -- no separate substitution call needed, since a "substituted"
   call is computationally identical to just calling with that embedding directly.
-- **Row 4** (spatial diff map): XOR between the left-prompt and right-prompt predicted masks
-  -- where (if anywhere) they diverge.
 """)
-    add_cell(nb, "code", f"""def bilateral_pairs(organs):
-    \"\"\"organ names -> list of (left_name, right_name) pairs sharing the same core noun.\"\"\"
-    by_core = {{}}
-    for o in organs:
-        position, core = parse_organ_roles(o)
-        if position:
-            by_core.setdefault(core, {{}})[position] = o
-    return [(v['left'], v['right']) for v in by_core.values() if 'left' in v and 'right' in v]
-
-row1_rows, row2_rows, row3_rows, row4_rows = [], [], [], []
+    add_cell(nb, "code", f"""row1_rows, row2_rows, row3_rows = [], [], []
 
 for sid, res in subject_results.items():
     person = res['person']
@@ -859,20 +1041,9 @@ for sid, res in subject_results.items():
                             'right_prompt_predicts_right_side': bool(right_pred_matches_right_gt),
                             'causally_grounded': bool(left_pred_matches_left_gt and right_pred_matches_right_gt)}})
 
-        # Row 4: spatial diff map between left-prompt and right-prompt masks
-        diff = np.logical_xor(L['baseline_mask'], R['baseline_mask'])
-        n_diff = int(diff.sum())
-        n_total = int(L['baseline_mask'].sum() + R['baseline_mask'].sum())
-        diff_coords = np.nonzero(diff)
-        diff_centroid_rl = float(diff_coords[RL_AXIS].mean()) if len(diff_coords[0]) else None
-        row4_rows.append({{'dataset': DATASET_NAME, 'person': person, 'subject_id': sid,
-                            'organ_pair': f'{{left_name}}/{{right_name}}',
-                            'diff_voxels': n_diff, 'diff_fraction_of_union': round(n_diff / max(n_total, 1), 4),
-                            'diff_centroid_rl_axis': round(diff_centroid_rl, 2) if diff_centroid_rl is not None else None}})
-
 for name, rows_out in [('row1_image_text_alignment', row1_rows), ('row2_embedding_output_regression', row2_rows),
-                         ('row3_causal_embedding_swap', row3_rows), ('row4_fused_feature_diff', row4_rows)]:
-    path = RESULTS_ROOT / f'{{name}}_{dataset_name}.csv'
+                         ('row3_causal_embedding_swap', row3_rows)]:
+    path = RESULTS_ROOT / f'{{name}}_{output_suffix}.csv'
     if rows_out:
         with open(path, 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=list(rows_out[0].keys()))
@@ -887,7 +1058,7 @@ for name, rows_out in [('row1_image_text_alignment', row1_rows), ('row2_embeddin
 # meaningful "output distance" for bilateral organs is centroid distance -- how far
 # apart the two predicted locations actually are.
 row2_regression_fieldnames = ['dataset', 'slope', 'intercept', 'r_squared', 'n_points', 'interpretation']
-row2_regression_path = RESULTS_ROOT / f'row2_regression_fit_{dataset_name}.csv'
+row2_regression_path = RESULTS_ROOT / f'row2_regression_fit_{output_suffix}.csv'
 if row2_rows:
     pairs = [(r['text_embed_cos_dist'], r['output_centroid_dist_vox']) for r in row2_rows
              if r['output_centroid_dist_vox'] is not None]
@@ -912,7 +1083,7 @@ if row2_rows:
         print(f'wrote {{row2_regression_path}}')
     else:
         print('\\nRow 2 regression skipped -- not enough variance in cos_dist or centroid_dist to fit '
-              '(check row2_embedding_output_regression_{dataset_name}.csv directly for the raw points instead)')
+              '(check row2_embedding_output_regression_{output_suffix}.csv directly for the raw points instead)')
         with open(row2_regression_path, 'w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=row2_regression_fieldnames)
             writer.writeheader()
@@ -938,7 +1109,7 @@ narrowed away from.
 Target metric: Dice vs. ground truth for each perturbed prompt (LIME's `classifier_fn` must
 return a 2-column pseudo-probability array `[1 - dice, dice]`, since `LimeTextExplainer` is
 built for classification -- this is the standard workaround for using it in a regression-like
-setting). Output: `lime_attribution_{dataset_name}.csv`, one row per (subject, organ, role)
+setting). Output: `lime_attribution_{output_suffix}.csv`, one row per (subject, organ, role)
 with LIME's weight for that word.
 """)
     add_cell(nb, "code", f"""LIME_NUM_SAMPLES = 10  # only 2 real prompt variants exist per word (present/absent);
@@ -964,7 +1135,7 @@ lime_explainer = lime.lime_text.LimeTextExplainer(class_names=['not_organ', 'dic
 
 lime_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'role', 'word', 'prompt_text',
                     'lime_weight', 'num_samples']
-lime_csv_path = RESULTS_ROOT / f'lime_attribution_{dataset_name}.csv'
+lime_csv_path = RESULTS_ROOT / f'lime_attribution_{output_suffix}.csv'
 lime_f = open(lime_csv_path, 'w', newline='')
 lime_writer = csv.DictWriter(lime_f, fieldnames=lime_fieldnames)
 lime_writer.writeheader()
@@ -976,18 +1147,25 @@ if not LIME_AVAILABLE:
 else:
     for si, (sid, info) in enumerate(subject_organs.items(), 1):
         person, rows = info['person'], info['rows']
+        landmark_rows = info.get('landmark_rows', [])
         print(f'[{{si}}/{{len(subject_organs)}}] {{person}}/{{sid}}: LIME (row 6)...')
         image_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['image_path']
         label_path = RESEARCH_REPO / person / 'samples' / DATASET_NAME / rows[0]['label_path']
         img_arr, _ = load_volume_ras(image_path)
         label_vol, _ = load_seg_ras(label_path)
         data, bbox, orig_shape = predictor.preprocess(img_arr)
+        # Same landmark lookup as section 10 -- keeps LIME's organ-ablated prompt consistent
+        # with the exact-Shapley/SHAP prompts ("structure near the <landmark>", not a vague
+        # generic noun).
+        landmarks = compute_landmarks(label_vol, landmark_rows)
 
         for row0 in rows:
             organ = row0['organ']
             label_id = int(row0['label_id'])
             prompt_text = row0['prompt_text']
             gt_mask = (label_vol == label_id)
+            gt_cs = mask_centroid_side(gt_mask)
+            landmark = nearest_landmark_name(organ, gt_cs[0], landmarks) if gt_cs else None
             position, organ_core = parse_organ_roles(organ)
 
             words_to_explain = [('position', position), ('organ', organ_core)]
@@ -999,7 +1177,7 @@ else:
                 # Join with '_' so LIME treats a multi-word organ name as ONE atomic token --
                 # verified directly against lime.lime_text.IndexedString before applying this.
                 word_for_lime = word.replace(' ', '_')
-                prompt_ablated = build_prompt(organ, {{role: False}})
+                prompt_ablated = build_prompt(organ, {{role: False}}, landmark=landmark)
                 classifier_fn = make_lime_classifier_fn(data, orig_shape, bbox, gt_mask, prompt_text, prompt_ablated)
                 t0 = time.time()
                 exp = lime_explainer.explain_instance(
@@ -1051,14 +1229,14 @@ The image is processed via sliding-window patches, so the hook fires once per pa
 embeddings are averaged across patches per prompt (image content varies by patch, but the
 text-driven query identity doesn't, so this gives one representative fused vector per organ).
 
-Output: `internal_representations_{dataset_name}.csv` (one row per subject x organ, with the
+Output: `internal_representations_{output_suffix}.csv` (one row per subject x organ, with the
 full raw text embedding and fused embedding serialized as space-separated floats), plus a
 printed "sidedness direction" analysis: for each pair of bilateral organ-pairs, the cosine
 similarity between their (right - left) embedding difference vectors -- close to 1.0 means a
 shared, general direction; close to 0 means independent, organ-specific associations.
 """)
     add_cell(nb, "code", f"""ir_fieldnames = ['dataset', 'person', 'subject_id', 'organ', 'text_embedding', 'fused_embedding']
-ir_csv_path = RESULTS_ROOT / f'internal_representations_{dataset_name}.csv'
+ir_csv_path = RESULTS_ROOT / f'internal_representations_{output_suffix}.csv'
 ir_f = open(ir_csv_path, 'w', newline='')
 ir_writer = csv.DictWriter(ir_f, fieldnames=ir_fieldnames)
 ir_writer.writeheader()
@@ -1128,7 +1306,7 @@ STAGE 1 -- IMAGE ENCODER: architecturally prompt-independent by construction.
 ''')
 
 sidedness_fieldnames = ['dataset', 'subject_id', 'space', 'organ_pair_a', 'organ_pair_b', 'cosine_similarity']
-sidedness_csv_path = RESULTS_ROOT / f'sidedness_analysis_{dataset_name}.csv'
+sidedness_csv_path = RESULTS_ROOT / f'sidedness_analysis_{output_suffix}.csv'
 sidedness_rows_out = []
 
 all_sims = {{'text': [], 'fused': []}}
@@ -1163,7 +1341,7 @@ with open(sidedness_csv_path, 'w', newline='') as f:
 print(f'wrote {{sidedness_csv_path}} ({{len(sidedness_rows_out)}} rows)')
 
 sidedness_summary_fieldnames = ['dataset', 'mean_cos_sim_text', 'mean_cos_sim_fused', 'delta', 'interpretation']
-sidedness_summary_path = RESULTS_ROOT / f'sidedness_summary_{dataset_name}.csv'
+sidedness_summary_path = RESULTS_ROOT / f'sidedness_summary_{output_suffix}.csv'
 if all_sims['text'] and all_sims['fused']:
     mean_text = float(np.mean(all_sims['text']))
     mean_fused = float(np.mean(all_sims['fused']))
@@ -1207,16 +1385,16 @@ print('    per-organ memorized association than a general spatial concept)')
     add_cell(nb, "code", f"""import shutil
 import pandas as pd
 
-wa_df = pd.read_csv(RESULTS_ROOT / f'word_attribution_{dataset_name}.csv')
-shap_df = pd.read_csv(RESULTS_ROOT / f'shap_attribution_{dataset_name}.csv')
-lime_df = pd.read_csv(RESULTS_ROOT / f'lime_attribution_{dataset_name}.csv')
-bp_df = pd.read_csv(RESULTS_ROOT / f'baseline_predictions_{dataset_name}.csv')
-am_df_len = sum(1 for _ in open(RESULTS_ROOT / f'ablation_masks_{dataset_name}.csv')) - 1  # -1 header, avoids loading the whole (large) file into memory
+wa_df = pd.read_csv(RESULTS_ROOT / f'word_attribution_{output_suffix}.csv')
+shap_df = pd.read_csv(RESULTS_ROOT / f'shap_attribution_{output_suffix}.csv')
+lime_df = pd.read_csv(RESULTS_ROOT / f'lime_attribution_{output_suffix}.csv')
+bp_df = pd.read_csv(RESULTS_ROOT / f'baseline_predictions_{output_suffix}.csv')
+am_df_len = sum(1 for _ in open(RESULTS_ROOT / f'ablation_masks_{output_suffix}.csv')) - 1  # -1 header, avoids loading the whole (large) file into memory
 print(f'=== {title} MODEL-INTERNALS INVESTIGATION Summary ===')
 print(f'Subjects: {{list(subject_organs)}}')
 print()
 print(f'Baseline predictions: {{len(bp_df)}} (subject x organ) rows, mean Dice vs. GT: {{bp_df["dice_gt"].mean():.4f}}')
-print(f'Ablation masks (every combo, no experiment left out): {{am_df_len}} rows -> ablation_masks_{dataset_name}.csv')
+print(f'Ablation masks (every combo, no experiment left out): {{am_df_len}} rows -> ablation_masks_{output_suffix}.csv')
 print()
 print('Row 5 (exact Shapley) -- mean |value| by role, f_dice_gt metric:')
 print(wa_df[wa_df['metric'] == 'f_dice_gt'].groupby('role')['shapley_value'].apply(lambda s: s.abs().mean()).sort_values(ascending=False).round(4))
@@ -1236,12 +1414,12 @@ print('     named. If both are substantial and comparable: genuine use of both w
 
 for name in ['row1_image_text_alignment', 'row2_embedding_output_regression',
              'row3_causal_embedding_swap', 'row4_fused_feature_diff']:
-    p = RESULTS_ROOT / f'{{name}}_{dataset_name}.csv'
+    p = RESULTS_ROOT / f'{{name}}_{output_suffix}.csv'
     if p.exists():
         df = pd.read_csv(p)
         print(f'\\n{{name}}: {{len(df)}} rows -> {{p.name}}')
 
-zip_path = WORKING_DIR / f'voxtell_{dataset_name}_groundedness_investigation_results'
+zip_path = WORKING_DIR / f'voxtell_{output_suffix}_groundedness_investigation_results'
 shutil.make_archive(str(zip_path), 'zip', str(RESULTS_ROOT))
 print(f"\\nArchive created at {{zip_path}}.zip ({{os.path.getsize(str(zip_path) + '.zip') / 1e6:.1f}} MB)")
 print("This zip file will appear directly in Kaggle's Output panel.")
@@ -1255,19 +1433,19 @@ Thirteen CSVs in the Kaggle **Output** tab (after a **Save Version** run finishe
 just `numpy`/`pandas`/`matplotlib` (`decode_mask_rle()` is pure Python/numpy/zlib; plotting
 LIME/SHAP values doesn't need those libraries installed locally either, just their CSV output).
 
-- **`internal_representations_{dataset_name}.csv`** -- raw text embeddings and fused (post
+- **`internal_representations_{output_suffix}.csv`** -- raw text embeddings and fused (post
   cross-attention) query embeddings, one row per (subject, organ), captured via a real
   `forward_hook` on `predictor.network.transformer_decoder`. The raw vectors, for your own
   further analysis.
-- **`sidedness_analysis_{dataset_name}.csv`** -- stages 2-3's actual computed result (not just
+- **`sidedness_analysis_{output_suffix}.csv`** -- stages 2-3's actual computed result (not just
   printed): one row per (subject, organ-pair-A, organ-pair-B, space), the cosine similarity
   between their (right - left) embedding-difference vectors, in both `text` (stage 2) and
   `fused` (stage 3) space.
-- **`sidedness_summary_{dataset_name}.csv`** -- one row: mean cosine similarity in each space,
+- **`sidedness_summary_{output_suffix}.csv`** -- one row: mean cosine similarity in each space,
   the delta between them, and a plain-language interpretation string -- the direct answer to
   "did fusion learn something beyond what the language model already had".
 
-- **`baseline_predictions_{dataset_name}.csv`** -- **the one to download for plotting the real
+- **`baseline_predictions_{output_suffix}.csv`** -- **the one to download for plotting the real
   (unablated) prediction.** One row per (subject, organ): `prompt_text`, `dice_gt`,
   `n_pred_voxels`, `volume_shape_ras`, the actual **`gt_mask_rle_b64` / `pred_mask_rle_b64`**
   segmentation masks (run-length-encoded + zlib-compressed + base64, decodable with
@@ -1275,31 +1453,38 @@ LIME/SHAP values doesn't need those libraries installed locally either, just the
   `pred_centroid_vox_0/1/2`, `pred_bbox_vox_{{0,1,2}}{{min,max}}`, `pred_side_axis0/1/2`, and the
   matching `gt_centroid_vox_*` / `gt_bbox_vox_*` / `gt_side_axis*` columns. Use with
   `scripts/plot_groundedness_results.py`.
-- **`ablation_masks_{dataset_name}.csv`** -- **all 4 prompt-combo masks (both present, each word
+- **`ablation_masks_{output_suffix}.csv`** -- **all 4 prompt-combo masks (both present, each word
   removed alone, both removed), not just the baseline.** One row per (subject, organ, combo):
   `roles_present`/`roles_dropped` (`position`/`organ`, any subset), `prompt_text`,
   `f_dice_gt`/`f_dice_self`/`f_centroid_shift`/`f_volume` (rows 8-11's metrics), `n_pred_voxels`,
   `volume_shape_ras`, and **`mask_rle_b64`** -- that combo's actual predicted mask, decodable
   the same way. `is_baseline=True` marks the real-prompt row, identical to that organ's row in
-  `baseline_predictions_{dataset_name}.csv`.
-- `word_attribution_{dataset_name}.csv` -- row 5 (exact Shapley value for **both** the position
+  `baseline_predictions_{output_suffix}.csv`.
+- `word_attribution_{output_suffix}.csv` -- row 5 (exact Shapley value for **both** the position
   word and the organ word, separately, per organ x subject x metric -- compare the two to see
   which the model actually relies on more).
-- **`shap_attribution_{dataset_name}.csv`** -- row 7, real `shap.KernelExplainer` output over
+- **`shap_attribution_{output_suffix}.csv`** -- row 7, real `shap.KernelExplainer` output over
   the same 4-combo space, plus a `matches_exact_shapley` boolean per row (should be all `True`
   -- SHAP is mathematically expected to agree with row 5 here; the agreement itself is evidence
   worth citing).
-- **`lime_attribution_{dataset_name}.csv`** -- row 6, real `lime.lime_text.LimeTextExplainer`
+- **`lime_attribution_{output_suffix}.csv`** -- row 6, real `lime.lime_text.LimeTextExplainer`
   output, explaining the position word and the organ word **separately** (not the full sentence,
   to match this notebook's positional-bias-only scope) -- one row per (subject, organ, role)
   with LIME's weight for that word.
-- `row1_image_text_alignment_{dataset_name}.csv` -- row 1 (matched vs. mismatched IoU)
-- `row2_embedding_output_regression_{dataset_name}.csv` -- row 2's raw (embedding-distance,
+- `row1_image_text_alignment_{output_suffix}.csv` -- row 1 (matched vs. mismatched IoU)
+- `row2_embedding_output_regression_{output_suffix}.csv` -- row 2's raw (embedding-distance,
   output-distance) points, one per organ-pair x subject.
-- **`row2_regression_fit_{dataset_name}.csv`** -- the fitted slope/intercept/R² from those
+- **`row2_regression_fit_{output_suffix}.csv`** -- the fitted slope/intercept/R² from those
   points, plus a plain-language interpretation -- previously only printed, now saved.
-- `row3_causal_embedding_swap_{dataset_name}.csv` -- row 3 (causal side-agreement)
-- `row4_fused_feature_diff_{dataset_name}.csv` -- row 4 (spatial diff map summary)
+- `row3_causal_embedding_swap_{output_suffix}.csv` -- row 3 (causal side-agreement)
+- **`row4_fused_feature_diff_{output_suffix}.csv`** -- row 4, the raw pre-sigmoid **logit** diff
+  (not a thresholded-mask XOR) between the left-prompt and right-prompt baseline prediction, per
+  bilateral organ pair x subject: `logit_diff_mean_abs`/`logit_diff_max_abs` (how much the raw,
+  continuous internal signal actually diverges), `logit_diff_argmax_crop_vox_0/1/2` (crop-local
+  voxel of peak divergence -- see `crop_bbox_repr` for that subject's crop offset),
+  `frac_voxels_class_flip` (fraction of voxels where the two prompts' pre-threshold sign
+  actually disagrees). Written in section 10 above (needs the raw logit volume before it's
+  freed), not in section 11.
 
 Note: Output only appears once a **Save Version** (Save & Run All) finishes, not from just an
 interactive "Run All" in the editor session.
@@ -1326,6 +1511,11 @@ if __name__ == "__main__":
     )
     build(
         "voxtell-oasis-rotation-multiangle-kaggle.ipynb", "neurite_oasis", "Neurite OASIS",
-        OASIS_SUBJECTS, "voxtell-oasis-groundedness-investigation-kaggle.ipynb",
+        OASIS_SUBJECTS, "voxtell-oasis-groundedness-investigation-batch1-kaggle.ipynb",
         organ_whitelist=OASIS_ORGAN_WHITELIST,
+    )
+    build(
+        "voxtell-oasis-rotation-multiangle-kaggle.ipynb", "neurite_oasis", "Neurite OASIS (batch 2)",
+        OASIS_SUBJECTS_BATCH2, "voxtell-oasis-groundedness-investigation-batch2-kaggle.ipynb",
+        organ_whitelist=OASIS_ORGAN_WHITELIST, output_suffix="neurite_oasis_batch2",
     )

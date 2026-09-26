@@ -89,6 +89,12 @@ OASIS_SUBJECTS_BATCH2 = [
     ("nipu", "OASIS_OAS1_0076_MR1"), ("nipu", "OASIS_OAS1_0151_MR1"),
     ("nipu", "OASIS_OAS1_0421_MR1"),
 ]
+# Batch 3: the 3 OASIS subjects with the largest total mask volume over the 8 organs below
+# (0123, 0057, 0151 -- ranked from the real label volumes, not manifest bboxes; these three
+# subjects also appear in batches 1/2, but batch 3 covers DIFFERENT organs, so nothing repeats).
+OASIS_SUBJECTS_BATCH3 = [
+    ("hridoy", "OASIS_OAS1_0123_MR1"), ("faria", "OASIS_OAS1_0057_MR1"), ("nipu", "OASIS_OAS1_0151_MR1"),
+]
 
 
 def cell(nb, i):
@@ -117,7 +123,8 @@ def add_cell(nb, cell_type, text):
     nb["cells"].append(c)
 
 
-def build(template_name, dataset_name, title, subjects, out_name, organ_whitelist=None, output_suffix=None):
+def build(template_name, dataset_name, title, subjects, out_name, organ_whitelist=None, output_suffix=None,
+          whitelist_note_text=None):
     # output_suffix drives every OUTPUT CSV/zip filename below; dataset_name alone still
     # drives the on-disk folder lookup (samples/{dataset_name}/...) inside the generated
     # notebook, via the DATASET_NAME variable it sets. Defaults to dataset_name (single-batch
@@ -354,6 +361,8 @@ except ImportError as e:
         whitelist_note = (f"\nFurther narrowed to the **{len(organ_whitelist)} largest bilateral pairs** "
                            "by ground-truth voxel volume (dropping the smallest, noise-prone ones like "
                            "vessel/accumbens) -- ranked from your existing manifest bbox data.\n")
+        if whitelist_note_text:
+            whitelist_note = "\n" + whitelist_note_text + "\n"
         whitelist_filter_line = (
             f"\n    _organ_cores = {{{whitelist_py}}}  # only the largest bilateral pairs (by GT voxel volume)"
             f"\n    rows = [r for r in rows if r['organ'].split(None, 1)[1] in _organ_cores]"
@@ -1504,6 +1513,12 @@ OASIS_ORGAN_WHITELIST = [
     "lateral ventricle", "choroid plexus",
 ]
 
+# Batch 3: the 8 largest bilateral pairs (by real mask volume) that batches 1/2 did NOT use.
+OASIS_ORGAN_WHITELIST_BATCH3 = [
+    "cerebellum white matter", "thalamus", "putamen", "caudate",
+    "hippocampus", "ventral DC", "amygdala", "pallidum",
+]
+
 if __name__ == "__main__":
     build(
         "voxtell-amos-rotation-multiangle-kaggle.ipynb", "amos22_mri", "AMOS22 MRI",
@@ -1518,4 +1533,13 @@ if __name__ == "__main__":
         "voxtell-oasis-rotation-multiangle-kaggle.ipynb", "neurite_oasis", "Neurite OASIS (batch 2)",
         OASIS_SUBJECTS_BATCH2, "voxtell-oasis-groundedness-investigation-batch2-kaggle.ipynb",
         organ_whitelist=OASIS_ORGAN_WHITELIST, output_suffix="neurite_oasis_batch2",
+    )
+    build(
+        "voxtell-oasis-rotation-multiangle-kaggle.ipynb", "neurite_oasis", "Neurite OASIS (batch 3)",
+        OASIS_SUBJECTS_BATCH3, "voxtell-oasis-groundedness-investigation-batch3-kaggle.ipynb",
+        organ_whitelist=OASIS_ORGAN_WHITELIST_BATCH3, output_suffix="neurite_oasis_batch3",
+        whitelist_note_text=("Further narrowed to **8 bilateral pairs not used in batches 1/2** -- the largest "
+                              "remaining pairs by real ground-truth mask volume (cerebellum white matter, thalamus, "
+                              "putamen, caudate, hippocampus, ventral DC, amygdala, pallidum); accumbens, inferior "
+                              "lateral ventricle and vessel are excluded as too small to score."),
     )

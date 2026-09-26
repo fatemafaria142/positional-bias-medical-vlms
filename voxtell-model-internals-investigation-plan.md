@@ -14,6 +14,36 @@ each row spells out, in full, what result points which way — no shorthand code
 
 ---
 
+## Research questions at a glance
+
+One core question and 16 row-level questions (17 in total). Each row-level question is answered
+by the row of the same number in the master table below. Rows 1–11 have been run. **Rows 12–16 are
+implemented in the two "mechanistic" notebooks but have not been run yet** that cover what rows 1–11 cannot answer: whether "left" means
+anatomy or image coordinates, whether the model uses a location prior instead of the image, a real
+embedding intervention, cross-attention evidence, and where in the network left/right diverge.
+
+| ID | Group | Research question |
+|---|---|---|
+| **Core** | Overall | When VoxTell segments "the right kidney", what drives the output: the image anatomy, the word "right", the word "kidney", or a memorized shape/location prior? |
+| 1 | Image-Text Alignment | Is the link between the prompt and the image region real? Does the matched prompt land on the correct region while a mismatched prompt does not? |
+| 2 | Fusion | Does a larger left/right difference in the text embeddings lead to a larger difference in the output masks? |
+| 3 | Fusion | If the "right kidney" embedding is substituted for "left kidney", does the mask move to the right kidney? |
+| 4 | Fusion | Where inside the model, if anywhere, do the left and right representations diverge? |
+| 5 | Word Attribution: Method | What is each word's exact importance (brute-force Shapley value)? |
+| 6 | Word Attribution: Method | What importance does LIME assign to each word? |
+| 7 | Word Attribution: Method | What importance does KernelSHAP assign to each word? |
+| 8 | Word Attribution: Metric | Does removing a word reduce accuracy against the ground truth (`f_dice_gt`)? |
+| 9 | Word Attribution: Metric | Does removing a word change the model's own answer (`f_dice_self`)? |
+| 10 | Word Attribution: Metric | Does removing the position word move the mask to the opposite side (`f_centroid_shift`)? |
+| 11 | Word Attribution: Metric | Does removing a word make the mask collapse to nothing (`f_volume`)? |
+| 12 *(notebook ready, not yet run)* | Image | If the image is flipped left-right and the prompt stays the same, does the mask follow the patient's anatomy or stay on the same side of the image? |
+| 13 *(notebook ready, not yet run)* | Image | Does the model rely on the image evidence, or on a location prior? Does it still segment where the organ usually is when the organ is erased, the image is blank, or the image comes from another subject? |
+| 14 *(notebook ready, not yet run)* | Fusion | In a real intervention, where does the mask move when the "left" representation is blended with, or partly replaced by, the "right" one, and at which decoder layer is the side decided? |
+| 15 *(notebook ready, not yet run)* | Image-Text Alignment | Does the cross-attention of "left kidney" concentrate on the left kidney rather than the right kidney or another organ? |
+| 16 *(notebook ready, not yet run)* | Fusion | At which decoder layer do the left and right representations first diverge, compared with the gap between two different organs? |
+
+---
+
 ## Plain-language summary (read this first if the table below feels dense)
 
 **The big question, in one sentence:** when VoxTell draws an outline for "the right kidney," is it
@@ -90,6 +120,11 @@ code is currently **unverified** — see the **Prerequisite** note below the tab
 | 9 | Word Attribution — Target Metric | `f_dice_self` | • For each word-removal combination, run the model and get its predicted mask.<br>• Compare that predicted mask against the model's own original prediction, the one made using the full, unmodified prompt — not against the ground truth.<br>• Repeat across all word combinations to see how much removing each word shifts the model's own answer, regardless of whether that answer was correct to begin with. | • This doesn't need a ground-truth label at all, so it can be computed even on subjects that were never manually annotated, widening how much data this analysis can run on.<br>• It isolates a different question from the accuracy-based version: not "does removing this word make the answer wrong," but "does removing this word change the answer at all."<br>• A word can matter a lot by this measure even on a subject with no ground truth available, which helps this analysis scale up. | Dice similarity score between the predicted mask for a given word combination and the model's own original, full-prompt prediction. | • A word whose removal causes a large change here is a word the model's output is sensitive to, whether or not the resulting answer happens to be correct.<br>• A word whose removal barely changes this score is a word the model appears to ignore entirely when producing its output. |
 | 10 | Word Attribution — Target Metric | `f_centroid_shift` | • For each word-removal combination, run the model and get its predicted mask, then compute the center point (centroid) of that mask.<br>• Measure how far that center point has moved along the left-right axis of the body, compared to the center point of the model's original, full-prompt prediction.<br>• Record this as a signed value, so it's clear whether the shift moved toward the left side or the right side, not just how far it moved. | • Left/right laterality is the exact question at the heart of this whole investigation, so a metric that directly measures side-to-side movement is more on-point than a general accuracy or similarity score.<br>• This is the clearest possible way to answer: if the position word is taken away, does the model's answer actually move to the other side, or does it stay put. | Signed left-right displacement of the predicted mask's center point, relative to the model's original, full-prompt prediction. | • Removing the position word causes a clear, consistent shift in the predicted side → the position word is genuinely responsible for telling the model which side to segment.<br>• Removing the position word causes little to no shift → the model isn't relying on the position word to decide which side to segment — it's likely relying on the organ name alone, or on some other default behavior. |
 | 11 | Word Attribution — Target Metric | `f_volume` | • For each word-removal combination, run the model and get its predicted mask, then count how many voxels (3D pixels) make up that mask.<br>• Compare this voxel count against the voxel count of the model's original, full-prompt prediction. | • A model can fail in more than one way when a word is removed — it might shift to the wrong location (caught by the centroid-shift measure above), or it might simply produce no usable answer at all. This measure is specifically designed to catch that second failure mode.<br>• Without this measure, a mask that collapses to near-empty could be missed or misread as "no change," when it's actually a distinct and important kind of failure. | Voxel count of the predicted mask for a given word combination, compared to the voxel count of the model's original, full-prompt prediction. | • A large drop toward zero voxels when a word is removed → the model effectively gave up and stopped producing a usable answer without that word — a different failure mode from simply shifting to the wrong side.<br>• A voxel count that stays roughly stable when a word is removed → the model is still confidently producing an answer of similar size, regardless of whether that answer moved to a different, possibly wrong, location. |
+| 12 *(notebook ready, not yet run)* | Image — Anatomy vs. coordinates | Left-right image flip, prompt fixed | • Take the unrotated image and its ground truth and flip both along the right-left axis (the flipped ground truth keeps its original labels, so the anatomically-left kidney now sits on the image's right).<br>• Run the same prompts ("left kidney", "right kidney") on the original and the flipped image.<br>• Score each mask by which ground-truth organ it overlaps: the organ with the named anatomical side (anatomy) or the organ at the named image side (coordinates).<br>• Repeat across all subjects and organ pairs, and with the existing rotation sweep if available. | • Rows 1–11 show the word selects a side but not the frame of reference: an anatomy-based model follows the organ, a coordinate-based one follows the image side.<br>• A flip keeps image content identical, so only the frame of reference changes. | Dice and coverage against the anatomically-named organ vs. the image-side organ, per prompt, original vs. flipped. | • Mask follows the anatomically-named organ after the flip → "left" is grounded in anatomy — supports genuine grounding.<br>• Mask stays on the same image side and now overlaps the other organ → "left" is an image-coordinate rule — supports the shortcut reading.<br>• Mixed or degraded results → partial reliance on both; report the split. |
+| 13 *(notebook ready, not yet run)* | Image — Evidence vs. location prior | Organ erasure, blank image, other-subject image | • Erase the target organ from the image (fill its ground-truth region with local background intensity) and prompt for it.<br>• Run the same prompt on a blank or noise image, and on a different subject's image.<br>• Record where any predicted mask lands, and how large it is.<br>• Compare against a baseline that puts each organ at the dataset-mean position for its side. | • Only the text was ablated so far, so the image's role is untested.<br>• A model that reads the image finds nothing where the organ is missing. A model that reproduces a prior still segments the usual place. | Predicted volume, centroid distance to the dataset-mean location for that side, and overlap with the erased region. | • Little or no mask when the organ is erased or the image is blank → the model depends on image evidence — supports genuine grounding.<br>• A mask of normal size at the usual location regardless of the image → a memorized location/shape prior — supports the shortcut/memorized reading.<br>• Matches the dataset-mean-position baseline → the position word is being converted into a fixed prior. |
+| 14 *(notebook ready, not yet run)* | Fusion — Real embedding intervention | Embedding blend and per-layer patching | • Blend the text embeddings of "left X" and "right X" (e.g. weights 0, 0.25, 0.5, 0.75, 1, plus −0.5 and 1.5 to extrapolate) and run each on the same image.<br>• Separately, run "left X" but, at decoder layer *k* (0–5), replace that layer's update (its change to the query state) with the update computed for "right X" on the same patch. Do this for each single layer, and for all layers from *k* onward, in both directions (L→R and R→L).<br>• As a control, patch the whole query state at a layer, which should exactly reproduce the source prompt's mask.<br>• Score each output by side and by Dice against each side's ground truth. | • Passing the right embedding to the model is the same as prompting "right", so a real test has to intervene inside the model or interpolate.<br>• Patching the update, not the full state, matters: the decoder is pre-norm and the state only carries the text through the residual stream, so a full-state patch is trivially the source prompt.<br>• The blend gives a dose-response curve, and the per-layer patch shows which layers carry the side. | Side call and Dice per blend weight and per patched layer, plus the weight or layer at which the side flips. | • Smooth, monotonic side shift with blend weight and a clear set of layers that flip the side → the side is causally carried by the text representation and decided in identifiable layers — supports genuine grounding.<br>• The side flips abruptly or only at extreme weights → a threshold-like or brittle representation.<br>• Patching layers does not move the mask → the side is decided elsewhere (image side or later decoder) — supports a non-text shortcut.<br>• The control fails to reproduce the source mask → a bug in the intervention; results are not valid. |
+| 15 *(notebook ready, not yet run)* | Image-Text Alignment — Cross-attention maps | Per-layer cross-attention of the text query over image tokens | • Record the cross-attention weights of every decoder layer (averaged over heads) for all four prompts of a subject.<br>• Map each weight from the image-token grid (12×12×12 per patch, ordered height-width-depth) back into voxel space, with the same Gaussian patch weighting as inference.<br>• For each prompt and layer, compute the attention density inside each of the four ground-truth regions relative to the volume average.<br>• Also record the attention centre of mass along the right-left axis against each organ's centroid. | • Rows 1 and 4 used final masks or logits, so the internal word-region link is untested.<br>• The cross-attention is where the text query reads the image, so it is the most direct evidence for alignment. | Attention enrichment (density in a region ÷ mean density) for matched, wrong-side and other-organ regions, per layer; centre of mass nearer to the named organ or not. | • Higher enrichment on the named organ than on the other side or other organs, in the late layers → the text query attends to the right place — supports genuine grounding.<br>• Equal enrichment on both sides → attention is side-blind; any side selection happens after attention.<br>• High enrichment on the organ regardless of the side word → attention finds the organ only (organ identity), leaving the side to another mechanism. |
+| 16 *(notebook ready, not yet run)* | Fusion — Per-layer divergence | Left-vs-right query state distance at each decoder layer | • From the same run as row 15, record the query state after every decoder layer (plus the input state) for all four prompts.<br>• Per patch, compute the cosine and L2 distance between "left X" and "right X" at each layer, averaged over patches that overlap the organs and separately over all patches.<br>• Use the distance between "left X" and a different organ ("left Y") as a reference scale.<br>• Also compare the difference between the two prompts' attention maps per layer. | • The notebooks only saved the final fused vector, so where the left/right difference is created, kept or lost is unknown.<br>• A reference organ pair shows whether the side difference is small or large relative to what the layers already distinguish. | Left/right distance per layer, as a ratio to the input distance and to the organ-vs-organ reference distance. | • The left/right distance grows in the layers after attention and stays large → the fusion builds a side-specific state — supports genuine grounding.<br>• The distance is present at the input and shrinks through the layers → the side signal is washed out before the mask is produced.<br>• The distance is always small compared with the organ-vs-organ reference → side is a minor component of the representation. |
 
 ---
 
@@ -130,12 +165,21 @@ needed) is what's left to answer "does fusion listen to text" observationally, n
    tables.
 3. **Rows 1, 3, 4** — blocked on the hook-discovery prerequisite above; run last, only if the hook
    point is found.
+4. **Rows 12–16 (planned extensions)** — none has been run.
+   - **Rows 12 and 13** (image flip; organ erasure / blank / other-subject image) need only
+     preprocessed volumes and the public API, no changes inside the model. Do these first: they
+     address the part of the core question that rows 1–11 cannot.
+   - **Rows 14–16** (embedding intervention, cross-attention maps, per-layer divergence) need a
+     custom sliding-window loop that reads and patches the decoder layers of
+     `predictor.network.transformer_decoder`. Rows 15 and 16 share one recording run; row 14 reuses
+     it for its patched variants. Verify the loop first by matching the predictor's own logits, and
+     by checking that the full-state patch control reproduces the source prompt.
 
 ---
 
 ## Implementation status
 
-All 11 rows are implemented, in three Kaggle notebooks, generated by
+Rows 1–11 are implemented, in four Kaggle notebooks, generated by
 `scripts/build_groundedness_investigation_notebooks.py` (each has a paired `-kaggle.ipynb` /
 `-v1.ipynb` file, byte-identical to each other):
 
@@ -144,6 +188,7 @@ All 11 rows are implemented, in three Kaggle notebooks, generated by
 | `voxtell-amos-groundedness-investigation` | AMOS22 MRI | 10 | 4 (L/R kidney, L/R adrenal) | 25 | **1,000** |
 | `voxtell-oasis-groundedness-investigation-batch1` | Neurite-OASIS | 5 | 10 (5 pairs × L/R) | 25 | **1,250** |
 | `voxtell-oasis-groundedness-investigation-batch2` | Neurite-OASIS | 5 (disjoint from batch1 — together, all 10 available OASIS subjects) | 10 | 25 | **1,250** |
+| `voxtell-oasis-groundedness-investigation-batch3` | Neurite-OASIS | 3 (0123, 0057, 0151 — the largest total mask over the 8 organs below; same subjects as some in batch1/2 but **different organs**) | 16 (8 new pairs × L/R: cerebellum white matter, thalamus, putamen, caudate, hippocampus, ventral DC, amygdala, pallidum) | 25 | **1,200** |
 
 **Prompts/organ = 25** breaks down the same way in every notebook:
 - 4 — main ablation (`ablation_masks_*.csv`: both present, position-only-removed,
@@ -152,12 +197,31 @@ All 11 rows are implemented, in three Kaggle notebooks, generated by
 - 1 — internal-layer embedding capture (section 13)
 
 (Not counted above: a one-time smoke-test overhead of `4 × organs/subject` per notebook, run
-once before the main loop — 16 for AMOS, 40 for each OASIS batch.)
+once before the main loop — 16 for AMOS, 40 for each of OASIS batches 1 and 2, 64 for batch 3.)
 
 The two OASIS notebooks' output CSVs are suffixed differently (`_neurite_oasis.csv` for batch 1,
 `_neurite_oasis_batch2.csv` for batch 2) even though both read from the same on-disk
 `samples/neurite_oasis/` folder — otherwise downloading both notebooks' results into the same
 local folder would silently overwrite one batch's files with the other's.
+
+**Rows 12–16 -- implemented, not yet run.** Two Kaggle notebooks, generated by
+`scripts/build_mechanistic_notebooks.py` from the tested modules `scripts/voxtell_mechanistic.py` and
+`scripts/voxtell_experiments.py`:
+
+| Notebook | Dataset | Subjects | Organs | Rows |
+|---|---|---|---|---|
+| `voxtell-amos-mechanistic-experiments-kaggle` | AMOS22 MRI | 10 | L/R kidney, L/R adrenal gland | 12, 13, 14, 15, 16 |
+| `voxtell-oasis-mechanistic-experiments-kaggle` | Neurite-OASIS | 10 | L/R cerebral white matter, L/R cerebellum cortex (the structures the model segments) | 12, 13, 14, 15, 16 |
+
+- Row 12: flip along the right-left axis, prompt unchanged; scored as `follows_named_organ` vs. `follows_image_side`.
+- Row 13: erase the named organ / both organs (filled from the surrounding background) / replace the image by noise.
+- Row 14: five embedding blends (alpha -0.5 ... 1.5), single-layer patches of the query update (all 6 layers, both
+  directions), patches from a layer onward, and a whole-state control that must reproduce the source prompt's mask.
+- Row 15: cross-attention of each prompt over every organ region, per decoder layer (enrichment and attention centre).
+- Row 16: cosine / relative L2 distance between the left and right query states per layer, with an organ-vs-organ reference.
+- Checked locally on a tiny stand-in model (custom sliding-window loop == the predictor's own loop; whole-state patch
+  reproduces the source; every CSV and the summary cell run end to end). **Not run on the real model yet.**
+- The notebooks verify the custom loop against the real predictor first (section 3) and stop if it does not match.
 
 **Hook prerequisite resolved:** rows 1, 3, 4 need **no `forward_hook`** — verified directly
 against the installed `voxtell` v0.1.0 source. `predictor.predict_sliding_window_return_logits(
@@ -200,7 +264,7 @@ calling the public API with a different embedding, no monkeypatching of voxtell'
   draws word/role-importance bar charts (single-method or a 3-way exact-Shapley/SHAP/LIME
   comparison chart) — needs only numpy/pandas/matplotlib, no GPU/torch/voxtell.
 
-**Output: 13 CSVs per notebook (39 total across all three notebooks), all under `results/`:**
+**Output: 13 CSVs per notebook (52 total across all four notebooks), all under `results/`:**
 
 | # | File | Row(s) | Contents |
 |---|---|---|---|

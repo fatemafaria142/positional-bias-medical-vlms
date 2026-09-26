@@ -1,0 +1,193 @@
+prompt_id,dataset,person,subject_id,organ,label_id,condition,landmark_organ,prompt_text
+1,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum white matter,5,both_present,,Segment the left cerebellum white matter in this image.
+2,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum white matter,5,position_removed,,Segment the cerebellum white matter in this image.
+3,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum white matter,5,organ_removed,left cerebellum cortex,Segment the left structure near the cerebellum cortex in this image.
+4,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum white matter,5,both_removed,left cerebellum cortex,Segment the structure near the cerebellum cortex in this image.
+5,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left thalamus,7,both_present,,Segment the left thalamus in this image.
+6,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left thalamus,7,position_removed,,Segment the thalamus in this image.
+7,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left thalamus,7,organ_removed,left choroid plexus,Segment the left structure near the choroid plexus in this image.
+8,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left thalamus,7,both_removed,left choroid plexus,Segment the structure near the choroid plexus in this image.
+9,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left caudate,8,both_present,,Segment the left caudate in this image.
+10,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left caudate,8,position_removed,,Segment the caudate in this image.
+11,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left caudate,8,organ_removed,left putamen,Segment the left structure near the putamen in this image.
+12,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left caudate,8,both_removed,left putamen,Segment the structure near the putamen in this image.
+13,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left putamen,9,both_present,,Segment the left putamen in this image.
+14,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left putamen,9,position_removed,,Segment the putamen in this image.
+15,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left putamen,9,organ_removed,left pallidum,Segment the left structure near the pallidum in this image.
+16,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left putamen,9,both_removed,left pallidum,Segment the structure near the pallidum in this image.
+17,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left pallidum,10,both_present,,Segment the left pallidum in this image.
+18,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left pallidum,10,position_removed,,Segment the pallidum in this image.
+19,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left pallidum,10,organ_removed,left putamen,Segment the left structure near the putamen in this image.
+20,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left pallidum,10,both_removed,left putamen,Segment the structure near the putamen in this image.
+21,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left hippocampus,14,both_present,,Segment the left hippocampus in this image.
+22,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left hippocampus,14,position_removed,,Segment the hippocampus in this image.
+23,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left hippocampus,14,organ_removed,left inferior lateral ventricle,Segment the left structure near the inferior lateral ventricle in this image.
+24,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left hippocampus,14,both_removed,left inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+25,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left amygdala,15,both_present,,Segment the left amygdala in this image.
+26,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left amygdala,15,position_removed,,Segment the amygdala in this image.
+27,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left amygdala,15,organ_removed,left vessel,Segment the left structure near the vessel in this image.
+28,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left amygdala,15,both_removed,left vessel,Segment the structure near the vessel in this image.
+29,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left ventral DC,17,both_present,,Segment the left ventral DC in this image.
+30,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left ventral DC,17,position_removed,,Segment the ventral DC in this image.
+31,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left ventral DC,17,organ_removed,3rd ventricle,Segment the left structure near the 3rd ventricle in this image.
+32,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left ventral DC,17,both_removed,3rd ventricle,Segment the structure near the 3rd ventricle in this image.
+33,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum white matter,24,both_present,,Segment the right cerebellum white matter in this image.
+34,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum white matter,24,position_removed,,Segment the cerebellum white matter in this image.
+35,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum white matter,24,organ_removed,right cerebellum cortex,Segment the right structure near the cerebellum cortex in this image.
+36,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum white matter,24,both_removed,right cerebellum cortex,Segment the structure near the cerebellum cortex in this image.
+37,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right thalamus,26,both_present,,Segment the right thalamus in this image.
+38,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right thalamus,26,position_removed,,Segment the thalamus in this image.
+39,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right thalamus,26,organ_removed,right choroid plexus,Segment the right structure near the choroid plexus in this image.
+40,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right thalamus,26,both_removed,right choroid plexus,Segment the structure near the choroid plexus in this image.
+41,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right caudate,27,both_present,,Segment the right caudate in this image.
+42,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right caudate,27,position_removed,,Segment the caudate in this image.
+43,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right caudate,27,organ_removed,right putamen,Segment the right structure near the putamen in this image.
+44,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right caudate,27,both_removed,right putamen,Segment the structure near the putamen in this image.
+45,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right putamen,28,both_present,,Segment the right putamen in this image.
+46,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right putamen,28,position_removed,,Segment the putamen in this image.
+47,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right putamen,28,organ_removed,right pallidum,Segment the right structure near the pallidum in this image.
+48,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right putamen,28,both_removed,right pallidum,Segment the structure near the pallidum in this image.
+49,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right pallidum,29,both_present,,Segment the right pallidum in this image.
+50,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right pallidum,29,position_removed,,Segment the pallidum in this image.
+51,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right pallidum,29,organ_removed,right putamen,Segment the right structure near the putamen in this image.
+52,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right pallidum,29,both_removed,right putamen,Segment the structure near the putamen in this image.
+53,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right hippocampus,30,both_present,,Segment the right hippocampus in this image.
+54,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right hippocampus,30,position_removed,,Segment the hippocampus in this image.
+55,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right hippocampus,30,organ_removed,right inferior lateral ventricle,Segment the right structure near the inferior lateral ventricle in this image.
+56,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right hippocampus,30,both_removed,right inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+57,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right amygdala,31,both_present,,Segment the right amygdala in this image.
+58,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right amygdala,31,position_removed,,Segment the amygdala in this image.
+59,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right amygdala,31,organ_removed,right vessel,Segment the right structure near the vessel in this image.
+60,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right amygdala,31,both_removed,right vessel,Segment the structure near the vessel in this image.
+61,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right ventral DC,33,both_present,,Segment the right ventral DC in this image.
+62,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right ventral DC,33,position_removed,,Segment the ventral DC in this image.
+63,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right ventral DC,33,organ_removed,3rd ventricle,Segment the right structure near the 3rd ventricle in this image.
+64,neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right ventral DC,33,both_removed,3rd ventricle,Segment the structure near the 3rd ventricle in this image.
+65,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,both_present,,Segment the left cerebellum white matter in this image.
+66,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,position_removed,,Segment the cerebellum white matter in this image.
+67,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,organ_removed,left cerebellum cortex,Segment the left structure near the cerebellum cortex in this image.
+68,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,both_removed,left cerebellum cortex,Segment the structure near the cerebellum cortex in this image.
+69,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,7,both_present,,Segment the left thalamus in this image.
+70,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,7,position_removed,,Segment the thalamus in this image.
+71,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,7,organ_removed,left choroid plexus,Segment the left structure near the choroid plexus in this image.
+72,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,7,both_removed,left choroid plexus,Segment the structure near the choroid plexus in this image.
+73,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,8,both_present,,Segment the left caudate in this image.
+74,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,8,position_removed,,Segment the caudate in this image.
+75,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,8,organ_removed,left putamen,Segment the left structure near the putamen in this image.
+76,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,8,both_removed,left putamen,Segment the structure near the putamen in this image.
+77,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,9,both_present,,Segment the left putamen in this image.
+78,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,9,position_removed,,Segment the putamen in this image.
+79,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,9,organ_removed,left pallidum,Segment the left structure near the pallidum in this image.
+80,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,9,both_removed,left pallidum,Segment the structure near the pallidum in this image.
+81,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left pallidum,10,both_present,,Segment the left pallidum in this image.
+82,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left pallidum,10,position_removed,,Segment the pallidum in this image.
+83,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left pallidum,10,organ_removed,left putamen,Segment the left structure near the putamen in this image.
+84,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left pallidum,10,both_removed,left putamen,Segment the structure near the putamen in this image.
+85,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,14,both_present,,Segment the left hippocampus in this image.
+86,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,14,position_removed,,Segment the hippocampus in this image.
+87,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,14,organ_removed,left inferior lateral ventricle,Segment the left structure near the inferior lateral ventricle in this image.
+88,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,14,both_removed,left inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+89,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left amygdala,15,both_present,,Segment the left amygdala in this image.
+90,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left amygdala,15,position_removed,,Segment the amygdala in this image.
+91,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left amygdala,15,organ_removed,left vessel,Segment the left structure near the vessel in this image.
+92,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left amygdala,15,both_removed,left vessel,Segment the structure near the vessel in this image.
+93,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left ventral DC,17,both_present,,Segment the left ventral DC in this image.
+94,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left ventral DC,17,position_removed,,Segment the ventral DC in this image.
+95,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left ventral DC,17,organ_removed,3rd ventricle,Segment the left structure near the 3rd ventricle in this image.
+96,neurite_oasis,faria,OASIS_OAS1_0057_MR1,left ventral DC,17,both_removed,3rd ventricle,Segment the structure near the 3rd ventricle in this image.
+97,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,24,both_present,,Segment the right cerebellum white matter in this image.
+98,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,24,position_removed,,Segment the cerebellum white matter in this image.
+99,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,24,organ_removed,right cerebellum cortex,Segment the right structure near the cerebellum cortex in this image.
+100,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,24,both_removed,right cerebellum cortex,Segment the structure near the cerebellum cortex in this image.
+101,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,26,both_present,,Segment the right thalamus in this image.
+102,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,26,position_removed,,Segment the thalamus in this image.
+103,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,26,organ_removed,right choroid plexus,Segment the right structure near the choroid plexus in this image.
+104,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,26,both_removed,right choroid plexus,Segment the structure near the choroid plexus in this image.
+105,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,27,both_present,,Segment the right caudate in this image.
+106,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,27,position_removed,,Segment the caudate in this image.
+107,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,27,organ_removed,right accumbens,Segment the right structure near the accumbens in this image.
+108,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,27,both_removed,right accumbens,Segment the structure near the accumbens in this image.
+109,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,28,both_present,,Segment the right putamen in this image.
+110,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,28,position_removed,,Segment the putamen in this image.
+111,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,28,organ_removed,right pallidum,Segment the right structure near the pallidum in this image.
+112,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,28,both_removed,right pallidum,Segment the structure near the pallidum in this image.
+113,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right pallidum,29,both_present,,Segment the right pallidum in this image.
+114,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right pallidum,29,position_removed,,Segment the pallidum in this image.
+115,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right pallidum,29,organ_removed,right putamen,Segment the right structure near the putamen in this image.
+116,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right pallidum,29,both_removed,right putamen,Segment the structure near the putamen in this image.
+117,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,30,both_present,,Segment the right hippocampus in this image.
+118,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,30,position_removed,,Segment the hippocampus in this image.
+119,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,30,organ_removed,right inferior lateral ventricle,Segment the right structure near the inferior lateral ventricle in this image.
+120,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,30,both_removed,right inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+121,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right amygdala,31,both_present,,Segment the right amygdala in this image.
+122,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right amygdala,31,position_removed,,Segment the amygdala in this image.
+123,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right amygdala,31,organ_removed,right vessel,Segment the right structure near the vessel in this image.
+124,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right amygdala,31,both_removed,right vessel,Segment the structure near the vessel in this image.
+125,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right ventral DC,33,both_present,,Segment the right ventral DC in this image.
+126,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right ventral DC,33,position_removed,,Segment the ventral DC in this image.
+127,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right ventral DC,33,organ_removed,3rd ventricle,Segment the right structure near the 3rd ventricle in this image.
+128,neurite_oasis,faria,OASIS_OAS1_0057_MR1,right ventral DC,33,both_removed,3rd ventricle,Segment the structure near the 3rd ventricle in this image.
+129,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum white matter,5,both_present,,Segment the left cerebellum white matter in this image.
+130,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum white matter,5,position_removed,,Segment the cerebellum white matter in this image.
+131,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum white matter,5,organ_removed,left cerebellum cortex,Segment the left structure near the cerebellum cortex in this image.
+132,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum white matter,5,both_removed,left cerebellum cortex,Segment the structure near the cerebellum cortex in this image.
+133,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left thalamus,7,both_present,,Segment the left thalamus in this image.
+134,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left thalamus,7,position_removed,,Segment the thalamus in this image.
+135,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left thalamus,7,organ_removed,left lateral ventricle,Segment the left structure near the lateral ventricle in this image.
+136,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left thalamus,7,both_removed,left lateral ventricle,Segment the structure near the lateral ventricle in this image.
+137,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left caudate,8,both_present,,Segment the left caudate in this image.
+138,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left caudate,8,position_removed,,Segment the caudate in this image.
+139,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left caudate,8,organ_removed,left accumbens,Segment the left structure near the accumbens in this image.
+140,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left caudate,8,both_removed,left accumbens,Segment the structure near the accumbens in this image.
+141,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left putamen,9,both_present,,Segment the left putamen in this image.
+142,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left putamen,9,position_removed,,Segment the putamen in this image.
+143,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left putamen,9,organ_removed,left pallidum,Segment the left structure near the pallidum in this image.
+144,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left putamen,9,both_removed,left pallidum,Segment the structure near the pallidum in this image.
+145,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left pallidum,10,both_present,,Segment the left pallidum in this image.
+146,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left pallidum,10,position_removed,,Segment the pallidum in this image.
+147,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left pallidum,10,organ_removed,left putamen,Segment the left structure near the putamen in this image.
+148,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left pallidum,10,both_removed,left putamen,Segment the structure near the putamen in this image.
+149,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left hippocampus,14,both_present,,Segment the left hippocampus in this image.
+150,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left hippocampus,14,position_removed,,Segment the hippocampus in this image.
+151,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left hippocampus,14,organ_removed,left inferior lateral ventricle,Segment the left structure near the inferior lateral ventricle in this image.
+152,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left hippocampus,14,both_removed,left inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+153,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left amygdala,15,both_present,,Segment the left amygdala in this image.
+154,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left amygdala,15,position_removed,,Segment the amygdala in this image.
+155,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left amygdala,15,organ_removed,left vessel,Segment the left structure near the vessel in this image.
+156,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left amygdala,15,both_removed,left vessel,Segment the structure near the vessel in this image.
+157,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left ventral DC,17,both_present,,Segment the left ventral DC in this image.
+158,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left ventral DC,17,position_removed,,Segment the ventral DC in this image.
+159,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left ventral DC,17,organ_removed,3rd ventricle,Segment the left structure near the 3rd ventricle in this image.
+160,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left ventral DC,17,both_removed,3rd ventricle,Segment the structure near the 3rd ventricle in this image.
+161,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum white matter,24,both_present,,Segment the right cerebellum white matter in this image.
+162,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum white matter,24,position_removed,,Segment the cerebellum white matter in this image.
+163,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum white matter,24,organ_removed,right cerebellum cortex,Segment the right structure near the cerebellum cortex in this image.
+164,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum white matter,24,both_removed,right cerebellum cortex,Segment the structure near the cerebellum cortex in this image.
+165,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right thalamus,26,both_present,,Segment the right thalamus in this image.
+166,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right thalamus,26,position_removed,,Segment the thalamus in this image.
+167,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right thalamus,26,organ_removed,right lateral ventricle,Segment the right structure near the lateral ventricle in this image.
+168,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right thalamus,26,both_removed,right lateral ventricle,Segment the structure near the lateral ventricle in this image.
+169,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right caudate,27,both_present,,Segment the right caudate in this image.
+170,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right caudate,27,position_removed,,Segment the caudate in this image.
+171,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right caudate,27,organ_removed,right pallidum,Segment the right structure near the pallidum in this image.
+172,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right caudate,27,both_removed,right pallidum,Segment the structure near the pallidum in this image.
+173,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right putamen,28,both_present,,Segment the right putamen in this image.
+174,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right putamen,28,position_removed,,Segment the putamen in this image.
+175,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right putamen,28,organ_removed,right pallidum,Segment the right structure near the pallidum in this image.
+176,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right putamen,28,both_removed,right pallidum,Segment the structure near the pallidum in this image.
+177,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right pallidum,29,both_present,,Segment the right pallidum in this image.
+178,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right pallidum,29,position_removed,,Segment the pallidum in this image.
+179,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right pallidum,29,organ_removed,right putamen,Segment the right structure near the putamen in this image.
+180,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right pallidum,29,both_removed,right putamen,Segment the structure near the putamen in this image.
+181,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right hippocampus,30,both_present,,Segment the right hippocampus in this image.
+182,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right hippocampus,30,position_removed,,Segment the hippocampus in this image.
+183,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right hippocampus,30,organ_removed,right inferior lateral ventricle,Segment the right structure near the inferior lateral ventricle in this image.
+184,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right hippocampus,30,both_removed,right inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+185,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right amygdala,31,both_present,,Segment the right amygdala in this image.
+186,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right amygdala,31,position_removed,,Segment the amygdala in this image.
+187,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right amygdala,31,organ_removed,right inferior lateral ventricle,Segment the right structure near the inferior lateral ventricle in this image.
+188,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right amygdala,31,both_removed,right inferior lateral ventricle,Segment the structure near the inferior lateral ventricle in this image.
+189,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right ventral DC,33,both_present,,Segment the right ventral DC in this image.
+190,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right ventral DC,33,position_removed,,Segment the ventral DC in this image.
+191,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right ventral DC,33,organ_removed,3rd ventricle,Segment the right structure near the 3rd ventricle in this image.
+192,neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right ventral DC,33,both_removed,3rd ventricle,Segment the structure near the 3rd ventricle in this image.

@@ -1,0 +1,21 @@
+dataset,person,subject_id,organ_pair,text_embed_cos_dist,output_dice_dist,output_centroid_dist_vox
+amos22_mri,nipu,amos_0508,left kidney/right kidney,0.1633,1.0,85.39
+amos22_mri,nipu,amos_0508,left adrenal gland/right adrenal gland,0.1754,1.0,60.33
+amos22_mri,faria,amos_0530,left kidney/right kidney,0.163,1.0,107.17
+amos22_mri,faria,amos_0530,left adrenal gland/right adrenal gland,0.1757,1.0,65.24
+amos22_mri,hridoy,amos_0555,left kidney/right kidney,0.163,1.0,112.29
+amos22_mri,hridoy,amos_0555,left adrenal gland/right adrenal gland,0.1757,1.0,54.07
+amos22_mri,faria,amos_0544,left kidney/right kidney,0.163,1.0,182.66
+amos22_mri,faria,amos_0544,left adrenal gland/right adrenal gland,0.1757,1.0,94.73
+amos22_mri,nipu,amos_0553,left kidney/right kidney,0.163,1.0,83.73
+amos22_mri,nipu,amos_0553,left adrenal gland/right adrenal gland,0.1757,1.0,41.54
+amos22_mri,hridoy,amos_0558,left kidney/right kidney,0.163,1.0,150.22
+amos22_mri,hridoy,amos_0558,left adrenal gland/right adrenal gland,0.1757,1.0,87.69
+amos22_mri,nipu,amos_0522,left kidney/right kidney,0.163,1.0,94.52
+amos22_mri,nipu,amos_0522,left adrenal gland/right adrenal gland,0.1757,1.0,46.06
+amos22_mri,faria,amos_0532,left kidney/right kidney,0.163,1.0,93.28
+amos22_mri,faria,amos_0532,left adrenal gland/right adrenal gland,0.1757,1.0,54.87
+amos22_mri,hridoy,amos_0554,left kidney/right kidney,0.163,1.0,153.65
+amos22_mri,hridoy,amos_0554,left adrenal gland/right adrenal gland,0.1757,1.0,81.05
+amos22_mri,nipu,amos_0575,left kidney/right kidney,0.163,1.0,102.76
+amos22_mri,nipu,amos_0575,left adrenal gland/right adrenal gland,0.1757,1.0,55.91

@@ -1,0 +1,401 @@
+dataset,person,subject_id,organ,is_bilateral,n_roles,n_combos,role,metric,shapley_value
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,position,f_dice_gt,0.129784
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,organ,f_dice_gt,0.725143
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,position,f_dice_self,0.212961
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,organ,f_dice_self,0.787039
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,position,f_centroid_shift,-14.598992
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,organ,f_centroid_shift,14.598992
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,position,f_volume,-128942.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter,True,2,4,organ,f_volume,310296.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,position,f_dice_gt,-0.006085
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,organ,f_dice_gt,-0.010553
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,position,f_dice_self,0.457364
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,organ,f_dice_self,0.542636
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,position,f_centroid_shift,-13.796553
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,organ,f_centroid_shift,-18.64966
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,position,f_volume,-154904.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex,True,2,4,organ,f_volume,-247135.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,position,f_dice_gt,-0.020795
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,organ,f_dice_gt,0.023527
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,position,f_dice_self,0.482831
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,organ,f_dice_self,0.517169
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,position,f_centroid_shift,-0.908667
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,organ,f_centroid_shift,0.908667
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,position,f_volume,974.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle,True,2,4,organ,f_volume,-933.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,position,f_dice_gt,0.184953
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,organ,f_dice_gt,0.6583
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,position,f_dice_self,0.24144
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,organ,f_dice_self,0.748308
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,position,f_centroid_shift,-23.084739
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,organ,f_centroid_shift,-2.086345
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,position,f_volume,-30817.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex,True,2,4,organ,f_volume,72713.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,position,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,organ,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,position,f_dice_self,-0.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,position,f_volume,2127.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus,True,2,4,organ,f_volume,-2127.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,position,f_dice_gt,0.148207
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,organ,f_dice_gt,0.756652
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,position,f_dice_self,0.189993
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,organ,f_dice_self,0.810007
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,position,f_centroid_shift,13.775046
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,organ,f_centroid_shift,-13.775046
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,position,f_volume,-108540.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral white matter,True,2,4,organ,f_volume,324729.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,position,f_dice_gt,0.010021
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,organ,f_dice_gt,-0.028827
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,position,f_dice_self,0.499996
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,organ,f_dice_self,0.49991
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,position,f_centroid_shift,45.960072
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,organ,f_centroid_shift,-12.212722
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,position,f_volume,-84537.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebral cortex,True,2,4,organ,f_volume,-316055.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,position,f_dice_gt,0.00321
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,organ,f_dice_gt,0.008826
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,position,f_dice_self,0.335995
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,organ,f_dice_self,0.664005
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,position,f_centroid_shift,12.57661
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,organ,f_centroid_shift,-12.57661
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,position,f_volume,1171.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right lateral ventricle,True,2,4,organ,f_volume,-512.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,position,f_dice_gt,0.077114
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,organ,f_dice_gt,0.654807
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,position,f_dice_self,0.202722
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,organ,f_dice_self,0.789774
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,position,f_centroid_shift,21.110555
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,organ,f_centroid_shift,5.976086
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,position,f_volume,-33726.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right cerebellum cortex,True,2,4,organ,f_volume,67838.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,position,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,organ,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,position,f_dice_self,-0.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,position,f_volume,2015.0
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,right choroid plexus,True,2,4,organ,f_volume,-2015.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,position,f_dice_gt,0.150934
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,organ,f_dice_gt,0.77304
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,position,f_dice_self,0.183248
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,organ,f_dice_self,0.816752
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,position,f_centroid_shift,-34.682578
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,organ,f_centroid_shift,-6.359732
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,position,f_volume,-126358.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter,True,2,4,organ,f_volume,366313.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,position,f_dice_gt,0.013378
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,organ,f_dice_gt,0.007786
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,position,f_dice_self,0.478453
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,organ,f_dice_self,0.521539
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,position,f_centroid_shift,-17.830098
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,organ,f_centroid_shift,-6.523169
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,position,f_volume,-139964.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex,True,2,4,organ,f_volume,-328036.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,position,f_dice_gt,-0.08683
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,organ,f_dice_gt,0.08683
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,position,f_dice_self,0.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,position,f_volume,2181.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle,True,2,4,organ,f_volume,-2987.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,position,f_dice_gt,0.188177
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,organ,f_dice_gt,0.673358
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,position,f_dice_self,0.239499
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,organ,f_dice_self,0.756061
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,position,f_centroid_shift,-23.297711
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,organ,f_centroid_shift,-3.851002
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,position,f_volume,-27780.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex,True,2,4,organ,f_volume,67973.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,position,f_dice_gt,0.002731
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,organ,f_dice_gt,-0.002731
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,position,f_dice_self,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,organ,f_dice_self,1.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,position,f_volume,2682.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus,True,2,4,organ,f_volume,-3488.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,position,f_dice_gt,0.157768
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,organ,f_dice_gt,0.773061
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,position,f_dice_self,0.18787
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,organ,f_dice_self,0.812106
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,position,f_centroid_shift,23.35645
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,organ,f_centroid_shift,-8.904228
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,position,f_volume,-118031.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral white matter,True,2,4,organ,f_volume,366587.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,position,f_dice_gt,0.008107
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,organ,f_dice_gt,-0.019397
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,position,f_dice_self,0.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,position,f_centroid_shift,39.312104
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,organ,f_centroid_shift,-3.386894
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,position,f_volume,-104815.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebral cortex,True,2,4,organ,f_volume,-367254.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,position,f_dice_gt,-0.002254
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,organ,f_dice_gt,0.002589
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,position,f_dice_self,0.496032
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,organ,f_dice_self,0.503968
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,position,f_centroid_shift,26.470368
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,organ,f_centroid_shift,10.338151
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,position,f_volume,2587.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right lateral ventricle,True,2,4,organ,f_volume,-3387.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,position,f_dice_gt,0.099181
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,organ,f_dice_gt,0.702659
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,position,f_dice_self,0.184299
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,organ,f_dice_self,0.804
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,position,f_centroid_shift,21.208154
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,organ,f_centroid_shift,4.341564
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,position,f_volume,-30052.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right cerebellum cortex,True,2,4,organ,f_volume,63684.5
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,position,f_dice_gt,0.00375
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,organ,f_dice_gt,-0.00375
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,position,f_dice_self,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,organ,f_dice_self,1.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,position,f_volume,3085.0
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,right choroid plexus,True,2,4,organ,f_volume,-3892.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,position,f_dice_gt,0.143678
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,organ,f_dice_gt,0.753266
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,position,f_dice_self,0.191337
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,organ,f_dice_self,0.808663
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,position,f_centroid_shift,-35.429874
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,organ,f_centroid_shift,-6.51919
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,position,f_volume,-123385.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,True,2,4,organ,f_volume,343155.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,position,f_dice_gt,0.011196
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,organ,f_dice_gt,0.009262
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,position,f_dice_self,0.424276
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,organ,f_dice_self,0.575724
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,position,f_centroid_shift,-17.797979
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,organ,f_centroid_shift,-7.365174
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,position,f_volume,-139207.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex,True,2,4,organ,f_volume,-284252.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,position,f_dice_gt,-0.043038
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,organ,f_dice_gt,0.043038
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,position,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,position,f_volume,2819.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle,True,2,4,organ,f_volume,-2955.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,position,f_dice_gt,0.183033
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,organ,f_dice_gt,0.681202
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,position,f_dice_self,0.235147
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,organ,f_dice_self,0.760224
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,position,f_centroid_shift,-24.437893
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,organ,f_centroid_shift,-3.406532
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,position,f_volume,-34050.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,True,2,4,organ,f_volume,77898.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,position,f_dice_gt,0.002242
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,organ,f_dice_gt,-0.002242
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,position,f_dice_self,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,organ,f_dice_self,1.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,position,f_volume,3133.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus,True,2,4,organ,f_volume,-3269.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,position,f_dice_gt,0.145381
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,organ,f_dice_gt,0.76976
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,position,f_dice_self,0.186572
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,organ,f_dice_self,0.81342
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,position,f_centroid_shift,20.402342
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,organ,f_centroid_shift,-6.201308
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,position,f_volume,-115068.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,True,2,4,organ,f_volume,346746.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,position,f_dice_gt,0.003941
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,organ,f_dice_gt,-0.01386
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,position,f_dice_self,0.499063
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,organ,f_dice_self,0.500937
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,position,f_centroid_shift,39.732415
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,organ,f_centroid_shift,-3.414961
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,position,f_volume,-93673.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral cortex,True,2,4,organ,f_volume,-335801.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,position,f_dice_gt,-0.000208
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,organ,f_dice_gt,0.001256
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,position,f_dice_self,0.419886
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,organ,f_dice_self,0.580114
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,position,f_centroid_shift,31.549416
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,organ,f_centroid_shift,13.345542
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,position,f_volume,2445.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right lateral ventricle,True,2,4,organ,f_volume,-2511.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,position,f_dice_gt,0.099718
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,organ,f_dice_gt,0.705287
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,position,f_dice_self,0.180237
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,organ,f_dice_self,0.80854
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,position,f_centroid_shift,21.717853
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,organ,f_centroid_shift,4.70726
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,position,f_volume,-35171.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,True,2,4,organ,f_volume,75135.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,position,f_dice_gt,0.000456
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,organ,f_dice_gt,-0.000456
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,position,f_dice_self,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,organ,f_dice_self,1.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,position,f_volume,2724.5
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right choroid plexus,True,2,4,organ,f_volume,-2860.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,position,f_dice_gt,0.138655
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,organ,f_dice_gt,0.756653
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,position,f_dice_self,0.191916
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,organ,f_dice_self,0.808084
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,position,f_centroid_shift,-24.153414
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,organ,f_centroid_shift,4.580511
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,position,f_volume,-134284.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter,True,2,4,organ,f_volume,369768.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,position,f_dice_gt,0.003527
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,organ,f_dice_gt,-0.000197
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,position,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,position,f_centroid_shift,-40.093649
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,organ,f_centroid_shift,12.068712
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,position,f_volume,-145764.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex,True,2,4,organ,f_volume,-308660.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,position,f_dice_gt,-0.087226
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,organ,f_dice_gt,0.087226
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,position,f_dice_self,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,organ,f_dice_self,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,position,f_volume,1650.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle,True,2,4,organ,f_volume,-1650.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,position,f_dice_gt,0.193192
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,organ,f_dice_gt,0.674304
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,position,f_dice_self,0.245493
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,organ,f_dice_self,0.74861
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,position,f_centroid_shift,-26.002897
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,organ,f_centroid_shift,-3.487701
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,position,f_volume,-29195.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex,True,2,4,organ,f_volume,71439.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,position,f_dice_gt,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,organ,f_dice_gt,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,position,f_dice_self,-0.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,position,f_volume,2116.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus,True,2,4,organ,f_volume,-2116.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,position,f_dice_gt,0.145625
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,organ,f_dice_gt,0.778169
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,position,f_dice_self,0.180201
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,organ,f_dice_self,0.819799
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,position,f_centroid_shift,33.49196
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,organ,f_centroid_shift,3.543161
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,position,f_volume,-123919.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral white matter,True,2,4,organ,f_volume,377454.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,position,f_dice_gt,0.007826
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,organ,f_dice_gt,-0.006401
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,position,f_dice_self,0.487163
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,organ,f_dice_self,0.51282
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,position,f_centroid_shift,12.639876
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,organ,f_centroid_shift,10.828147
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,position,f_volume,-93022.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebral cortex,True,2,4,organ,f_volume,-361838.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,position,f_dice_gt,0.000838
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,organ,f_dice_gt,0.000838
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,position,f_dice_self,0.476721
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,organ,f_dice_self,0.523279
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,position,f_centroid_shift,8.854342
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,organ,f_centroid_shift,-8.854342
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,position,f_volume,2038.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right lateral ventricle,True,2,4,organ,f_volume,-1982.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,position,f_dice_gt,0.102079
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,organ,f_dice_gt,0.698937
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,position,f_dice_self,0.182455
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,organ,f_dice_self,0.807188
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,position,f_centroid_shift,22.325767
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,organ,f_centroid_shift,5.756739
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,position,f_volume,-33043.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right cerebellum cortex,True,2,4,organ,f_volume,64896.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,position,f_dice_gt,0.000341
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,organ,f_dice_gt,-0.000341
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,position,f_dice_self,-0.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,position,f_volume,2477.0
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,right choroid plexus,True,2,4,organ,f_volume,-2477.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,position,f_dice_gt,0.144529
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,organ,f_dice_gt,0.760809
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,position,f_dice_self,0.190084
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,organ,f_dice_self,0.809916
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,position,f_centroid_shift,-14.327326
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,organ,f_centroid_shift,14.327326
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,position,f_volume,-129016.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter,True,2,4,organ,f_volume,362051.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,position,f_dice_gt,0.008952
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,organ,f_dice_gt,0.003676
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,position,f_dice_self,0.484426
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,organ,f_dice_self,0.515548
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,position,f_centroid_shift,-24.936812
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,organ,f_centroid_shift,-5.431067
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,position,f_volume,-142391.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex,True,2,4,organ,f_volume,-308359.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,position,f_dice_gt,-0.036548
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,organ,f_dice_gt,0.036548
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,position,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,position,f_volume,2065.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle,True,2,4,organ,f_volume,-2313.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,position,f_dice_gt,0.182298
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,organ,f_dice_gt,0.669004
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,position,f_dice_self,0.240557
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,organ,f_dice_self,0.752352
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,position,f_centroid_shift,-22.812783
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,organ,f_centroid_shift,-2.524001
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,position,f_volume,-27041.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex,True,2,4,organ,f_volume,68464.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,position,f_dice_gt,0.003112
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,organ,f_dice_gt,-0.003112
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,position,f_dice_self,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,organ,f_dice_self,1.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,position,f_volume,2247.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus,True,2,4,organ,f_volume,-2495.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,position,f_dice_gt,0.144903
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,organ,f_dice_gt,0.777411
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,position,f_dice_self,0.181086
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,organ,f_dice_self,0.818914
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,position,f_centroid_shift,11.336216
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,organ,f_centroid_shift,-11.336216
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,position,f_volume,-120508.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral white matter,True,2,4,organ,f_volume,368040.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,position,f_dice_gt,0.006993
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,organ,f_dice_gt,-0.021511
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,position,f_dice_self,0.492334
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,organ,f_dice_self,0.507666
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,position,f_centroid_shift,33.131907
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,organ,f_centroid_shift,-1.03806
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,position,f_volume,-96077.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebral cortex,True,2,4,organ,f_volume,-358100.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,position,f_dice_gt,-0.000539
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,organ,f_dice_gt,0.000539
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,position,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,organ,f_dice_self,-0.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,position,f_volume,-182.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right lateral ventricle,True,2,4,organ,f_volume,182.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,position,f_dice_gt,0.106824
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,organ,f_dice_gt,0.690883
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,position,f_dice_self,0.183224
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,organ,f_dice_self,0.811143
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,position,f_centroid_shift,21.237067
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,organ,f_centroid_shift,5.036894
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,position,f_volume,-31152.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right cerebellum cortex,True,2,4,organ,f_volume,63286.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,position,f_dice_gt,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,organ,f_dice_gt,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,position,f_dice_self,-0.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,organ,f_dice_self,0.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,position,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,organ,f_centroid_shift,0.0
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,position,f_volume,1.5
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,right choroid plexus,True,2,4,organ,f_volume,-1.5

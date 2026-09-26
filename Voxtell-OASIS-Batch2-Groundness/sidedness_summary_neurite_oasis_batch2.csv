@@ -1,0 +1,2 @@
+dataset,mean_cos_sim_text,mean_cos_sim_fused,delta,interpretation
+neurite_oasis,0.949153,0.561529,-0.387624,fusion DECREASES sidedness consistency relative to raw text: whatever general direction exists in language gets partially organ-specific after fusion -- more consistent with per-organ adaptation than a single shared spatial concept.

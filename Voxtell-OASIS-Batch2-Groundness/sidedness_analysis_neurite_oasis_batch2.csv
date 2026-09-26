@@ -1,0 +1,101 @@
+dataset,subject_id,space,organ_pair_a,organ_pair_b,cosine_similarity
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral white matter,cerebral cortex,0.959931
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral white matter,lateral ventricle,0.952247
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral white matter,cerebellum cortex,0.951646
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral white matter,choroid plexus,0.961049
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral cortex,lateral ventricle,0.934529
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral cortex,cerebellum cortex,0.963104
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebral cortex,choroid plexus,0.945469
+neurite_oasis,OASIS_OAS1_0363_MR1,text,lateral ventricle,cerebellum cortex,0.921737
+neurite_oasis,OASIS_OAS1_0363_MR1,text,lateral ventricle,choroid plexus,0.950206
+neurite_oasis,OASIS_OAS1_0363_MR1,text,cerebellum cortex,choroid plexus,0.951612
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral white matter,cerebral cortex,0.959931
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral white matter,lateral ventricle,0.952247
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral white matter,cerebellum cortex,0.951646
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral white matter,choroid plexus,0.961049
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral cortex,lateral ventricle,0.934529
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral cortex,cerebellum cortex,0.963104
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebral cortex,choroid plexus,0.945469
+neurite_oasis,OASIS_OAS1_0419_MR1,text,lateral ventricle,cerebellum cortex,0.921737
+neurite_oasis,OASIS_OAS1_0419_MR1,text,lateral ventricle,choroid plexus,0.950206
+neurite_oasis,OASIS_OAS1_0419_MR1,text,cerebellum cortex,choroid plexus,0.951612
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral white matter,cerebral cortex,0.959931
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral white matter,lateral ventricle,0.952247
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral white matter,cerebellum cortex,0.951646
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral white matter,choroid plexus,0.961049
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral cortex,lateral ventricle,0.934529
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral cortex,cerebellum cortex,0.963104
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebral cortex,choroid plexus,0.945469
+neurite_oasis,OASIS_OAS1_0076_MR1,text,lateral ventricle,cerebellum cortex,0.921737
+neurite_oasis,OASIS_OAS1_0076_MR1,text,lateral ventricle,choroid plexus,0.950206
+neurite_oasis,OASIS_OAS1_0076_MR1,text,cerebellum cortex,choroid plexus,0.951612
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral white matter,cerebral cortex,0.959931
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral white matter,lateral ventricle,0.952247
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral white matter,cerebellum cortex,0.951646
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral white matter,choroid plexus,0.961049
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral cortex,lateral ventricle,0.934529
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral cortex,cerebellum cortex,0.963104
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebral cortex,choroid plexus,0.945469
+neurite_oasis,OASIS_OAS1_0151_MR1,text,lateral ventricle,cerebellum cortex,0.921737
+neurite_oasis,OASIS_OAS1_0151_MR1,text,lateral ventricle,choroid plexus,0.950206
+neurite_oasis,OASIS_OAS1_0151_MR1,text,cerebellum cortex,choroid plexus,0.951612
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral white matter,cerebral cortex,0.959931
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral white matter,lateral ventricle,0.952247
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral white matter,cerebellum cortex,0.951646
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral white matter,choroid plexus,0.961049
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral cortex,lateral ventricle,0.934529
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral cortex,cerebellum cortex,0.963104
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebral cortex,choroid plexus,0.945469
+neurite_oasis,OASIS_OAS1_0421_MR1,text,lateral ventricle,cerebellum cortex,0.921737
+neurite_oasis,OASIS_OAS1_0421_MR1,text,lateral ventricle,choroid plexus,0.950206
+neurite_oasis,OASIS_OAS1_0421_MR1,text,cerebellum cortex,choroid plexus,0.951612
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral white matter,cerebral cortex,0.614624
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral white matter,lateral ventricle,0.581005
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral white matter,cerebellum cortex,0.569072
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral white matter,choroid plexus,0.433168
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral cortex,lateral ventricle,0.596686
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral cortex,cerebellum cortex,0.676114
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebral cortex,choroid plexus,0.469393
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,lateral ventricle,cerebellum cortex,0.571295
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,lateral ventricle,choroid plexus,0.550309
+neurite_oasis,OASIS_OAS1_0363_MR1,fused,cerebellum cortex,choroid plexus,0.565531
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral white matter,cerebral cortex,0.617989
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral white matter,lateral ventricle,0.589955
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral white matter,cerebellum cortex,0.560235
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral white matter,choroid plexus,0.417468
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral cortex,lateral ventricle,0.597316
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral cortex,cerebellum cortex,0.664294
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebral cortex,choroid plexus,0.446494
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,lateral ventricle,cerebellum cortex,0.568881
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,lateral ventricle,choroid plexus,0.530341
+neurite_oasis,OASIS_OAS1_0419_MR1,fused,cerebellum cortex,choroid plexus,0.571106
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral white matter,cerebral cortex,0.617975
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral white matter,lateral ventricle,0.585319
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral white matter,cerebellum cortex,0.555059
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral white matter,choroid plexus,0.432087
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral cortex,lateral ventricle,0.593672
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral cortex,cerebellum cortex,0.660972
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebral cortex,choroid plexus,0.45557
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,lateral ventricle,cerebellum cortex,0.566732
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,lateral ventricle,choroid plexus,0.541752
+neurite_oasis,OASIS_OAS1_0076_MR1,fused,cerebellum cortex,choroid plexus,0.582038
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral white matter,cerebral cortex,0.617624
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral white matter,lateral ventricle,0.590716
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral white matter,cerebellum cortex,0.571481
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral white matter,choroid plexus,0.45089
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral cortex,lateral ventricle,0.59511
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral cortex,cerebellum cortex,0.670463
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebral cortex,choroid plexus,0.473127
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,lateral ventricle,cerebellum cortex,0.56974
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,lateral ventricle,choroid plexus,0.548811
+neurite_oasis,OASIS_OAS1_0151_MR1,fused,cerebellum cortex,choroid plexus,0.574341
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral white matter,cerebral cortex,0.620151
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral white matter,lateral ventricle,0.594159
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral white matter,cerebellum cortex,0.570948
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral white matter,choroid plexus,0.440263
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral cortex,lateral ventricle,0.596522
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral cortex,cerebellum cortex,0.671339
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebral cortex,choroid plexus,0.463673
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,lateral ventricle,cerebellum cortex,0.57082
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,lateral ventricle,choroid plexus,0.540324
+neurite_oasis,OASIS_OAS1_0421_MR1,fused,cerebellum cortex,choroid plexus,0.563497

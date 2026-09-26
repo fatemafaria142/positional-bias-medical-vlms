@@ -1,0 +1,26 @@
+dataset,person,subject_id,organ_pair,text_embed_cos_dist,output_dice_dist,output_centroid_dist_vox
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebral white matter/right cerebral white matter,0.1395,1.0,55.72
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebral cortex/right cerebral cortex,0.1489,1.0,52.21
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left lateral ventricle/right lateral ventricle,0.0888,1.0,
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebellum cortex/right cerebellum cortex,0.1427,1.0,54.81
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left choroid plexus/right choroid plexus,0.1466,0.0,
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter/right cerebral white matter,0.1395,1.0,56.48
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex/right cerebral cortex,0.1489,1.0,64.89
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle/right lateral ventricle,0.0888,0.0,
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex/right cerebellum cortex,0.1427,1.0,52.11
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left choroid plexus/right choroid plexus,0.1466,0.0,
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter/right cerebral white matter,0.1395,1.0,59.33
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral cortex/right cerebral cortex,0.1489,1.0,62.49
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left lateral ventricle/right lateral ventricle,0.0888,1.0,75.43
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex/right cerebellum cortex,0.1427,1.0,56.48
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left choroid plexus/right choroid plexus,0.1466,0.0,
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter/right cerebral white matter,0.1395,1.0,56.36
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral cortex/right cerebral cortex,0.1489,1.0,55.03
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left lateral ventricle/right lateral ventricle,0.0888,1.0,73.0
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex/right cerebellum cortex,0.1427,1.0,51.51
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left choroid plexus/right choroid plexus,0.1466,0.0,
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter/right cerebral white matter,0.1395,1.0,55.94
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral cortex/right cerebral cortex,0.1489,1.0,71.45
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left lateral ventricle/right lateral ventricle,0.0888,1.0,69.51
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex/right cerebellum cortex,0.1427,0.9999,50.64
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left choroid plexus/right choroid plexus,0.1466,0.0,

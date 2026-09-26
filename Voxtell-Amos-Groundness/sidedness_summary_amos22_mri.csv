@@ -1,0 +1,2 @@
+dataset,mean_cos_sim_text,mean_cos_sim_fused,delta,interpretation
+amos22_mri,0.962729,0.68036,-0.282369,fusion DECREASES sidedness consistency relative to raw text: whatever general direction exists in language gets partially organ-specific after fusion -- more consistent with per-organ adaptation than a single shared spatial concept.

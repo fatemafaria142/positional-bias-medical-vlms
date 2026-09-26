@@ -243,21 +243,28 @@ about 1 (>= 0.999; patching a whole layer state must reproduce the source prompt
 
 ROW_13_CELL = """import traceback
 
-r13_path = RESULTS_ROOT / f'row13_organ_noise_@@SUFFIX@@.csv'
+# Row 13 also saves, for every organ and condition, one 2-D plane of the image the model received and of its mask
+# (results/row13_slices/<subject>.npz), so that the experiment can be drawn on real scan images.
+ROW13_ONLY = None            # e.g. ['amos_0508'] to run a single subject; None = all subjects
+(RESULTS_ROOT / 'row13_slices').mkdir(exist_ok=True)
+r13_path = RESULTS_ROOT / (f'row13_organ_noise_@@SUFFIX@@.csv' if ROW13_ONLY is None else f'row13_organ_noise_subset_@@SUFFIX@@.csv')
 first = True
 for si, sid in enumerate(subject_organs, 1):
+    if ROW13_ONLY is not None and sid not in ROW13_ONLY:
+        continue
     t0 = time.time()
     try:
         person, img_arr, label_vol, organs, ids, prompts = load_subject(sid)
-        rows13 = ve.run_erasure(predictor, img_arr, label_vol, organs, ids, prompts, seed=si)
+        rows13, slices = ve.run_erasure(predictor, img_arr, label_vol, organs, ids, prompts, seed=si, return_slices=True)
         append_csv(r13_path, tag(rows13, sid, person), first)
+        np.savez_compressed(RESULTS_ROOT / 'row13_slices' / f'{sid}.npz', **slices)
         first = False
         print(f'[{si}/{len(subject_organs)}] {sid}: row 13 done in {time.time() - t0:.0f}s')
     except Exception:
         print(f'[{si}/{len(subject_organs)}] {sid}: FAILED'); traceback.print_exc()
     finally:
         gc.collect(); torch.cuda.empty_cache()
-print('wrote', r13_path.name)
+print('wrote', r13_path.name, 'and row13_slices/*.npz')
 """
 
 

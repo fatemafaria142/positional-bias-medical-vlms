@@ -1,0 +1,163 @@
+dataset,person,subject_id,pair,variant,dst,src,alpha,layer,agreement_with_source_baseline,n_pred_voxels,cov_left_organ,cov_right_organ,dice_left_organ,dice_right_organ,call,moved_to_source_side
+amos22_mri,nipu,amos_0508,kidney,baseline,left,,nan,-1,nan,42224,0.9456,0.0,0.9401,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,baseline,right,,nan,-1,nan,41225,0.0,0.9315,0.0,0.9364,right,False
+amos22_mri,nipu,amos_0508,kidney,blend,left,right,-0.5,-1,nan,42113,0.9427,0.0,0.9384,0.0,left,nan
+amos22_mri,nipu,amos_0508,kidney,blend,left,right,0.25,-1,nan,41575,0.9381,0.0,0.9399,0.0,left,nan
+amos22_mri,nipu,amos_0508,kidney,blend,left,right,0.5,-1,nan,54048,0.5517,0.7166,0.4808,0.6239,both,nan
+amos22_mri,nipu,amos_0508,kidney,blend,left,right,0.75,-1,nan,41084,0.0,0.927,0.0,0.9335,right,nan
+amos22_mri,nipu,amos_0508,kidney,blend,left,right,1.5,-1,nan,37462,0.0,0.8711,0.0,0.9173,right,nan
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,left,right,nan,0,nan,42665,0.9502,0.0,0.9396,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,left,right,nan,1,nan,42617,0.95,0.0,0.94,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,left,right,nan,2,nan,42347,0.9469,0.0,0.94,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,left,right,nan,3,nan,42224,0.9458,0.0,0.9402,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,left,right,nan,4,nan,42243,0.9461,0.0,0.9403,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,left,right,nan,5,nan,42219,0.9452,0.0,0.9397,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,updates_from_layer,left,right,nan,0,nan,37399,0.0,0.8633,0.0,0.9099,right,True
+amos22_mri,nipu,amos_0508,kidney,updates_from_layer,left,right,nan,3,nan,41511,0.9361,0.0,0.9386,0.0,left,False
+amos22_mri,nipu,amos_0508,kidney,whole_state_control,left,right,nan,0,0.999999,41227,0.0,0.9315,0.0,0.9364,right,True
+amos22_mri,nipu,amos_0508,kidney,whole_state_control,left,right,nan,5,1.0,41225,0.0,0.9315,0.0,0.9364,right,True
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,right,left,nan,0,nan,39317,0.0,0.9008,0.0,0.9269,right,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,right,left,nan,1,nan,40520,0.0,0.9207,0.0,0.9334,right,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,right,left,nan,2,nan,40985,0.0,0.9274,0.0,0.9349,right,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,right,left,nan,3,nan,41110,0.0,0.9292,0.0,0.9354,right,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,right,left,nan,4,nan,41017,0.0,0.9283,0.0,0.9355,right,False
+amos22_mri,nipu,amos_0508,kidney,single_layer_update,right,left,nan,5,nan,41056,0.0,0.9286,0.0,0.9354,right,False
+amos22_mri,nipu,amos_0508,kidney,updates_from_layer,right,left,nan,0,nan,12079,0.2577,0.027,0.3997,0.0419,neither,False
+amos22_mri,nipu,amos_0508,kidney,updates_from_layer,right,left,nan,3,nan,39424,0.0,0.9018,0.0,0.9267,right,False
+amos22_mri,nipu,amos_0508,kidney,whole_state_control,right,left,nan,0,1.0,42223,0.9456,0.0,0.9401,0.0,left,True
+amos22_mri,nipu,amos_0508,kidney,whole_state_control,right,left,nan,5,1.0,42224,0.9456,0.0,0.9401,0.0,left,True
+amos22_mri,nipu,amos_0508,adrenal gland,baseline,left,,nan,-1,nan,735,0.8305,0.0,0.7354,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,baseline,right,,nan,-1,nan,495,0.0,0.5554,0.0,0.6487,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,blend,left,right,-0.5,-1,nan,394,0.5342,0.0,0.638,0.0,left,nan
+amos22_mri,nipu,amos_0508,adrenal gland,blend,left,right,0.25,-1,nan,569,0.7055,0.0,0.7147,0.0,left,nan
+amos22_mri,nipu,amos_0508,adrenal gland,blend,left,right,0.5,-1,nan,56,0.0,0.0763,0.0,0.1411,neither,nan
+amos22_mri,nipu,amos_0508,adrenal gland,blend,left,right,0.75,-1,nan,452,0.0,0.5137,0.0,0.6225,right,nan
+amos22_mri,nipu,amos_0508,adrenal gland,blend,left,right,1.5,-1,nan,384,0.0,0.4705,0.0,0.6061,right,nan
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,left,right,nan,0,nan,498,0.6575,0.0,0.7098,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,left,right,nan,1,nan,695,0.7997,0.0,0.7303,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,left,right,nan,2,nan,685,0.7928,0.0,0.7297,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,left,right,nan,3,nan,683,0.7911,0.0,0.7293,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,left,right,nan,4,nan,684,0.7962,0.0,0.7334,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,left,right,nan,5,nan,720,0.8116,0.0,0.727,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,updates_from_layer,left,right,nan,0,nan,118,0.0,0.1568,0.0,0.2681,neither,False
+amos22_mri,nipu,amos_0508,adrenal gland,updates_from_layer,left,right,nan,3,nan,315,0.4315,0.0,0.5606,0.0,left,False
+amos22_mri,nipu,amos_0508,adrenal gland,whole_state_control,left,right,nan,0,1.0,495,0.0,0.5554,0.0,0.6487,right,True
+amos22_mri,nipu,amos_0508,adrenal gland,whole_state_control,left,right,nan,5,1.0,495,0.0,0.5554,0.0,0.6487,right,True
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,right,left,nan,0,nan,526,0.0,0.5583,0.0,0.6355,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,right,left,nan,1,nan,492,0.0,0.5496,0.0,0.6436,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,right,left,nan,2,nan,489,0.0,0.5482,0.0,0.6436,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,right,left,nan,3,nan,499,0.0,0.5554,0.0,0.6466,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,right,left,nan,4,nan,497,0.0,0.5568,0.0,0.6493,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,single_layer_update,right,left,nan,5,nan,489,0.0,0.5482,0.0,0.6436,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,updates_from_layer,right,left,nan,0,nan,0,0.0,0.0,0.0,0.0,empty,False
+amos22_mri,nipu,amos_0508,adrenal gland,updates_from_layer,right,left,nan,3,nan,385,0.0,0.4504,0.0,0.5796,right,False
+amos22_mri,nipu,amos_0508,adrenal gland,whole_state_control,right,left,nan,0,1.0,736,0.8322,0.0,0.7364,0.0,left,True
+amos22_mri,nipu,amos_0508,adrenal gland,whole_state_control,right,left,nan,5,1.0,735,0.8305,0.0,0.7354,0.0,left,True
+amos22_mri,faria,amos_0530,kidney,baseline,left,,nan,-1,nan,29164,0.9222,0.0,0.9366,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,baseline,right,,nan,-1,nan,30211,0.0,0.9637,0.0,0.9544,right,False
+amos22_mri,faria,amos_0530,kidney,blend,left,right,-0.5,-1,nan,28270,0.9025,0.0,0.9306,0.0,left,nan
+amos22_mri,faria,amos_0530,kidney,blend,left,right,0.25,-1,nan,28942,0.9202,0.0,0.9381,0.0,left,nan
+amos22_mri,faria,amos_0530,kidney,blend,left,right,0.5,-1,nan,7111,0.0487,0.1845,0.0788,0.2976,neither,nan
+amos22_mri,faria,amos_0530,kidney,blend,left,right,0.75,-1,nan,30302,0.0,0.966,0.0,0.9552,right,nan
+amos22_mri,faria,amos_0530,kidney,blend,left,right,1.5,-1,nan,28962,0.0,0.9417,0.0,0.9525,right,nan
+amos22_mri,faria,amos_0530,kidney,single_layer_update,left,right,nan,0,nan,19728,0.6423,0.0,0.7759,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,left,right,nan,1,nan,29068,0.9234,0.0,0.9393,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,left,right,nan,2,nan,29249,0.9267,0.0,0.9399,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,left,right,nan,3,nan,29061,0.9225,0.0,0.9385,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,left,right,nan,4,nan,28956,0.9199,0.0,0.9376,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,left,right,nan,5,nan,28781,0.9157,0.0,0.9361,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,updates_from_layer,left,right,nan,0,nan,29374,0.0034,0.9474,0.0035,0.9516,right,True
+amos22_mri,faria,amos_0530,kidney,updates_from_layer,left,right,nan,3,nan,28557,0.9121,0.0,0.9359,0.0,left,False
+amos22_mri,faria,amos_0530,kidney,whole_state_control,left,right,nan,0,0.999999,30212,0.0,0.9638,0.0,0.9544,right,True
+amos22_mri,faria,amos_0530,kidney,whole_state_control,left,right,nan,5,1.0,30211,0.0,0.9637,0.0,0.9544,right,True
+amos22_mri,faria,amos_0530,kidney,single_layer_update,right,left,nan,0,nan,28890,0.0,0.9353,0.0,0.9472,right,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,right,left,nan,1,nan,29837,0.0,0.9591,0.0,0.9559,right,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,right,left,nan,2,nan,30027,0.0,0.962,0.0,0.9557,right,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,right,left,nan,3,nan,29982,0.0,0.9611,0.0,0.9554,right,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,right,left,nan,4,nan,30098,0.0,0.9623,0.0,0.9548,right,False
+amos22_mri,faria,amos_0530,kidney,single_layer_update,right,left,nan,5,nan,29725,0.0,0.9561,0.0,0.9546,right,False
+amos22_mri,faria,amos_0530,kidney,updates_from_layer,right,left,nan,0,nan,1673,0.0556,0.0,0.1053,0.0,neither,False
+amos22_mri,faria,amos_0530,kidney,updates_from_layer,right,left,nan,3,nan,24310,0.0,0.7965,0.0,0.8751,right,False
+amos22_mri,faria,amos_0530,kidney,whole_state_control,right,left,nan,0,0.999999,29160,0.9221,0.0,0.9365,0.0,left,True
+amos22_mri,faria,amos_0530,kidney,whole_state_control,right,left,nan,5,1.0,29164,0.9222,0.0,0.9366,0.0,left,True
+amos22_mri,faria,amos_0530,adrenal gland,baseline,left,,nan,-1,nan,570,0.6934,0.0,0.4644,0.0,left,False
+amos22_mri,faria,amos_0530,adrenal gland,baseline,right,,nan,-1,nan,761,0.0,0.7618,0.0,0.6532,right,False
+amos22_mri,faria,amos_0530,adrenal gland,blend,left,right,-0.5,-1,nan,418,0.4983,0.0,0.4057,0.0,left,nan
+amos22_mri,faria,amos_0530,adrenal gland,blend,left,right,0.25,-1,nan,418,0.5226,0.0,0.4255,0.0,left,nan
+amos22_mri,faria,amos_0530,adrenal gland,blend,left,right,0.5,-1,nan,495,0.0,0.5762,0.0,0.6173,right,nan
+amos22_mri,faria,amos_0530,adrenal gland,blend,left,right,0.75,-1,nan,728,0.0,0.7391,0.0,0.6497,right,nan
+amos22_mri,faria,amos_0530,adrenal gland,blend,left,right,1.5,-1,nan,669,0.0,0.7058,0.0,0.65,right,nan
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,left,right,nan,0,nan,242,0.2683,0.0,0.2911,0.0,neither,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,left,right,nan,1,nan,504,0.6167,0.0,0.4475,0.0,left,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,left,right,nan,2,nan,489,0.5993,0.0,0.4433,0.0,left,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,left,right,nan,3,nan,496,0.5993,0.0,0.4393,0.0,left,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,left,right,nan,4,nan,458,0.554,0.0,0.4268,0.0,left,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,left,right,nan,5,nan,488,0.5819,0.0,0.431,0.0,left,False
+amos22_mri,faria,amos_0530,adrenal gland,updates_from_layer,left,right,nan,0,nan,575,0.0,0.6462,0.0,0.644,right,True
+amos22_mri,faria,amos_0530,adrenal gland,updates_from_layer,left,right,nan,3,nan,152,0.0976,0.0,0.1276,0.0,neither,False
+amos22_mri,faria,amos_0530,adrenal gland,whole_state_control,left,right,nan,0,1.0,761,0.0,0.7618,0.0,0.6532,right,True
+amos22_mri,faria,amos_0530,adrenal gland,whole_state_control,left,right,nan,5,1.0,761,0.0,0.7618,0.0,0.6532,right,True
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,right,left,nan,0,nan,752,0.0,0.7461,0.0,0.644,right,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,right,left,nan,1,nan,733,0.0,0.7443,0.0,0.6518,right,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,right,left,nan,2,nan,734,0.0,0.7426,0.0,0.6498,right,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,right,left,nan,3,nan,740,0.0,0.7426,0.0,0.6468,right,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,right,left,nan,4,nan,740,0.0,0.7426,0.0,0.6468,right,False
+amos22_mri,faria,amos_0530,adrenal gland,single_layer_update,right,left,nan,5,nan,739,0.0,0.7408,0.0,0.6458,right,False
+amos22_mri,faria,amos_0530,adrenal gland,updates_from_layer,right,left,nan,0,nan,0,0.0,0.0,0.0,0.0,empty,False
+amos22_mri,faria,amos_0530,adrenal gland,updates_from_layer,right,left,nan,3,nan,642,0.0,0.6778,0.0,0.6381,right,False
+amos22_mri,faria,amos_0530,adrenal gland,whole_state_control,right,left,nan,0,1.0,571,0.6934,0.0,0.4639,0.0,left,True
+amos22_mri,faria,amos_0530,adrenal gland,whole_state_control,right,left,nan,5,1.0,570,0.6934,0.0,0.4644,0.0,left,True
+amos22_mri,hridoy,amos_0555,kidney,baseline,left,,nan,-1,nan,27965,0.956,0.0,0.9602,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,baseline,right,,nan,-1,nan,28510,0.0,0.9751,0.0,0.971,right,False
+amos22_mri,hridoy,amos_0555,kidney,blend,left,right,-0.5,-1,nan,26844,0.9289,0.0,0.9519,0.0,left,nan
+amos22_mri,hridoy,amos_0555,kidney,blend,left,right,0.25,-1,nan,27722,0.9501,0.0,0.9584,0.0,left,nan
+amos22_mri,hridoy,amos_0555,kidney,blend,left,right,0.5,-1,nan,43013,0.6342,0.8598,0.5024,0.6819,both,nan
+amos22_mri,hridoy,amos_0555,kidney,blend,left,right,0.75,-1,nan,28751,0.0,0.9793,0.0,0.971,right,nan
+amos22_mri,hridoy,amos_0555,kidney,blend,left,right,1.5,-1,nan,26762,0.0,0.9329,0.0,0.9585,right,nan
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,left,right,nan,0,nan,27949,0.9557,0.0,0.9601,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,left,right,nan,1,nan,28009,0.9572,0.0,0.9606,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,left,right,nan,2,nan,28010,0.9568,0.0,0.9602,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,left,right,nan,3,nan,27862,0.9531,0.0,0.959,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,left,right,nan,4,nan,27781,0.9514,0.0,0.9587,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,left,right,nan,5,nan,27284,0.9374,0.0,0.9531,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,updates_from_layer,left,right,nan,0,nan,28351,0.0,0.971,0.0,0.9696,right,True
+amos22_mri,hridoy,amos_0555,kidney,updates_from_layer,left,right,nan,3,nan,26764,0.9217,0.0,0.9459,0.0,left,False
+amos22_mri,hridoy,amos_0555,kidney,whole_state_control,left,right,nan,0,0.999999,28510,0.0,0.9752,0.0,0.971,right,True
+amos22_mri,hridoy,amos_0555,kidney,whole_state_control,left,right,nan,5,1.0,28510,0.0,0.9751,0.0,0.971,right,True
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,right,left,nan,0,nan,28111,0.0,0.9675,0.0,0.9702,right,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,right,left,nan,1,nan,28071,0.0,0.9667,0.0,0.9701,right,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,right,left,nan,2,nan,28386,0.0,0.9728,0.0,0.9707,right,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,right,left,nan,3,nan,28376,0.0,0.9724,0.0,0.9706,right,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,right,left,nan,4,nan,28449,0.0,0.9744,0.0,0.9713,right,False
+amos22_mri,hridoy,amos_0555,kidney,single_layer_update,right,left,nan,5,nan,28082,0.0,0.9665,0.0,0.9697,right,False
+amos22_mri,hridoy,amos_0555,kidney,updates_from_layer,right,left,nan,0,nan,12966,0.4582,0.0,0.6278,0.0,left,True
+amos22_mri,hridoy,amos_0555,kidney,updates_from_layer,right,left,nan,3,nan,27124,0.0,0.9398,0.0,0.9592,right,False
+amos22_mri,hridoy,amos_0555,kidney,whole_state_control,right,left,nan,0,1.0,27966,0.9561,0.0,0.9603,0.0,left,True
+amos22_mri,hridoy,amos_0555,kidney,whole_state_control,right,left,nan,5,1.0,27965,0.956,0.0,0.9602,0.0,left,True
+amos22_mri,hridoy,amos_0555,adrenal gland,baseline,left,,nan,-1,nan,547,0.9623,0.0,0.7075,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,baseline,right,,nan,-1,nan,739,0.0,0.7962,0.0,0.6239,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,blend,left,right,-0.5,-1,nan,406,0.8805,0.0,0.7735,0.0,left,nan
+amos22_mri,hridoy,amos_0555,adrenal gland,blend,left,right,0.25,-1,nan,517,0.9497,0.0,0.7234,0.0,left,nan
+amos22_mri,hridoy,amos_0555,adrenal gland,blend,left,right,0.5,-1,nan,647,0.1478,0.7248,0.0974,0.6144,right,nan
+amos22_mri,hridoy,amos_0555,adrenal gland,blend,left,right,0.75,-1,nan,741,0.0,0.8046,0.0,0.6294,right,nan
+amos22_mri,hridoy,amos_0555,adrenal gland,blend,left,right,1.5,-1,nan,622,0.0,0.771,0.0,0.6685,right,nan
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,left,right,nan,0,nan,514,0.9434,0.0,0.7212,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,left,right,nan,1,nan,547,0.9623,0.0,0.7075,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,left,right,nan,2,nan,539,0.9591,0.0,0.7118,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,left,right,nan,3,nan,537,0.9591,0.0,0.7135,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,left,right,nan,4,nan,526,0.956,0.0,0.7204,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,left,right,nan,5,nan,555,0.9591,0.0,0.6987,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,updates_from_layer,left,right,nan,0,nan,600,0.0,0.7311,0.0,0.6468,right,True
+amos22_mri,hridoy,amos_0555,adrenal gland,updates_from_layer,left,right,nan,3,nan,388,0.8428,0.0,0.7592,0.0,left,False
+amos22_mri,hridoy,amos_0555,adrenal gland,whole_state_control,left,right,nan,0,1.0,739,0.0,0.7962,0.0,0.6239,right,True
+amos22_mri,hridoy,amos_0555,adrenal gland,whole_state_control,left,right,nan,5,1.0,739,0.0,0.7962,0.0,0.6239,right,True
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,right,left,nan,0,nan,748,0.0,0.8088,0.0,0.6291,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,right,left,nan,1,nan,720,0.0,0.7962,0.0,0.6338,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,right,left,nan,2,nan,721,0.0,0.7962,0.0,0.6332,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,right,left,nan,3,nan,726,0.0,0.8004,0.0,0.6339,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,right,left,nan,4,nan,726,0.0,0.8088,0.0,0.6406,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,single_layer_update,right,left,nan,5,nan,712,0.0,0.792,0.0,0.6347,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,updates_from_layer,right,left,nan,0,nan,96,0.0,0.1723,0.0,0.2867,neither,False
+amos22_mri,hridoy,amos_0555,adrenal gland,updates_from_layer,right,left,nan,3,nan,652,0.0,0.7773,0.0,0.656,right,False
+amos22_mri,hridoy,amos_0555,adrenal gland,whole_state_control,right,left,nan,0,1.0,547,0.9623,0.0,0.7075,0.0,left,True
+amos22_mri,hridoy,amos_0555,adrenal gland,whole_state_control,right,left,nan,5,1.0,547,0.9623,0.0,0.7075,0.0,left,True

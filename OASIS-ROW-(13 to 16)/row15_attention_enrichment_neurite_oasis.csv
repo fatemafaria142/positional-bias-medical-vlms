@@ -1,0 +1,481 @@
+dataset,person,subject_id,layer,prompt_organ,region_organ,is_matched,is_wrong_side,enrichment,mass_fraction
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebral white matter,left cerebral white matter,True,False,0.9225,0.062622
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebral white matter,left cerebellum cortex,False,False,0.8156,0.012831
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebral white matter,right cerebral white matter,False,True,0.2714,0.018991
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebral white matter,right cerebellum cortex,False,False,0.2797,0.004484
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebellum cortex,left cerebral white matter,False,False,0.9513,0.064584
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebellum cortex,left cerebellum cortex,True,False,0.8164,0.012843
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebellum cortex,right cerebral white matter,False,False,0.271,0.018961
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,left cerebellum cortex,right cerebellum cortex,False,True,0.3684,0.005906
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebral white matter,left cerebral white matter,False,True,0.3127,0.021225
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebral white matter,left cerebellum cortex,False,False,0.3596,0.005657
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebral white matter,right cerebral white matter,True,False,0.6925,0.048451
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebral white matter,right cerebellum cortex,False,False,0.5676,0.009099
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebellum cortex,left cerebral white matter,False,False,0.3748,0.025445
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebellum cortex,left cerebellum cortex,False,True,0.4216,0.006632
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebellum cortex,right cerebral white matter,False,False,0.8212,0.057454
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,1,right cerebellum cortex,right cerebellum cortex,True,False,0.6951,0.011142
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebral white matter,left cerebral white matter,True,False,0.4932,0.033483
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebral white matter,left cerebellum cortex,False,False,0.5256,0.008269
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebral white matter,right cerebral white matter,False,True,0.3406,0.023831
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebral white matter,right cerebellum cortex,False,False,0.3037,0.004869
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebellum cortex,left cerebral white matter,False,False,0.5435,0.036893
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebellum cortex,left cerebellum cortex,True,False,0.7516,0.011825
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebellum cortex,right cerebral white matter,False,False,0.2247,0.015718
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,left cerebellum cortex,right cerebellum cortex,False,True,0.432,0.006926
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebral white matter,left cerebral white matter,False,True,0.3421,0.023226
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebral white matter,left cerebellum cortex,False,False,0.386,0.006073
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebral white matter,right cerebral white matter,True,False,0.7421,0.05192
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebral white matter,right cerebellum cortex,False,False,0.4529,0.00726
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebellum cortex,left cerebral white matter,False,False,0.3777,0.025643
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebellum cortex,left cerebellum cortex,False,True,0.5074,0.007983
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebellum cortex,right cerebral white matter,False,False,0.3945,0.027604
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,2,right cerebellum cortex,right cerebellum cortex,True,False,0.6829,0.010947
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebral white matter,left cerebral white matter,True,False,0.4757,0.032291
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebral white matter,left cerebellum cortex,False,False,0.4463,0.007021
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebral white matter,right cerebral white matter,False,True,1.6129,0.112847
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebral white matter,right cerebellum cortex,False,False,0.3127,0.005012
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebellum cortex,left cerebral white matter,False,False,0.6198,0.042073
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebellum cortex,left cerebellum cortex,True,False,0.8205,0.012909
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebellum cortex,right cerebral white matter,False,False,0.307,0.021478
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,left cerebellum cortex,right cerebellum cortex,False,True,0.5281,0.008465
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebral white matter,left cerebral white matter,False,True,0.3582,0.024317
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebral white matter,left cerebellum cortex,False,False,0.3863,0.006078
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebral white matter,right cerebral white matter,True,False,1.8499,0.129428
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebral white matter,right cerebellum cortex,False,False,0.4159,0.006666
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebellum cortex,left cerebral white matter,False,False,0.463,0.031429
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebellum cortex,left cerebellum cortex,False,True,0.6005,0.009448
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebellum cortex,right cerebral white matter,False,False,0.479,0.033511
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,3,right cerebellum cortex,right cerebellum cortex,True,False,0.8018,0.012853
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebral white matter,left cerebral white matter,True,False,0.5404,0.036685
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebral white matter,left cerebellum cortex,False,False,0.4863,0.007651
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebral white matter,right cerebral white matter,False,True,1.7281,0.120909
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebral white matter,right cerebellum cortex,False,False,0.371,0.005947
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebellum cortex,left cerebral white matter,False,False,0.6056,0.041114
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebellum cortex,left cerebellum cortex,True,False,0.8979,0.014125
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebellum cortex,right cerebral white matter,False,False,0.3377,0.023624
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,left cerebellum cortex,right cerebellum cortex,False,True,0.6404,0.010265
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebral white matter,left cerebral white matter,False,True,0.3964,0.026909
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebral white matter,left cerebellum cortex,False,False,0.4287,0.006744
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebral white matter,right cerebral white matter,True,False,2.2825,0.159697
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebral white matter,right cerebellum cortex,False,False,0.4448,0.007131
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebellum cortex,left cerebral white matter,False,False,0.5057,0.034327
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebellum cortex,left cerebellum cortex,False,True,0.7024,0.01105
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebellum cortex,right cerebral white matter,False,False,0.4765,0.033336
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,4,right cerebellum cortex,right cerebellum cortex,True,False,0.8623,0.013823
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebral white matter,left cerebral white matter,True,False,0.7012,0.0476
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebral white matter,left cerebellum cortex,False,False,0.68,0.010697
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebral white matter,right cerebral white matter,False,True,0.7649,0.053518
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebral white matter,right cerebellum cortex,False,False,0.5128,0.00822
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebellum cortex,left cerebral white matter,False,False,0.7233,0.0491
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebellum cortex,left cerebellum cortex,True,False,1.099,0.01729
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebellum cortex,right cerebral white matter,False,False,0.4464,0.031235
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,left cerebellum cortex,right cerebellum cortex,False,True,0.771,0.01236
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebral white matter,left cerebral white matter,False,True,0.5578,0.037865
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebral white matter,left cerebellum cortex,False,False,0.556,0.008748
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebral white matter,right cerebral white matter,True,False,1.2372,0.086559
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebral white matter,right cerebellum cortex,False,False,0.6146,0.009852
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebellum cortex,left cerebral white matter,False,False,0.6212,0.042174
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebellum cortex,left cerebellum cortex,False,True,0.835,0.013136
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebellum cortex,right cerebral white matter,False,False,0.7331,0.051294
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,5,right cerebellum cortex,right cerebellum cortex,True,False,1.1222,0.017988
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebral white matter,left cerebral white matter,True,False,0.6495,0.044091
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebral white matter,left cerebellum cortex,False,False,0.65,0.010225
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebral white matter,right cerebral white matter,False,True,0.7405,0.051808
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebral white matter,right cerebellum cortex,False,False,0.5629,0.009023
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebellum cortex,left cerebral white matter,False,False,0.66,0.044808
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebellum cortex,left cerebellum cortex,True,False,0.9619,0.015133
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebellum cortex,right cerebral white matter,False,False,0.4753,0.033255
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,left cerebellum cortex,right cerebellum cortex,False,True,0.772,0.012375
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebral white matter,left cerebral white matter,False,True,0.5966,0.0405
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebral white matter,left cerebellum cortex,False,False,0.5787,0.009105
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebral white matter,right cerebral white matter,True,False,0.9117,0.063784
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebral white matter,right cerebellum cortex,False,False,0.6025,0.009659
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebellum cortex,left cerebral white matter,False,False,0.646,0.043855
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebellum cortex,left cerebellum cortex,False,True,0.7878,0.012394
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebellum cortex,right cerebral white matter,False,False,0.6553,0.045851
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,6,right cerebellum cortex,right cerebellum cortex,True,False,0.9049,0.014506
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebral white matter,left cerebral white matter,True,False,0.8973,0.058094
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebral white matter,left cerebellum cortex,False,False,0.6828,0.009266
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebral white matter,right cerebral white matter,False,True,0.322,0.021282
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebral white matter,right cerebellum cortex,False,False,0.1994,0.002734
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebellum cortex,left cerebral white matter,False,False,0.9336,0.060447
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebellum cortex,left cerebellum cortex,True,False,0.7194,0.009762
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebellum cortex,right cerebral white matter,False,False,0.2746,0.018149
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,left cerebellum cortex,right cerebellum cortex,False,True,0.2917,0.004
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebral white matter,left cerebral white matter,False,True,0.2947,0.019078
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebral white matter,left cerebellum cortex,False,False,0.27,0.003664
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebral white matter,right cerebral white matter,True,False,0.8101,0.053538
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebral white matter,right cerebellum cortex,False,False,0.4546,0.006233
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebellum cortex,left cerebral white matter,False,False,0.352,0.022791
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebellum cortex,left cerebellum cortex,False,True,0.3411,0.004629
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebellum cortex,right cerebral white matter,False,False,0.7944,0.052498
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,1,right cerebellum cortex,right cerebellum cortex,True,False,0.6287,0.008621
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebral white matter,left cerebral white matter,True,False,0.4561,0.02953
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebral white matter,left cerebellum cortex,False,False,0.3863,0.005242
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebral white matter,right cerebral white matter,False,True,0.4461,0.029482
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebral white matter,right cerebellum cortex,False,False,0.209,0.002866
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebellum cortex,left cerebral white matter,False,False,0.4896,0.031697
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebellum cortex,left cerebellum cortex,True,False,0.6279,0.008521
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebellum cortex,right cerebral white matter,False,False,0.2092,0.013826
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,left cerebellum cortex,right cerebellum cortex,False,True,0.3472,0.00476
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebral white matter,left cerebral white matter,False,True,0.323,0.02091
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebral white matter,left cerebellum cortex,False,False,0.2893,0.003926
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebral white matter,right cerebral white matter,True,False,0.9716,0.064207
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebral white matter,right cerebellum cortex,False,False,0.3235,0.004436
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebellum cortex,left cerebral white matter,False,False,0.3487,0.022574
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebellum cortex,left cerebellum cortex,False,True,0.4266,0.00579
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebellum cortex,right cerebral white matter,False,False,0.3651,0.024129
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,2,right cerebellum cortex,right cerebellum cortex,True,False,0.5752,0.007887
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebral white matter,left cerebral white matter,True,False,0.4423,0.028636
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebral white matter,left cerebellum cortex,False,False,0.3271,0.004439
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebral white matter,right cerebral white matter,False,True,1.9145,0.126517
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebral white matter,right cerebellum cortex,False,False,0.2185,0.002996
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebellum cortex,left cerebral white matter,False,False,0.566,0.036646
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebellum cortex,left cerebellum cortex,True,False,0.7203,0.009774
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebellum cortex,right cerebral white matter,False,False,0.2926,0.019337
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,left cerebellum cortex,right cerebellum cortex,False,True,0.454,0.006226
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebral white matter,left cerebral white matter,False,True,0.3533,0.022877
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebral white matter,left cerebellum cortex,False,False,0.304,0.004126
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebral white matter,right cerebral white matter,True,False,1.8737,0.123825
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebral white matter,right cerebellum cortex,False,False,0.3026,0.004149
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebellum cortex,left cerebral white matter,False,False,0.4285,0.027745
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebellum cortex,left cerebellum cortex,False,True,0.5281,0.007167
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebellum cortex,right cerebral white matter,False,False,0.43,0.02842
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,3,right cerebellum cortex,right cerebellum cortex,True,False,0.7041,0.009654
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebral white matter,left cerebral white matter,True,False,0.5719,0.03703
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebral white matter,left cerebellum cortex,False,False,0.3889,0.005277
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebral white matter,right cerebral white matter,False,True,1.8585,0.122818
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebral white matter,right cerebellum cortex,False,False,0.2848,0.003905
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebellum cortex,left cerebral white matter,False,False,0.5767,0.037336
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebellum cortex,left cerebellum cortex,True,False,0.8173,0.011091
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebellum cortex,right cerebral white matter,False,False,0.3357,0.022186
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,left cerebellum cortex,right cerebellum cortex,False,True,0.5876,0.008058
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebral white matter,left cerebral white matter,False,True,0.4015,0.025997
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebral white matter,left cerebellum cortex,False,False,0.3513,0.004768
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebral white matter,right cerebral white matter,True,False,2.3691,0.156565
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebral white matter,right cerebellum cortex,False,False,0.347,0.004758
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebellum cortex,left cerebral white matter,False,False,0.4792,0.031027
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebellum cortex,left cerebellum cortex,False,True,0.6462,0.008769
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebellum cortex,right cerebral white matter,False,False,0.4568,0.030189
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,4,right cerebellum cortex,right cerebellum cortex,True,False,0.799,0.010956
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebral white matter,left cerebral white matter,True,False,0.7542,0.048832
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebral white matter,left cerebellum cortex,False,False,0.6658,0.009035
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebral white matter,right cerebral white matter,False,True,0.6387,0.042206
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebral white matter,right cerebellum cortex,False,False,0.4525,0.006205
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebellum cortex,left cerebral white matter,False,False,0.7176,0.046462
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebellum cortex,left cerebellum cortex,True,False,1.0272,0.013939
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebellum cortex,right cerebral white matter,False,False,0.4669,0.030857
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,left cerebellum cortex,right cerebellum cortex,False,True,0.7433,0.010192
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebral white matter,left cerebral white matter,False,True,0.5735,0.03713
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebral white matter,left cerebellum cortex,False,False,0.5429,0.007368
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebral white matter,right cerebral white matter,True,False,0.9318,0.061577
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebral white matter,right cerebellum cortex,False,False,0.5836,0.008002
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebellum cortex,left cerebral white matter,False,False,0.6185,0.040043
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebellum cortex,left cerebellum cortex,False,True,0.8206,0.011136
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebellum cortex,right cerebral white matter,False,False,0.7564,0.049987
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,5,right cerebellum cortex,right cerebellum cortex,True,False,1.1362,0.015579
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebral white matter,left cerebral white matter,True,False,0.6444,0.04172
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebral white matter,left cerebellum cortex,False,False,0.6142,0.008335
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebral white matter,right cerebral white matter,False,True,0.5702,0.03768
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebral white matter,right cerebellum cortex,False,False,0.5029,0.006896
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebellum cortex,left cerebral white matter,False,False,0.6582,0.042618
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebellum cortex,left cerebellum cortex,True,False,0.9703,0.013166
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebellum cortex,right cerebral white matter,False,False,0.491,0.032446
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,left cerebellum cortex,right cerebellum cortex,False,True,0.842,0.011545
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebral white matter,left cerebral white matter,False,True,0.5715,0.037002
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebral white matter,left cerebellum cortex,False,False,0.5433,0.007373
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebral white matter,right cerebral white matter,True,False,0.6299,0.041624
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebral white matter,right cerebellum cortex,False,False,0.5285,0.007247
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebellum cortex,left cerebral white matter,False,False,0.6453,0.041777
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebellum cortex,left cerebellum cortex,False,True,0.8022,0.010886
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebellum cortex,right cerebral white matter,False,False,0.6678,0.044129
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,6,right cerebellum cortex,right cerebellum cortex,True,False,0.995,0.013643
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebral white matter,left cerebral white matter,True,False,0.848,0.04986
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebral white matter,left cerebellum cortex,False,False,0.7909,0.012962
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebral white matter,right cerebral white matter,False,True,0.334,0.019734
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebral white matter,right cerebellum cortex,False,False,0.2732,0.004485
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebellum cortex,left cerebral white matter,False,False,0.8959,0.052677
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebellum cortex,left cerebellum cortex,True,False,0.8254,0.013527
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebellum cortex,right cerebral white matter,False,False,0.2879,0.017008
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,left cerebellum cortex,right cerebellum cortex,False,True,0.3694,0.006064
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebral white matter,left cerebral white matter,False,True,0.2839,0.016693
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebral white matter,left cerebellum cortex,False,False,0.3657,0.005993
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebral white matter,right cerebral white matter,True,False,0.8346,0.049307
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebral white matter,right cerebellum cortex,False,False,0.5288,0.008681
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebellum cortex,left cerebral white matter,False,False,0.341,0.020049
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebellum cortex,left cerebellum cortex,False,True,0.433,0.007096
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebellum cortex,right cerebral white matter,False,False,0.8504,0.050239
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,1,right cerebellum cortex,right cerebellum cortex,True,False,0.679,0.011146
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebral white matter,left cerebral white matter,True,False,0.4376,0.025733
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebral white matter,left cerebellum cortex,False,False,0.4995,0.008186
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebral white matter,right cerebral white matter,False,True,0.491,0.029006
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebral white matter,right cerebellum cortex,False,False,0.2863,0.0047
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebellum cortex,left cerebral white matter,False,False,0.4638,0.02727
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebellum cortex,left cerebellum cortex,True,False,0.7563,0.012395
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebellum cortex,right cerebral white matter,False,False,0.2125,0.012553
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,left cerebellum cortex,right cerebellum cortex,False,True,0.4268,0.007007
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebral white matter,left cerebral white matter,False,True,0.3142,0.018476
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebral white matter,left cerebellum cortex,False,False,0.3893,0.006381
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebral white matter,right cerebral white matter,True,False,1.0469,0.061852
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebral white matter,right cerebellum cortex,False,False,0.4157,0.006823
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebellum cortex,left cerebral white matter,False,False,0.3308,0.019449
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebellum cortex,left cerebellum cortex,False,True,0.5271,0.008639
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebellum cortex,right cerebral white matter,False,False,0.3729,0.022031
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,2,right cerebellum cortex,right cerebellum cortex,True,False,0.6575,0.010794
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebral white matter,left cerebral white matter,True,False,0.4387,0.025796
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebral white matter,left cerebellum cortex,False,False,0.4207,0.006894
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebral white matter,right cerebral white matter,False,True,2.1386,0.126344
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebral white matter,right cerebellum cortex,False,False,0.2852,0.004682
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebellum cortex,left cerebral white matter,False,False,0.5431,0.031934
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebellum cortex,left cerebellum cortex,True,False,0.827,0.013554
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebellum cortex,right cerebral white matter,False,False,0.3026,0.017878
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,left cerebellum cortex,right cerebellum cortex,False,True,0.5225,0.008578
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebral white matter,left cerebral white matter,False,True,0.348,0.02046
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebral white matter,left cerebellum cortex,False,False,0.401,0.006572
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebral white matter,right cerebral white matter,True,False,1.9972,0.11799
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebral white matter,right cerebellum cortex,False,False,0.3916,0.006429
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebellum cortex,left cerebral white matter,False,False,0.4124,0.02425
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebellum cortex,left cerebellum cortex,False,True,0.6216,0.010187
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebellum cortex,right cerebral white matter,False,False,0.437,0.025817
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,3,right cerebellum cortex,right cerebellum cortex,True,False,0.7754,0.012729
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebral white matter,left cerebral white matter,True,False,0.587,0.034517
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebral white matter,left cerebellum cortex,False,False,0.4811,0.007885
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebral white matter,right cerebral white matter,False,True,2.0563,0.121485
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebral white matter,right cerebellum cortex,False,False,0.3544,0.005818
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebellum cortex,left cerebral white matter,False,False,0.5597,0.032908
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebellum cortex,left cerebellum cortex,True,False,0.8698,0.014255
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebellum cortex,right cerebral white matter,False,False,0.3515,0.020767
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,left cerebellum cortex,right cerebellum cortex,False,True,0.6185,0.010154
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebral white matter,left cerebral white matter,False,True,0.4007,0.023562
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebral white matter,left cerebellum cortex,False,False,0.4443,0.007281
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebral white matter,right cerebral white matter,True,False,2.5844,0.152685
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebral white matter,right cerebellum cortex,False,False,0.4272,0.007012
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebellum cortex,left cerebral white matter,False,False,0.4658,0.027388
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebellum cortex,left cerebellum cortex,False,True,0.7083,0.011609
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebellum cortex,right cerebral white matter,False,False,0.4846,0.028627
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,4,right cerebellum cortex,right cerebellum cortex,True,False,0.8324,0.013665
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebral white matter,left cerebral white matter,True,False,0.7366,0.043312
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebral white matter,left cerebellum cortex,False,False,0.712,0.01167
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebral white matter,right cerebral white matter,False,True,0.6583,0.038889
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebral white matter,right cerebellum cortex,False,False,0.5172,0.008491
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebellum cortex,left cerebral white matter,False,False,0.7229,0.042504
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebellum cortex,left cerebellum cortex,True,False,1.0069,0.016501
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebellum cortex,right cerebral white matter,False,False,0.5089,0.030068
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,left cerebellum cortex,right cerebellum cortex,False,True,0.7108,0.011668
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebral white matter,left cerebral white matter,False,True,0.5668,0.033324
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebral white matter,left cerebellum cortex,False,False,0.6158,0.010092
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebral white matter,right cerebral white matter,True,False,0.9311,0.05501
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebral white matter,right cerebellum cortex,False,False,0.6468,0.010618
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebellum cortex,left cerebral white matter,False,False,0.6356,0.037369
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebellum cortex,left cerebellum cortex,False,True,0.7974,0.013068
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebellum cortex,right cerebral white matter,False,False,0.866,0.05116
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,5,right cerebellum cortex,right cerebellum cortex,True,False,1.0559,0.017332
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebral white matter,left cerebral white matter,True,False,0.6262,0.036818
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebral white matter,left cerebellum cortex,False,False,0.6758,0.011075
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebral white matter,right cerebral white matter,False,True,0.5601,0.033088
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebral white matter,right cerebellum cortex,False,False,0.5659,0.009289
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebellum cortex,left cerebral white matter,False,False,0.6501,0.038225
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebellum cortex,left cerebellum cortex,True,False,0.9037,0.014811
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebellum cortex,right cerebral white matter,False,False,0.5376,0.031759
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,left cerebellum cortex,right cerebellum cortex,False,True,0.739,0.012131
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebral white matter,left cerebral white matter,False,True,0.5562,0.032701
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebral white matter,left cerebellum cortex,False,False,0.6189,0.010143
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebral white matter,right cerebral white matter,True,False,0.616,0.036395
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebral white matter,right cerebellum cortex,False,False,0.6015,0.009874
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebellum cortex,left cerebral white matter,False,False,0.6804,0.040005
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebellum cortex,left cerebellum cortex,False,True,0.7892,0.012934
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebellum cortex,right cerebral white matter,False,False,0.8055,0.047587
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,6,right cerebellum cortex,right cerebellum cortex,True,False,0.946,0.01553
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebral white matter,left cerebral white matter,True,False,0.8707,0.052411
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebral white matter,left cerebellum cortex,False,False,0.7604,0.011995
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebral white matter,right cerebral white matter,False,True,0.3207,0.019292
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebral white matter,right cerebellum cortex,False,False,0.2576,0.004108
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebellum cortex,left cerebral white matter,False,False,0.8928,0.053741
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebellum cortex,left cerebellum cortex,True,False,0.8111,0.012796
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebellum cortex,right cerebral white matter,False,False,0.2812,0.016918
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,left cerebellum cortex,right cerebellum cortex,False,True,0.3475,0.005541
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebral white matter,left cerebral white matter,False,True,0.2871,0.017284
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebral white matter,left cerebellum cortex,False,False,0.3308,0.005218
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebral white matter,right cerebral white matter,True,False,0.8381,0.050422
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebral white matter,right cerebellum cortex,False,False,0.5046,0.008048
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebellum cortex,left cerebral white matter,False,False,0.3454,0.020788
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebellum cortex,left cerebellum cortex,False,True,0.3916,0.006177
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebellum cortex,right cerebral white matter,False,False,0.8518,0.051246
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,1,right cerebellum cortex,right cerebellum cortex,True,False,0.6372,0.010162
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebral white matter,left cerebral white matter,True,False,0.442,0.026607
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebral white matter,left cerebellum cortex,False,False,0.468,0.007384
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebral white matter,right cerebral white matter,False,True,0.4675,0.028126
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebral white matter,right cerebellum cortex,False,False,0.2692,0.004293
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebellum cortex,left cerebral white matter,False,False,0.4846,0.029167
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebellum cortex,left cerebellum cortex,True,False,0.7033,0.011095
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebellum cortex,right cerebral white matter,False,False,0.2097,0.012614
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,left cerebellum cortex,right cerebellum cortex,False,True,0.3966,0.006325
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebral white matter,left cerebral white matter,False,True,0.312,0.018779
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebral white matter,left cerebellum cortex,False,False,0.3505,0.005529
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebral white matter,right cerebral white matter,True,False,1.0774,0.064817
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebral white matter,right cerebellum cortex,False,False,0.3886,0.006197
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebellum cortex,left cerebral white matter,False,False,0.3463,0.020846
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebellum cortex,left cerebellum cortex,False,True,0.4793,0.007561
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebellum cortex,right cerebral white matter,False,False,0.3728,0.022426
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,2,right cerebellum cortex,right cerebellum cortex,True,False,0.5964,0.009511
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebral white matter,left cerebral white matter,True,False,0.4175,0.025132
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebral white matter,left cerebellum cortex,False,False,0.3884,0.006127
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebral white matter,right cerebral white matter,False,True,2.1887,0.131674
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebral white matter,right cerebellum cortex,False,False,0.2702,0.004309
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebellum cortex,left cerebral white matter,False,False,0.5582,0.033602
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebellum cortex,left cerebellum cortex,True,False,0.7623,0.012026
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebellum cortex,right cerebral white matter,False,False,0.2918,0.017554
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,left cerebellum cortex,right cerebellum cortex,False,True,0.4885,0.007791
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebral white matter,left cerebral white matter,False,True,0.3431,0.020652
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebral white matter,left cerebellum cortex,False,False,0.3672,0.005793
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebral white matter,right cerebral white matter,True,False,2.0135,0.121136
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebral white matter,right cerebellum cortex,False,False,0.3687,0.005881
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebellum cortex,left cerebral white matter,False,False,0.4216,0.02538
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebellum cortex,left cerebellum cortex,False,True,0.57,0.008993
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebellum cortex,right cerebral white matter,False,False,0.4161,0.025032
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,3,right cerebellum cortex,right cerebellum cortex,True,False,0.6935,0.01106
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebral white matter,left cerebral white matter,True,False,0.559,0.033646
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebral white matter,left cerebellum cortex,False,False,0.4564,0.0072
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebral white matter,right cerebral white matter,False,True,2.0416,0.122826
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebral white matter,right cerebellum cortex,False,False,0.3447,0.005498
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebellum cortex,left cerebral white matter,False,False,0.5708,0.034357
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebellum cortex,left cerebellum cortex,True,False,0.8385,0.013228
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebellum cortex,right cerebral white matter,False,False,0.3377,0.020319
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,left cerebellum cortex,right cerebellum cortex,False,True,0.6111,0.009746
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebral white matter,left cerebral white matter,False,True,0.3911,0.023542
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebral white matter,left cerebellum cortex,False,False,0.4123,0.006504
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebral white matter,right cerebral white matter,True,False,2.5886,0.155737
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebral white matter,right cerebellum cortex,False,False,0.4108,0.006552
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebellum cortex,left cerebral white matter,False,False,0.4706,0.028327
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebellum cortex,left cerebellum cortex,False,True,0.6723,0.010606
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebellum cortex,right cerebral white matter,False,False,0.4532,0.027265
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,4,right cerebellum cortex,right cerebellum cortex,True,False,0.7927,0.012642
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebral white matter,left cerebral white matter,True,False,0.7779,0.046822
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebral white matter,left cerebellum cortex,False,False,0.7563,0.011932
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebral white matter,right cerebral white matter,False,True,0.6403,0.038524
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebral white matter,right cerebellum cortex,False,False,0.524,0.008357
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebellum cortex,left cerebral white matter,False,False,0.7252,0.043654
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebellum cortex,left cerebellum cortex,True,False,1.0581,0.016692
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebellum cortex,right cerebral white matter,False,False,0.4749,0.028572
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,left cerebellum cortex,right cerebellum cortex,False,True,0.7432,0.011852
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebral white matter,left cerebral white matter,False,True,0.5738,0.034538
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebral white matter,left cerebellum cortex,False,False,0.6057,0.009555
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebral white matter,right cerebral white matter,True,False,0.9214,0.05543
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebral white matter,right cerebellum cortex,False,False,0.6397,0.010202
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebellum cortex,left cerebral white matter,False,False,0.6229,0.037494
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebellum cortex,left cerebellum cortex,False,True,0.8425,0.013292
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebellum cortex,right cerebral white matter,False,False,0.7912,0.047599
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,5,right cerebellum cortex,right cerebellum cortex,True,False,1.0767,0.017171
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebral white matter,left cerebral white matter,True,False,0.648,0.039002
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebral white matter,left cerebellum cortex,False,False,0.6775,0.010689
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebral white matter,right cerebral white matter,False,True,0.5618,0.033796
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebral white matter,right cerebellum cortex,False,False,0.5627,0.008974
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebellum cortex,left cerebral white matter,False,False,0.6653,0.040048
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebellum cortex,left cerebellum cortex,True,False,0.9445,0.0149
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebellum cortex,right cerebral white matter,False,False,0.4992,0.030034
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,left cerebellum cortex,right cerebellum cortex,False,True,0.7677,0.012243
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebral white matter,left cerebral white matter,False,True,0.5699,0.034304
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebral white matter,left cerebellum cortex,False,False,0.5995,0.009458
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebral white matter,right cerebral white matter,True,False,0.6082,0.036593
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebral white matter,right cerebellum cortex,False,False,0.5811,0.009267
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebellum cortex,left cerebral white matter,False,False,0.6608,0.039772
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebellum cortex,left cerebellum cortex,False,True,0.8088,0.01276
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebellum cortex,right cerebral white matter,False,False,0.7003,0.042132
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,6,right cerebellum cortex,right cerebellum cortex,True,False,0.9293,0.01482
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebral white matter,left cerebral white matter,True,False,0.875,0.053355
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebral white matter,left cerebellum cortex,False,False,0.7793,0.013282
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebral white matter,right cerebral white matter,False,True,0.3436,0.021297
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebral white matter,right cerebellum cortex,False,False,0.2506,0.004315
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebellum cortex,left cerebral white matter,False,False,0.9395,0.057291
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebellum cortex,left cerebellum cortex,True,False,0.7917,0.013491
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebellum cortex,right cerebral white matter,False,False,0.2857,0.017706
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,left cerebellum cortex,right cerebellum cortex,False,True,0.3495,0.006019
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebral white matter,left cerebral white matter,False,True,0.2942,0.017937
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebral white matter,left cerebellum cortex,False,False,0.3467,0.005908
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebral white matter,right cerebral white matter,True,False,0.8691,0.053864
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebral white matter,right cerebellum cortex,False,False,0.5289,0.00911
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebellum cortex,left cerebral white matter,False,False,0.3556,0.021683
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebellum cortex,left cerebellum cortex,False,True,0.4191,0.007142
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebellum cortex,right cerebral white matter,False,False,0.8679,0.053789
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,1,right cerebellum cortex,right cerebellum cortex,True,False,0.6805,0.01172
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebral white matter,left cerebral white matter,True,False,0.4518,0.02755
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebral white matter,left cerebellum cortex,False,False,0.4819,0.008212
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebral white matter,right cerebral white matter,False,True,0.5009,0.031045
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebral white matter,right cerebellum cortex,False,False,0.2677,0.004611
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebellum cortex,left cerebral white matter,False,False,0.483,0.029451
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebellum cortex,left cerebellum cortex,True,False,0.7359,0.012541
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebellum cortex,right cerebral white matter,False,False,0.2155,0.013355
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,left cerebellum cortex,right cerebellum cortex,False,True,0.4149,0.007145
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebral white matter,left cerebral white matter,False,True,0.3222,0.01965
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebral white matter,left cerebellum cortex,False,False,0.3684,0.006278
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebral white matter,right cerebral white matter,True,False,1.0859,0.0673
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebral white matter,right cerebellum cortex,False,False,0.4007,0.006901
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebellum cortex,left cerebral white matter,False,False,0.3443,0.020995
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebellum cortex,left cerebellum cortex,False,True,0.5137,0.008755
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebellum cortex,right cerebral white matter,False,False,0.3791,0.023498
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,2,right cerebellum cortex,right cerebellum cortex,True,False,0.6694,0.011529
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebral white matter,left cerebral white matter,True,False,0.4511,0.027507
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebral white matter,left cerebellum cortex,False,False,0.4049,0.006901
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebral white matter,right cerebral white matter,False,True,2.115,0.131075
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebral white matter,right cerebellum cortex,False,False,0.2678,0.004613
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebellum cortex,left cerebral white matter,False,False,0.5649,0.034451
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebellum cortex,left cerebellum cortex,True,False,0.8211,0.013993
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebellum cortex,right cerebral white matter,False,False,0.3042,0.018855
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,left cerebellum cortex,right cerebellum cortex,False,True,0.5231,0.00901
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebral white matter,left cerebral white matter,False,True,0.3549,0.021641
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebral white matter,left cerebellum cortex,False,False,0.378,0.006443
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebral white matter,right cerebral white matter,True,False,2.0078,0.124432
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebral white matter,right cerebellum cortex,False,False,0.3693,0.006361
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebellum cortex,left cerebral white matter,False,False,0.4247,0.025897
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebellum cortex,left cerebellum cortex,False,True,0.6105,0.010404
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebellum cortex,right cerebral white matter,False,False,0.4491,0.027833
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,3,right cerebellum cortex,right cerebellum cortex,True,False,0.8046,0.013857
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebral white matter,left cerebral white matter,True,False,0.5891,0.035927
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebral white matter,left cerebellum cortex,False,False,0.4643,0.007913
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebral white matter,right cerebral white matter,False,True,2.0351,0.126128
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebral white matter,right cerebellum cortex,False,False,0.3336,0.005746
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebellum cortex,left cerebral white matter,False,False,0.5762,0.035138
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebellum cortex,left cerebellum cortex,True,False,0.8953,0.015259
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebellum cortex,right cerebral white matter,False,False,0.3598,0.022301
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,left cerebellum cortex,right cerebellum cortex,False,True,0.6304,0.010858
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebral white matter,left cerebral white matter,False,True,0.4032,0.024588
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebral white matter,left cerebellum cortex,False,False,0.4175,0.007116
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebral white matter,right cerebral white matter,True,False,2.5918,0.160629
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebral white matter,right cerebellum cortex,False,False,0.4001,0.006891
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebellum cortex,left cerebral white matter,False,False,0.4768,0.029077
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebellum cortex,left cerebellum cortex,False,True,0.7038,0.011995
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebellum cortex,right cerebral white matter,False,False,0.4982,0.030878
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,4,right cerebellum cortex,right cerebellum cortex,True,False,0.8635,0.014872
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebral white matter,left cerebral white matter,True,False,0.7493,0.045693
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebral white matter,left cerebellum cortex,False,False,0.7109,0.012116
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebral white matter,right cerebral white matter,False,True,0.6483,0.040175
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebral white matter,right cerebellum cortex,False,False,0.4935,0.0085
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebellum cortex,left cerebral white matter,False,False,0.7318,0.044626
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebellum cortex,left cerebellum cortex,True,False,1.0395,0.017716
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebellum cortex,right cerebral white matter,False,False,0.5207,0.032274
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,left cerebellum cortex,right cerebellum cortex,False,True,0.7311,0.012592
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebral white matter,left cerebral white matter,False,True,0.5697,0.03474
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebral white matter,left cerebellum cortex,False,False,0.5908,0.010069
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebral white matter,right cerebral white matter,True,False,0.9359,0.058002
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebral white matter,right cerebellum cortex,False,False,0.6251,0.010767
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebellum cortex,left cerebral white matter,False,False,0.6328,0.038591
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebellum cortex,left cerebellum cortex,False,True,0.8085,0.013778
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebellum cortex,right cerebral white matter,False,False,0.9036,0.056
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,5,right cerebellum cortex,right cerebellum cortex,True,False,1.1211,0.01931
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebral white matter,left cerebral white matter,True,False,0.6398,0.039013
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebral white matter,left cerebellum cortex,False,False,0.662,0.011282
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebral white matter,right cerebral white matter,False,True,0.5649,0.035013
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebral white matter,right cerebellum cortex,False,False,0.5442,0.009373
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebellum cortex,left cerebral white matter,False,False,0.6685,0.040763
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebellum cortex,left cerebellum cortex,True,False,0.9384,0.015993
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebellum cortex,right cerebral white matter,False,False,0.5502,0.034101
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,left cerebellum cortex,right cerebellum cortex,False,True,0.766,0.013194
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebral white matter,left cerebral white matter,False,True,0.5616,0.034246
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebral white matter,left cerebellum cortex,False,False,0.5978,0.010188
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebral white matter,right cerebral white matter,True,False,0.6233,0.038629
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebral white matter,right cerebellum cortex,False,False,0.579,0.009973
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebellum cortex,left cerebral white matter,False,False,0.6904,0.042102
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebellum cortex,left cerebellum cortex,False,True,0.8126,0.013848
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebellum cortex,right cerebral white matter,False,False,0.8355,0.05178
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,6,right cerebellum cortex,right cerebellum cortex,True,False,1.0035,0.017284

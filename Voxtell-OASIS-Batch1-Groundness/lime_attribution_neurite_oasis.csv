@@ -1,0 +1,101 @@
+dataset,person,subject_id,organ,role,word,prompt_text,lime_weight,num_samples
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebral white matter,position,left,Segment the left cerebral white matter in this image.,0.000888,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebral white matter,organ,cerebral white matter,Segment the left cerebral white matter in this image.,0.002714,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebral cortex,position,left,Segment the left cerebral cortex in this image.,6.8e-05,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebral cortex,organ,cerebral cortex,Segment the left cerebral cortex in this image.,7.3e-05,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left lateral ventricle,position,left,Segment the left lateral ventricle in this image.,-0.000674,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left lateral ventricle,organ,lateral ventricle,Segment the left lateral ventricle in this image.,-6e-06,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebellum cortex,position,left,Segment the left cerebellum cortex in this image.,0.001107,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left cerebellum cortex,organ,cerebellum cortex,Segment the left cerebellum cortex in this image.,0.002572,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left choroid plexus,position,left,Segment the left choroid plexus in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,left choroid plexus,organ,choroid plexus,Segment the left choroid plexus in this image.,-5e-06,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right cerebral white matter,position,right,Segment the right cerebral white matter in this image.,0.000847,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right cerebral white matter,organ,cerebral white matter,Segment the right cerebral white matter in this image.,0.002726,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right cerebral cortex,position,right,Segment the right cerebral cortex in this image.,4.7e-05,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right cerebral cortex,organ,cerebral cortex,Segment the right cerebral cortex in this image.,7e-06,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right lateral ventricle,position,right,Segment the right lateral ventricle in this image.,-1e-06,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right lateral ventricle,organ,lateral ventricle,Segment the right lateral ventricle in this image.,-8e-06,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right cerebellum cortex,position,right,Segment the right cerebellum cortex in this image.,0.000625,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right cerebellum cortex,organ,cerebellum cortex,Segment the right cerebellum cortex in this image.,0.002404,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right choroid plexus,position,right,Segment the right choroid plexus in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0014_MR1,right choroid plexus,organ,choroid plexus,Segment the right choroid plexus in this image.,-4e-06,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,position,left,Segment the left cerebral white matter in this image.,0.000875,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,organ,cerebral white matter,Segment the left cerebral white matter in this image.,0.002714,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,position,left,Segment the left cerebral cortex in this image.,5.7e-05,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,organ,cerebral cortex,Segment the left cerebral cortex in this image.,5e-05,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,position,left,Segment the left lateral ventricle in this image.,-7.6e-05,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,organ,lateral ventricle,Segment the left lateral ventricle in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,position,left,Segment the left cerebellum cortex in this image.,0.001303,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,organ,cerebellum cortex,Segment the left cerebellum cortex in this image.,0.002611,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left choroid plexus,position,left,Segment the left choroid plexus in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left choroid plexus,organ,choroid plexus,Segment the left choroid plexus in this image.,-2.3e-05,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,position,right,Segment the right cerebral white matter in this image.,0.000835,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,organ,cerebral white matter,Segment the right cerebral white matter in this image.,0.002705,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,position,right,Segment the right cerebral cortex in this image.,6.3e-05,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,organ,cerebral cortex,Segment the right cerebral cortex in this image.,1.4e-05,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,position,right,Segment the right lateral ventricle in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,organ,lateral ventricle,Segment the right lateral ventricle in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,position,right,Segment the right cerebellum cortex in this image.,0.000535,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,organ,cerebellum cortex,Segment the right cerebellum cortex in this image.,0.002353,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right choroid plexus,position,right,Segment the right choroid plexus in this image.,0.0,10
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right choroid plexus,organ,choroid plexus,Segment the right choroid plexus in this image.,-1e-06,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter,position,left,Segment the left cerebral white matter in this image.,0.000814,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter,organ,cerebral white matter,Segment the left cerebral white matter in this image.,0.002621,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral cortex,position,left,Segment the left cerebral cortex in this image.,7.6e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral cortex,organ,cerebral cortex,Segment the left cerebral cortex in this image.,6.7e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left lateral ventricle,position,left,Segment the left lateral ventricle in this image.,-7.5e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left lateral ventricle,organ,lateral ventricle,Segment the left lateral ventricle in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex,position,left,Segment the left cerebellum cortex in this image.,0.001174,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex,organ,cerebellum cortex,Segment the left cerebellum cortex in this image.,0.002516,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left choroid plexus,position,left,Segment the left choroid plexus in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left choroid plexus,organ,choroid plexus,Segment the left choroid plexus in this image.,-1e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral white matter,position,right,Segment the right cerebral white matter in this image.,0.000838,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral white matter,organ,cerebral white matter,Segment the right cerebral white matter in this image.,0.002408,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral cortex,position,right,Segment the right cerebral cortex in this image.,9e-06,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral cortex,organ,cerebral cortex,Segment the right cerebral cortex in this image.,-0.000194,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right lateral ventricle,position,right,Segment the right lateral ventricle in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right lateral ventricle,organ,lateral ventricle,Segment the right lateral ventricle in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum cortex,position,right,Segment the right cerebellum cortex in this image.,0.000634,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum cortex,organ,cerebellum cortex,Segment the right cerebellum cortex in this image.,0.002225,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right choroid plexus,position,right,Segment the right choroid plexus in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right choroid plexus,organ,choroid plexus,Segment the right choroid plexus in this image.,-5e-06,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter,position,left,Segment the left cerebral white matter in this image.,0.000851,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter,organ,cerebral white matter,Segment the left cerebral white matter in this image.,0.002711,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral cortex,position,left,Segment the left cerebral cortex in this image.,4.3e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral cortex,organ,cerebral cortex,Segment the left cerebral cortex in this image.,3.7e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left lateral ventricle,position,left,Segment the left lateral ventricle in this image.,-7.2e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left lateral ventricle,organ,lateral ventricle,Segment the left lateral ventricle in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex,position,left,Segment the left cerebellum cortex in this image.,0.001086,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex,organ,cerebellum cortex,Segment the left cerebellum cortex in this image.,0.00258,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left choroid plexus,position,left,Segment the left choroid plexus in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left choroid plexus,organ,choroid plexus,Segment the left choroid plexus in this image.,-2e-06,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral white matter,position,right,Segment the right cerebral white matter in this image.,0.000847,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral white matter,organ,cerebral white matter,Segment the right cerebral white matter in this image.,0.002721,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral cortex,position,right,Segment the right cerebral cortex in this image.,4e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral cortex,organ,cerebral cortex,Segment the right cerebral cortex in this image.,-2.5e-05,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right lateral ventricle,position,right,Segment the right lateral ventricle in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right lateral ventricle,organ,lateral ventricle,Segment the right lateral ventricle in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebellum cortex,position,right,Segment the right cerebellum cortex in this image.,0.000564,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebellum cortex,organ,cerebellum cortex,Segment the right cerebellum cortex in this image.,0.002363,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right choroid plexus,position,right,Segment the right choroid plexus in this image.,0.0,10
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right choroid plexus,organ,choroid plexus,Segment the right choroid plexus in this image.,0.0,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter,position,left,Segment the left cerebral white matter in this image.,0.00081,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter,organ,cerebral white matter,Segment the left cerebral white matter in this image.,0.002646,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral cortex,position,left,Segment the left cerebral cortex in this image.,7.4e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral cortex,organ,cerebral cortex,Segment the left cerebral cortex in this image.,7e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left lateral ventricle,position,left,Segment the left lateral ventricle in this image.,-9.6e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left lateral ventricle,organ,lateral ventricle,Segment the left lateral ventricle in this image.,1.6e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex,position,left,Segment the left cerebellum cortex in this image.,0.001146,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex,organ,cerebellum cortex,Segment the left cerebellum cortex in this image.,0.002601,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left choroid plexus,position,left,Segment the left choroid plexus in this image.,0.0,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left choroid plexus,organ,choroid plexus,Segment the left choroid plexus in this image.,-1e-06,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral white matter,position,right,Segment the right cerebral white matter in this image.,0.000835,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral white matter,organ,cerebral white matter,Segment the right cerebral white matter in this image.,0.002554,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral cortex,position,right,Segment the right cerebral cortex in this image.,3.4e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral cortex,organ,cerebral cortex,Segment the right cerebral cortex in this image.,-2.9e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right lateral ventricle,position,right,Segment the right lateral ventricle in this image.,1.6e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right lateral ventricle,organ,lateral ventricle,Segment the right lateral ventricle in this image.,1.6e-05,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebellum cortex,position,right,Segment the right cerebellum cortex in this image.,0.0005,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebellum cortex,organ,cerebellum cortex,Segment the right cerebellum cortex in this image.,0.002173,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right choroid plexus,position,right,Segment the right choroid plexus in this image.,0.0,10
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right choroid plexus,organ,choroid plexus,Segment the right choroid plexus in this image.,0.0,10

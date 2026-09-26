@@ -1,0 +1,81 @@
+dataset,person,subject_id,organ,role,word,prompt_text,lime_weight,num_samples
+amos22_mri,nipu,amos_0508,right kidney,position,right,Segment the right kidney in this image.,0.000957,10
+amos22_mri,nipu,amos_0508,right kidney,organ,kidney,Segment the right kidney in this image.,0.00281,10
+amos22_mri,nipu,amos_0508,left kidney,position,left,Segment the left kidney in this image.,0.000942,10
+amos22_mri,nipu,amos_0508,left kidney,organ,kidney,Segment the left kidney in this image.,0.002821,10
+amos22_mri,nipu,amos_0508,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000608,10
+amos22_mri,nipu,amos_0508,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.001945,10
+amos22_mri,nipu,amos_0508,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000848,10
+amos22_mri,nipu,amos_0508,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.002207,10
+amos22_mri,faria,amos_0530,right kidney,position,right,Segment the right kidney in this image.,0.000975,10
+amos22_mri,faria,amos_0530,right kidney,organ,kidney,Segment the right kidney in this image.,0.002864,10
+amos22_mri,faria,amos_0530,left kidney,position,left,Segment the left kidney in this image.,0.000934,10
+amos22_mri,faria,amos_0530,left kidney,organ,kidney,Segment the left kidney in this image.,0.00281,10
+amos22_mri,faria,amos_0530,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000616,10
+amos22_mri,faria,amos_0530,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.00196,10
+amos22_mri,faria,amos_0530,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000679,10
+amos22_mri,faria,amos_0530,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.001388,10
+amos22_mri,hridoy,amos_0555,right kidney,position,right,Segment the right kidney in this image.,0.000989,10
+amos22_mri,hridoy,amos_0555,right kidney,organ,kidney,Segment the right kidney in this image.,0.002914,10
+amos22_mri,hridoy,amos_0555,left kidney,position,left,Segment the left kidney in this image.,0.000983,10
+amos22_mri,hridoy,amos_0555,left kidney,organ,kidney,Segment the left kidney in this image.,0.002882,10
+amos22_mri,hridoy,amos_0555,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000577,10
+amos22_mri,hridoy,amos_0555,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.001874,10
+amos22_mri,hridoy,amos_0555,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.001035,10
+amos22_mri,hridoy,amos_0555,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.002123,10
+amos22_mri,faria,amos_0544,right kidney,position,right,Segment the right kidney in this image.,0.001064,10
+amos22_mri,faria,amos_0544,right kidney,organ,kidney,Segment the right kidney in this image.,0.002867,10
+amos22_mri,faria,amos_0544,left kidney,position,left,Segment the left kidney in this image.,0.000925,10
+amos22_mri,faria,amos_0544,left kidney,organ,kidney,Segment the left kidney in this image.,0.002874,10
+amos22_mri,faria,amos_0544,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000503,10
+amos22_mri,faria,amos_0544,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.001483,10
+amos22_mri,faria,amos_0544,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000869,10
+amos22_mri,faria,amos_0544,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.0019,10
+amos22_mri,nipu,amos_0553,right kidney,position,right,Segment the right kidney in this image.,0.000932,10
+amos22_mri,nipu,amos_0553,right kidney,organ,kidney,Segment the right kidney in this image.,0.002867,10
+amos22_mri,nipu,amos_0553,left kidney,position,left,Segment the left kidney in this image.,0.00092,10
+amos22_mri,nipu,amos_0553,left kidney,organ,kidney,Segment the left kidney in this image.,0.002867,10
+amos22_mri,nipu,amos_0553,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000498,10
+amos22_mri,nipu,amos_0553,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.002154,10
+amos22_mri,nipu,amos_0553,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.001506,10
+amos22_mri,nipu,amos_0553,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.00202,10
+amos22_mri,hridoy,amos_0558,right kidney,position,right,Segment the right kidney in this image.,0.000948,10
+amos22_mri,hridoy,amos_0558,right kidney,organ,kidney,Segment the right kidney in this image.,0.002843,10
+amos22_mri,hridoy,amos_0558,left kidney,position,left,Segment the left kidney in this image.,0.000851,10
+amos22_mri,hridoy,amos_0558,left kidney,organ,kidney,Segment the left kidney in this image.,0.002827,10
+amos22_mri,hridoy,amos_0558,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000313,10
+amos22_mri,hridoy,amos_0558,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.002167,10
+amos22_mri,hridoy,amos_0558,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000406,10
+amos22_mri,hridoy,amos_0558,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.000903,10
+amos22_mri,nipu,amos_0522,right kidney,position,right,Segment the right kidney in this image.,0.0009,10
+amos22_mri,nipu,amos_0522,right kidney,organ,kidney,Segment the right kidney in this image.,0.002693,10
+amos22_mri,nipu,amos_0522,left kidney,position,left,Segment the left kidney in this image.,0.000913,10
+amos22_mri,nipu,amos_0522,left kidney,organ,kidney,Segment the left kidney in this image.,0.002744,10
+amos22_mri,nipu,amos_0522,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000306,10
+amos22_mri,nipu,amos_0522,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.001365,10
+amos22_mri,nipu,amos_0522,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.0007,10
+amos22_mri,nipu,amos_0522,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.001827,10
+amos22_mri,faria,amos_0532,right kidney,position,right,Segment the right kidney in this image.,0.000948,10
+amos22_mri,faria,amos_0532,right kidney,organ,kidney,Segment the right kidney in this image.,0.002835,10
+amos22_mri,faria,amos_0532,left kidney,position,left,Segment the left kidney in this image.,0.000983,10
+amos22_mri,faria,amos_0532,left kidney,organ,kidney,Segment the left kidney in this image.,0.002803,10
+amos22_mri,faria,amos_0532,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000699,10
+amos22_mri,faria,amos_0532,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.002043,10
+amos22_mri,faria,amos_0532,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000778,10
+amos22_mri,faria,amos_0532,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.002131,10
+amos22_mri,hridoy,amos_0554,right kidney,position,right,Segment the right kidney in this image.,0.000889,10
+amos22_mri,hridoy,amos_0554,right kidney,organ,kidney,Segment the right kidney in this image.,0.002825,10
+amos22_mri,hridoy,amos_0554,left kidney,position,left,Segment the left kidney in this image.,0.000874,10
+amos22_mri,hridoy,amos_0554,left kidney,organ,kidney,Segment the left kidney in this image.,0.002772,10
+amos22_mri,hridoy,amos_0554,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.001163,10
+amos22_mri,hridoy,amos_0554,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.002214,10
+amos22_mri,hridoy,amos_0554,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000414,10
+amos22_mri,hridoy,amos_0554,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.002334,10
+amos22_mri,nipu,amos_0575,right kidney,position,right,Segment the right kidney in this image.,0.00102,10
+amos22_mri,nipu,amos_0575,right kidney,organ,kidney,Segment the right kidney in this image.,0.002879,10
+amos22_mri,nipu,amos_0575,left kidney,position,left,Segment the left kidney in this image.,0.000853,10
+amos22_mri,nipu,amos_0575,left kidney,organ,kidney,Segment the left kidney in this image.,0.002885,10
+amos22_mri,nipu,amos_0575,right adrenal gland,position,right,Segment the right adrenal gland in this image.,0.000989,10
+amos22_mri,nipu,amos_0575,right adrenal gland,organ,adrenal gland,Segment the right adrenal gland in this image.,0.00217,10
+amos22_mri,nipu,amos_0575,left adrenal gland,position,left,Segment the left adrenal gland in this image.,0.000633,10
+amos22_mri,nipu,amos_0575,left adrenal gland,organ,adrenal gland,Segment the left adrenal gland in this image.,0.002587,10

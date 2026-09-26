@@ -1,0 +1,21 @@
+dataset,person,subject_id,organ_pair,iou_matched,iou_mismatched,genuine_grounding
+amos22_mri,nipu,amos_0508,left kidney/right kidney,0.8869,0.0,True
+amos22_mri,nipu,amos_0508,left adrenal gland/right adrenal gland,0.5815,0.0,True
+amos22_mri,faria,amos_0530,left kidney/right kidney,0.8805,0.0,True
+amos22_mri,faria,amos_0530,left adrenal gland/right adrenal gland,0.3024,0.0,True
+amos22_mri,hridoy,amos_0555,left kidney/right kidney,0.9237,0.0,True
+amos22_mri,hridoy,amos_0555,left adrenal gland/right adrenal gland,0.5474,0.0,True
+amos22_mri,faria,amos_0544,left kidney/right kidney,0.9186,0.0,True
+amos22_mri,faria,amos_0544,left adrenal gland/right adrenal gland,0.464,0.0,True
+amos22_mri,nipu,amos_0553,left kidney/right kidney,0.9149,0.0,True
+amos22_mri,nipu,amos_0553,left adrenal gland/right adrenal gland,0.5071,0.0,True
+amos22_mri,hridoy,amos_0558,left kidney/right kidney,0.8906,0.0,True
+amos22_mri,hridoy,amos_0558,left adrenal gland/right adrenal gland,0.1771,0.0,True
+amos22_mri,nipu,amos_0522,left kidney/right kidney,0.8423,0.0,True
+amos22_mri,nipu,amos_0522,left adrenal gland/right adrenal gland,0.4378,0.0,True
+amos22_mri,faria,amos_0532,left kidney/right kidney,0.8762,0.0,True
+amos22_mri,faria,amos_0532,left adrenal gland/right adrenal gland,0.5511,0.0,True
+amos22_mri,hridoy,amos_0554,left kidney/right kidney,0.8585,0.0,True
+amos22_mri,hridoy,amos_0554,left adrenal gland/right adrenal gland,0.6355,0.0,True
+amos22_mri,nipu,amos_0575,left kidney/right kidney,0.9254,0.0,True
+amos22_mri,nipu,amos_0575,left adrenal gland/right adrenal gland,0.7579,0.0,True

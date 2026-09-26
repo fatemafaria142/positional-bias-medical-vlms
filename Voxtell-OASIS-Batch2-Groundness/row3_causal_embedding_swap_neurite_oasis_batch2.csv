@@ -1,0 +1,26 @@
+dataset,person,subject_id,organ_pair,left_prompt_predicts_left_side,right_prompt_predicts_right_side,causally_grounded
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral white matter/right cerebral white matter,True,True,True
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebral cortex/right cerebral cortex,True,True,True
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left lateral ventricle/right lateral ventricle,True,True,True
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left cerebellum cortex/right cerebellum cortex,True,True,True
+neurite_oasis,faria,OASIS_OAS1_0363_MR1,left choroid plexus/right choroid plexus,False,False,False
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral white matter/right cerebral white matter,True,True,True
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebral cortex/right cerebral cortex,True,True,True
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left lateral ventricle/right lateral ventricle,False,True,False
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left cerebellum cortex/right cerebellum cortex,True,True,True
+neurite_oasis,hridoy,OASIS_OAS1_0419_MR1,left choroid plexus/right choroid plexus,False,False,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter/right cerebral white matter,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral cortex/right cerebral cortex,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left lateral ventricle/right lateral ventricle,False,True,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex/right cerebellum cortex,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left choroid plexus/right choroid plexus,False,False,False
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral white matter/right cerebral white matter,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebral cortex/right cerebral cortex,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left lateral ventricle/right lateral ventricle,False,True,False
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left cerebellum cortex/right cerebellum cortex,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0151_MR1,left choroid plexus/right choroid plexus,False,False,False
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral white matter/right cerebral white matter,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebral cortex/right cerebral cortex,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left lateral ventricle/right lateral ventricle,False,False,False
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left cerebellum cortex/right cerebellum cortex,True,True,True
+neurite_oasis,nipu,OASIS_OAS1_0421_MR1,left choroid plexus/right choroid plexus,False,False,False

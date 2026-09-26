@@ -1,0 +1,21 @@
+dataset,person,subject_id,organ_pair,left_prompt_predicts_left_side,right_prompt_predicts_right_side,causally_grounded
+amos22_mri,nipu,amos_0508,left kidney/right kidney,True,True,True
+amos22_mri,nipu,amos_0508,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,faria,amos_0530,left kidney/right kidney,True,True,True
+amos22_mri,faria,amos_0530,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,hridoy,amos_0555,left kidney/right kidney,True,True,True
+amos22_mri,hridoy,amos_0555,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,faria,amos_0544,left kidney/right kidney,True,True,True
+amos22_mri,faria,amos_0544,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,nipu,amos_0553,left kidney/right kidney,True,True,True
+amos22_mri,nipu,amos_0553,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,hridoy,amos_0558,left kidney/right kidney,True,True,True
+amos22_mri,hridoy,amos_0558,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,nipu,amos_0522,left kidney/right kidney,True,True,True
+amos22_mri,nipu,amos_0522,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,faria,amos_0532,left kidney/right kidney,True,True,True
+amos22_mri,faria,amos_0532,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,hridoy,amos_0554,left kidney/right kidney,True,True,True
+amos22_mri,hridoy,amos_0554,left adrenal gland/right adrenal gland,True,True,True
+amos22_mri,nipu,amos_0575,left kidney/right kidney,True,True,True
+amos22_mri,nipu,amos_0575,left adrenal gland/right adrenal gland,True,True,True

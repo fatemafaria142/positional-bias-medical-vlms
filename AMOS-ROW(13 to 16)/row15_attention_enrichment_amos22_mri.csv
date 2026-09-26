@@ -1,0 +1,289 @@
+dataset,person,subject_id,layer,prompt_organ,region_organ,is_matched,is_wrong_side,enrichment,mass_fraction
+amos22_mri,nipu,amos_0508,1,right kidney,right kidney,True,False,3.3409,0.021057
+amos22_mri,nipu,amos_0508,1,right kidney,left kidney,False,True,0.66,0.004167
+amos22_mri,nipu,amos_0508,1,right kidney,right adrenal gland,False,False,1.5503,0.000163
+amos22_mri,nipu,amos_0508,1,right kidney,left adrenal gland,False,False,0.2154,1.9e-05
+amos22_mri,nipu,amos_0508,1,left kidney,right kidney,False,True,0.4369,0.002754
+amos22_mri,nipu,amos_0508,1,left kidney,left kidney,True,False,3.438,0.021705
+amos22_mri,nipu,amos_0508,1,left kidney,right adrenal gland,False,False,0.5301,5.6e-05
+amos22_mri,nipu,amos_0508,1,left kidney,left adrenal gland,False,False,0.369,3.3e-05
+amos22_mri,nipu,amos_0508,1,right adrenal gland,right kidney,False,False,0.7492,0.004722
+amos22_mri,nipu,amos_0508,1,right adrenal gland,left kidney,False,False,0.2104,0.001328
+amos22_mri,nipu,amos_0508,1,right adrenal gland,right adrenal gland,True,False,1.0447,0.00011
+amos22_mri,nipu,amos_0508,1,right adrenal gland,left adrenal gland,False,True,0.2207,1.9e-05
+amos22_mri,nipu,amos_0508,1,left adrenal gland,right kidney,False,False,0.2001,0.001261
+amos22_mri,nipu,amos_0508,1,left adrenal gland,left kidney,False,False,0.4363,0.002755
+amos22_mri,nipu,amos_0508,1,left adrenal gland,right adrenal gland,False,True,0.3123,3.3e-05
+amos22_mri,nipu,amos_0508,1,left adrenal gland,left adrenal gland,True,False,0.2513,2.2e-05
+amos22_mri,nipu,amos_0508,2,right kidney,right kidney,True,False,6.5162,0.04107
+amos22_mri,nipu,amos_0508,2,right kidney,left kidney,False,True,0.9568,0.00604
+amos22_mri,nipu,amos_0508,2,right kidney,right adrenal gland,False,False,0.8447,8.9e-05
+amos22_mri,nipu,amos_0508,2,right kidney,left adrenal gland,False,False,0.2564,2.3e-05
+amos22_mri,nipu,amos_0508,2,left kidney,right kidney,False,True,0.5628,0.003547
+amos22_mri,nipu,amos_0508,2,left kidney,left kidney,True,False,4.4501,0.028095
+amos22_mri,nipu,amos_0508,2,left kidney,right adrenal gland,False,False,0.3598,3.8e-05
+amos22_mri,nipu,amos_0508,2,left kidney,left adrenal gland,False,False,0.2983,2.6e-05
+amos22_mri,nipu,amos_0508,2,right adrenal gland,right kidney,False,False,0.7653,0.004823
+amos22_mri,nipu,amos_0508,2,right adrenal gland,left kidney,False,False,0.2586,0.001633
+amos22_mri,nipu,amos_0508,2,right adrenal gland,right adrenal gland,True,False,0.6023,6.3e-05
+amos22_mri,nipu,amos_0508,2,right adrenal gland,left adrenal gland,False,True,0.2686,2.4e-05
+amos22_mri,nipu,amos_0508,2,left adrenal gland,right kidney,False,False,0.2379,0.0015
+amos22_mri,nipu,amos_0508,2,left adrenal gland,left kidney,False,False,0.4249,0.002683
+amos22_mri,nipu,amos_0508,2,left adrenal gland,right adrenal gland,False,True,0.2989,3.1e-05
+amos22_mri,nipu,amos_0508,2,left adrenal gland,left adrenal gland,True,False,0.2823,2.5e-05
+amos22_mri,nipu,amos_0508,3,right kidney,right kidney,True,False,1.5547,0.009799
+amos22_mri,nipu,amos_0508,3,right kidney,left kidney,False,True,1.808,0.011414
+amos22_mri,nipu,amos_0508,3,right kidney,right adrenal gland,False,False,0.6142,6.5e-05
+amos22_mri,nipu,amos_0508,3,right kidney,left adrenal gland,False,False,0.4764,4.2e-05
+amos22_mri,nipu,amos_0508,3,left kidney,right kidney,False,True,0.709,0.004469
+amos22_mri,nipu,amos_0508,3,left kidney,left kidney,True,False,4.6904,0.029612
+amos22_mri,nipu,amos_0508,3,left kidney,right adrenal gland,False,False,0.4527,4.8e-05
+amos22_mri,nipu,amos_0508,3,left kidney,left adrenal gland,False,False,0.522,4.6e-05
+amos22_mri,nipu,amos_0508,3,right adrenal gland,right kidney,False,False,0.4198,0.002646
+amos22_mri,nipu,amos_0508,3,right adrenal gland,left kidney,False,False,0.3176,0.002005
+amos22_mri,nipu,amos_0508,3,right adrenal gland,right adrenal gland,True,False,0.4532,4.8e-05
+amos22_mri,nipu,amos_0508,3,right adrenal gland,left adrenal gland,False,True,0.2951,2.6e-05
+amos22_mri,nipu,amos_0508,3,left adrenal gland,right kidney,False,False,0.276,0.00174
+amos22_mri,nipu,amos_0508,3,left adrenal gland,left kidney,False,False,0.4012,0.002533
+amos22_mri,nipu,amos_0508,3,left adrenal gland,right adrenal gland,False,True,0.3271,3.4e-05
+amos22_mri,nipu,amos_0508,3,left adrenal gland,left adrenal gland,True,False,0.3215,2.8e-05
+amos22_mri,nipu,amos_0508,4,right kidney,right kidney,True,False,4.1521,0.02617
+amos22_mri,nipu,amos_0508,4,right kidney,left kidney,False,True,2.5186,0.015901
+amos22_mri,nipu,amos_0508,4,right kidney,right adrenal gland,False,False,1.4991,0.000158
+amos22_mri,nipu,amos_0508,4,right kidney,left adrenal gland,False,False,0.7168,6.3e-05
+amos22_mri,nipu,amos_0508,4,left kidney,right kidney,False,True,1.8814,0.011858
+amos22_mri,nipu,amos_0508,4,left kidney,left kidney,True,False,7.3732,0.04655
+amos22_mri,nipu,amos_0508,4,left kidney,right adrenal gland,False,False,0.874,9.2e-05
+amos22_mri,nipu,amos_0508,4,left kidney,left adrenal gland,False,False,0.8845,7.8e-05
+amos22_mri,nipu,amos_0508,4,right adrenal gland,right kidney,False,False,0.7961,0.005018
+amos22_mri,nipu,amos_0508,4,right adrenal gland,left kidney,False,False,0.5042,0.003183
+amos22_mri,nipu,amos_0508,4,right adrenal gland,right adrenal gland,True,False,1.0671,0.000112
+amos22_mri,nipu,amos_0508,4,right adrenal gland,left adrenal gland,False,True,0.6549,5.8e-05
+amos22_mri,nipu,amos_0508,4,left adrenal gland,right kidney,False,False,0.4442,0.002799
+amos22_mri,nipu,amos_0508,4,left adrenal gland,left kidney,False,False,0.6495,0.004101
+amos22_mri,nipu,amos_0508,4,left adrenal gland,right adrenal gland,False,True,0.6399,6.7e-05
+amos22_mri,nipu,amos_0508,4,left adrenal gland,left adrenal gland,True,False,0.7844,6.9e-05
+amos22_mri,nipu,amos_0508,5,right kidney,right kidney,True,False,2.7757,0.017495
+amos22_mri,nipu,amos_0508,5,right kidney,left kidney,False,True,1.7656,0.011147
+amos22_mri,nipu,amos_0508,5,right kidney,right adrenal gland,False,False,1.7497,0.000184
+amos22_mri,nipu,amos_0508,5,right kidney,left adrenal gland,False,False,0.801,7.1e-05
+amos22_mri,nipu,amos_0508,5,left kidney,right kidney,False,True,1.0835,0.006829
+amos22_mri,nipu,amos_0508,5,left kidney,left kidney,True,False,4.0692,0.02569
+amos22_mri,nipu,amos_0508,5,left kidney,right adrenal gland,False,False,0.8551,9e-05
+amos22_mri,nipu,amos_0508,5,left kidney,left adrenal gland,False,False,1.1171,9.9e-05
+amos22_mri,nipu,amos_0508,5,right adrenal gland,right kidney,False,False,1.2947,0.00816
+amos22_mri,nipu,amos_0508,5,right adrenal gland,left kidney,False,False,0.6118,0.003862
+amos22_mri,nipu,amos_0508,5,right adrenal gland,right adrenal gland,True,False,1.4339,0.000151
+amos22_mri,nipu,amos_0508,5,right adrenal gland,left adrenal gland,False,True,0.8316,7.3e-05
+amos22_mri,nipu,amos_0508,5,left adrenal gland,right kidney,False,False,0.4808,0.00303
+amos22_mri,nipu,amos_0508,5,left adrenal gland,left kidney,False,False,0.818,0.005164
+amos22_mri,nipu,amos_0508,5,left adrenal gland,right adrenal gland,False,True,0.6653,7e-05
+amos22_mri,nipu,amos_0508,5,left adrenal gland,left adrenal gland,True,False,0.9275,8.2e-05
+amos22_mri,nipu,amos_0508,6,right kidney,right kidney,True,False,2.3479,0.014798
+amos22_mri,nipu,amos_0508,6,right kidney,left kidney,False,True,2.2169,0.013996
+amos22_mri,nipu,amos_0508,6,right kidney,right adrenal gland,False,False,1.8751,0.000197
+amos22_mri,nipu,amos_0508,6,right kidney,left adrenal gland,False,False,1.6234,0.000143
+amos22_mri,nipu,amos_0508,6,left kidney,right kidney,False,True,1.2996,0.008191
+amos22_mri,nipu,amos_0508,6,left kidney,left kidney,True,False,3.8128,0.024071
+amos22_mri,nipu,amos_0508,6,left kidney,right adrenal gland,False,False,1.2093,0.000127
+amos22_mri,nipu,amos_0508,6,left kidney,left adrenal gland,False,False,2.2164,0.000196
+amos22_mri,nipu,amos_0508,6,right adrenal gland,right kidney,False,False,0.9977,0.006288
+amos22_mri,nipu,amos_0508,6,right adrenal gland,left kidney,False,False,0.857,0.00541
+amos22_mri,nipu,amos_0508,6,right adrenal gland,right adrenal gland,True,False,1.5039,0.000158
+amos22_mri,nipu,amos_0508,6,right adrenal gland,left adrenal gland,False,True,1.6913,0.000149
+amos22_mri,nipu,amos_0508,6,left adrenal gland,right kidney,False,False,0.6855,0.004321
+amos22_mri,nipu,amos_0508,6,left adrenal gland,left kidney,False,False,0.9434,0.005956
+amos22_mri,nipu,amos_0508,6,left adrenal gland,right adrenal gland,False,True,1.1995,0.000126
+amos22_mri,nipu,amos_0508,6,left adrenal gland,left adrenal gland,True,False,2.198,0.000194
+amos22_mri,faria,amos_0530,1,right kidney,right kidney,True,False,1.2116,0.006107
+amos22_mri,faria,amos_0530,1,right kidney,left kidney,False,True,0.6718,0.003437
+amos22_mri,faria,amos_0530,1,right kidney,right adrenal gland,False,False,0.8107,7.9e-05
+amos22_mri,faria,amos_0530,1,right kidney,left adrenal gland,False,False,0.2452,1.2e-05
+amos22_mri,faria,amos_0530,1,left kidney,right kidney,False,True,0.5234,0.002638
+amos22_mri,faria,amos_0530,1,left kidney,left kidney,True,False,2.2014,0.011265
+amos22_mri,faria,amos_0530,1,left kidney,right adrenal gland,False,False,0.2336,2.3e-05
+amos22_mri,faria,amos_0530,1,left kidney,left adrenal gland,False,False,0.8941,4.4e-05
+amos22_mri,faria,amos_0530,1,right adrenal gland,right kidney,False,False,0.4008,0.00202
+amos22_mri,faria,amos_0530,1,right adrenal gland,left kidney,False,False,0.158,0.000808
+amos22_mri,faria,amos_0530,1,right adrenal gland,right adrenal gland,True,False,0.8103,7.9e-05
+amos22_mri,faria,amos_0530,1,right adrenal gland,left adrenal gland,False,True,0.2339,1.1e-05
+amos22_mri,faria,amos_0530,1,left adrenal gland,right kidney,False,False,0.2001,0.001009
+amos22_mri,faria,amos_0530,1,left adrenal gland,left kidney,False,False,0.2803,0.001434
+amos22_mri,faria,amos_0530,1,left adrenal gland,right adrenal gland,False,True,0.2434,2.4e-05
+amos22_mri,faria,amos_0530,1,left adrenal gland,left adrenal gland,True,False,0.4652,2.3e-05
+amos22_mri,faria,amos_0530,2,right kidney,right kidney,True,False,3.3577,0.016923
+amos22_mri,faria,amos_0530,2,right kidney,left kidney,False,True,0.6029,0.003085
+amos22_mri,faria,amos_0530,2,right kidney,right adrenal gland,False,False,0.193,1.9e-05
+amos22_mri,faria,amos_0530,2,right kidney,left adrenal gland,False,False,0.2282,1.1e-05
+amos22_mri,faria,amos_0530,2,left kidney,right kidney,False,True,0.4425,0.00223
+amos22_mri,faria,amos_0530,2,left kidney,left kidney,True,False,3.8141,0.019518
+amos22_mri,faria,amos_0530,2,left kidney,right adrenal gland,False,False,0.1492,1.4e-05
+amos22_mri,faria,amos_0530,2,left kidney,left adrenal gland,False,False,0.4098,2e-05
+amos22_mri,faria,amos_0530,2,right adrenal gland,right kidney,False,False,0.4957,0.002498
+amos22_mri,faria,amos_0530,2,right adrenal gland,left kidney,False,False,0.164,0.000839
+amos22_mri,faria,amos_0530,2,right adrenal gland,right adrenal gland,True,False,0.3501,3.4e-05
+amos22_mri,faria,amos_0530,2,right adrenal gland,left adrenal gland,False,True,0.2361,1.2e-05
+amos22_mri,faria,amos_0530,2,left adrenal gland,right kidney,False,False,0.1831,0.000923
+amos22_mri,faria,amos_0530,2,left adrenal gland,left kidney,False,False,0.2832,0.001449
+amos22_mri,faria,amos_0530,2,left adrenal gland,right adrenal gland,False,True,0.2031,2e-05
+amos22_mri,faria,amos_0530,2,left adrenal gland,left adrenal gland,True,False,0.3047,1.5e-05
+amos22_mri,faria,amos_0530,3,right kidney,right kidney,True,False,2.3771,0.01198
+amos22_mri,faria,amos_0530,3,right kidney,left kidney,False,True,1.3098,0.006703
+amos22_mri,faria,amos_0530,3,right kidney,right adrenal gland,False,False,0.2556,2.5e-05
+amos22_mri,faria,amos_0530,3,right kidney,left adrenal gland,False,False,0.4648,2.3e-05
+amos22_mri,faria,amos_0530,3,left kidney,right kidney,False,True,0.6914,0.003485
+amos22_mri,faria,amos_0530,3,left kidney,left kidney,True,False,6.436,0.032934
+amos22_mri,faria,amos_0530,3,left kidney,right adrenal gland,False,False,0.1954,1.9e-05
+amos22_mri,faria,amos_0530,3,left kidney,left adrenal gland,False,False,0.8305,4.1e-05
+amos22_mri,faria,amos_0530,3,right adrenal gland,right kidney,False,False,0.5332,0.002687
+amos22_mri,faria,amos_0530,3,right adrenal gland,left kidney,False,False,0.2211,0.001131
+amos22_mri,faria,amos_0530,3,right adrenal gland,right adrenal gland,True,False,0.2749,2.7e-05
+amos22_mri,faria,amos_0530,3,right adrenal gland,left adrenal gland,False,True,0.2321,1.1e-05
+amos22_mri,faria,amos_0530,3,left adrenal gland,right kidney,False,False,0.2318,0.001168
+amos22_mri,faria,amos_0530,3,left adrenal gland,left kidney,False,False,0.3183,0.001629
+amos22_mri,faria,amos_0530,3,left adrenal gland,right adrenal gland,False,True,0.2006,1.9e-05
+amos22_mri,faria,amos_0530,3,left adrenal gland,left adrenal gland,True,False,0.2708,1.3e-05
+amos22_mri,faria,amos_0530,4,right kidney,right kidney,True,False,7.4742,0.03767
+amos22_mri,faria,amos_0530,4,right kidney,left kidney,False,True,1.9774,0.010119
+amos22_mri,faria,amos_0530,4,right kidney,right adrenal gland,False,False,0.4115,4e-05
+amos22_mri,faria,amos_0530,4,right kidney,left adrenal gland,False,False,0.883,4.3e-05
+amos22_mri,faria,amos_0530,4,left kidney,right kidney,False,True,2.5345,0.012774
+amos22_mri,faria,amos_0530,4,left kidney,left kidney,True,False,13.1196,0.067135
+amos22_mri,faria,amos_0530,4,left kidney,right adrenal gland,False,False,0.3185,3.1e-05
+amos22_mri,faria,amos_0530,4,left kidney,left adrenal gland,False,False,1.8691,9.1e-05
+amos22_mri,faria,amos_0530,4,right adrenal gland,right kidney,False,False,1.3952,0.007032
+amos22_mri,faria,amos_0530,4,right adrenal gland,left kidney,False,False,0.4048,0.002071
+amos22_mri,faria,amos_0530,4,right adrenal gland,right adrenal gland,True,False,0.6579,6.4e-05
+amos22_mri,faria,amos_0530,4,right adrenal gland,left adrenal gland,False,True,0.5845,2.9e-05
+amos22_mri,faria,amos_0530,4,left adrenal gland,right kidney,False,False,0.4962,0.002501
+amos22_mri,faria,amos_0530,4,left adrenal gland,left kidney,False,False,0.7987,0.004087
+amos22_mri,faria,amos_0530,4,left adrenal gland,right adrenal gland,False,True,0.5003,4.9e-05
+amos22_mri,faria,amos_0530,4,left adrenal gland,left adrenal gland,True,False,1.0425,5.1e-05
+amos22_mri,faria,amos_0530,5,right kidney,right kidney,True,False,4.5328,0.022845
+amos22_mri,faria,amos_0530,5,right kidney,left kidney,False,True,1.8176,0.009301
+amos22_mri,faria,amos_0530,5,right kidney,right adrenal gland,False,False,0.7597,7.4e-05
+amos22_mri,faria,amos_0530,5,right kidney,left adrenal gland,False,False,0.9692,4.7e-05
+amos22_mri,faria,amos_0530,5,left kidney,right kidney,False,True,1.6272,0.008201
+amos22_mri,faria,amos_0530,5,left kidney,left kidney,True,False,5.7961,0.02966
+amos22_mri,faria,amos_0530,5,left kidney,right adrenal gland,False,False,0.5584,5.4e-05
+amos22_mri,faria,amos_0530,5,left kidney,left adrenal gland,False,False,2.1432,0.000105
+amos22_mri,faria,amos_0530,5,right adrenal gland,right kidney,False,False,1.3909,0.00701
+amos22_mri,faria,amos_0530,5,right adrenal gland,left kidney,False,False,0.5441,0.002784
+amos22_mri,faria,amos_0530,5,right adrenal gland,right adrenal gland,True,False,1.5067,0.000146
+amos22_mri,faria,amos_0530,5,right adrenal gland,left adrenal gland,False,True,0.861,4.2e-05
+amos22_mri,faria,amos_0530,5,left adrenal gland,right kidney,False,False,0.5218,0.00263
+amos22_mri,faria,amos_0530,5,left adrenal gland,left kidney,False,False,0.8301,0.004248
+amos22_mri,faria,amos_0530,5,left adrenal gland,right adrenal gland,False,True,0.7537,7.3e-05
+amos22_mri,faria,amos_0530,5,left adrenal gland,left adrenal gland,True,False,1.404,6.9e-05
+amos22_mri,faria,amos_0530,6,right kidney,right kidney,True,False,4.6911,0.023643
+amos22_mri,faria,amos_0530,6,right kidney,left kidney,False,True,2.6661,0.013643
+amos22_mri,faria,amos_0530,6,right kidney,right adrenal gland,False,False,1.0879,0.000106
+amos22_mri,faria,amos_0530,6,right kidney,left adrenal gland,False,False,1.8454,9e-05
+amos22_mri,faria,amos_0530,6,left kidney,right kidney,False,True,2.1974,0.011075
+amos22_mri,faria,amos_0530,6,left kidney,left kidney,True,False,5.6869,0.029101
+amos22_mri,faria,amos_0530,6,left kidney,right adrenal gland,False,False,1.5179,0.000147
+amos22_mri,faria,amos_0530,6,left kidney,left adrenal gland,False,False,3.2406,0.000158
+amos22_mri,faria,amos_0530,6,right adrenal gland,right kidney,False,False,1.4448,0.007282
+amos22_mri,faria,amos_0530,6,right adrenal gland,left kidney,False,False,1.5104,0.007729
+amos22_mri,faria,amos_0530,6,right adrenal gland,right adrenal gland,True,False,2.4278,0.000236
+amos22_mri,faria,amos_0530,6,right adrenal gland,left adrenal gland,False,True,1.6566,8.1e-05
+amos22_mri,faria,amos_0530,6,left adrenal gland,right kidney,False,False,1.048,0.005282
+amos22_mri,faria,amos_0530,6,left adrenal gland,left kidney,False,False,1.0871,0.005563
+amos22_mri,faria,amos_0530,6,left adrenal gland,right adrenal gland,False,True,1.988,0.000193
+amos22_mri,faria,amos_0530,6,left adrenal gland,left adrenal gland,True,False,2.6304,0.000128
+amos22_mri,hridoy,amos_0555,1,right kidney,right kidney,True,False,1.8741,0.011186
+amos22_mri,hridoy,amos_0555,1,right kidney,left kidney,False,True,0.5531,0.003294
+amos22_mri,hridoy,amos_0555,1,right kidney,right adrenal gland,False,False,0.4496,4.5e-05
+amos22_mri,hridoy,amos_0555,1,right kidney,left adrenal gland,False,False,0.2498,1.7e-05
+amos22_mri,hridoy,amos_0555,1,left kidney,right kidney,False,True,0.6058,0.003616
+amos22_mri,hridoy,amos_0555,1,left kidney,left kidney,True,False,2.4587,0.014645
+amos22_mri,hridoy,amos_0555,1,left kidney,right adrenal gland,False,False,0.22,2.2e-05
+amos22_mri,hridoy,amos_0555,1,left kidney,left adrenal gland,False,False,0.6435,4.3e-05
+amos22_mri,hridoy,amos_0555,1,right adrenal gland,right kidney,False,False,0.3704,0.00221
+amos22_mri,hridoy,amos_0555,1,right adrenal gland,left kidney,False,False,0.1562,0.00093
+amos22_mri,hridoy,amos_0555,1,right adrenal gland,right adrenal gland,True,False,0.3499,3.5e-05
+amos22_mri,hridoy,amos_0555,1,right adrenal gland,left adrenal gland,False,True,0.3173,2.1e-05
+amos22_mri,hridoy,amos_0555,1,left adrenal gland,right kidney,False,False,0.1793,0.00107
+amos22_mri,hridoy,amos_0555,1,left adrenal gland,left kidney,False,False,0.3272,0.001949
+amos22_mri,hridoy,amos_0555,1,left adrenal gland,right adrenal gland,False,True,0.1917,1.9e-05
+amos22_mri,hridoy,amos_0555,1,left adrenal gland,left adrenal gland,True,False,0.4423,3e-05
+amos22_mri,hridoy,amos_0555,2,right kidney,right kidney,True,False,4.6249,0.027604
+amos22_mri,hridoy,amos_0555,2,right kidney,left kidney,False,True,0.7171,0.004272
+amos22_mri,hridoy,amos_0555,2,right kidney,right adrenal gland,False,False,0.1469,1.5e-05
+amos22_mri,hridoy,amos_0555,2,right kidney,left adrenal gland,False,False,0.1654,1.1e-05
+amos22_mri,hridoy,amos_0555,2,left kidney,right kidney,False,True,0.547,0.003265
+amos22_mri,hridoy,amos_0555,2,left kidney,left kidney,True,False,3.7803,0.022518
+amos22_mri,hridoy,amos_0555,2,left kidney,right adrenal gland,False,False,0.1242,1.2e-05
+amos22_mri,hridoy,amos_0555,2,left kidney,left adrenal gland,False,False,0.2473,1.7e-05
+amos22_mri,hridoy,amos_0555,2,right adrenal gland,right kidney,False,False,0.4343,0.002592
+amos22_mri,hridoy,amos_0555,2,right adrenal gland,left kidney,False,False,0.1828,0.001089
+amos22_mri,hridoy,amos_0555,2,right adrenal gland,right adrenal gland,True,False,0.1891,1.9e-05
+amos22_mri,hridoy,amos_0555,2,right adrenal gland,left adrenal gland,False,True,0.2267,1.5e-05
+amos22_mri,hridoy,amos_0555,2,left adrenal gland,right kidney,False,False,0.1735,0.001035
+amos22_mri,hridoy,amos_0555,2,left adrenal gland,left kidney,False,False,0.3332,0.001985
+amos22_mri,hridoy,amos_0555,2,left adrenal gland,right adrenal gland,False,True,0.1362,1.4e-05
+amos22_mri,hridoy,amos_0555,2,left adrenal gland,left adrenal gland,True,False,0.2745,1.8e-05
+amos22_mri,hridoy,amos_0555,3,right kidney,right kidney,True,False,2.0689,0.012348
+amos22_mri,hridoy,amos_0555,3,right kidney,left kidney,False,True,1.6714,0.009955
+amos22_mri,hridoy,amos_0555,3,right kidney,right adrenal gland,False,False,0.2327,2.3e-05
+amos22_mri,hridoy,amos_0555,3,right kidney,left adrenal gland,False,False,0.2373,1.6e-05
+amos22_mri,hridoy,amos_0555,3,left kidney,right kidney,False,True,0.8103,0.004836
+amos22_mri,hridoy,amos_0555,3,left kidney,left kidney,True,False,5.4508,0.032468
+amos22_mri,hridoy,amos_0555,3,left kidney,right adrenal gland,False,False,0.1683,1.7e-05
+amos22_mri,hridoy,amos_0555,3,left kidney,left adrenal gland,False,False,0.3662,2.5e-05
+amos22_mri,hridoy,amos_0555,3,right adrenal gland,right kidney,False,False,0.3726,0.002224
+amos22_mri,hridoy,amos_0555,3,right adrenal gland,left kidney,False,False,0.2415,0.001438
+amos22_mri,hridoy,amos_0555,3,right adrenal gland,right adrenal gland,True,False,0.1822,1.8e-05
+amos22_mri,hridoy,amos_0555,3,right adrenal gland,left adrenal gland,False,True,0.1892,1.3e-05
+amos22_mri,hridoy,amos_0555,3,left adrenal gland,right kidney,False,False,0.2092,0.001249
+amos22_mri,hridoy,amos_0555,3,left adrenal gland,left kidney,False,False,0.3309,0.001971
+amos22_mri,hridoy,amos_0555,3,left adrenal gland,right adrenal gland,False,True,0.1491,1.5e-05
+amos22_mri,hridoy,amos_0555,3,left adrenal gland,left adrenal gland,True,False,0.2064,1.4e-05
+amos22_mri,hridoy,amos_0555,4,right kidney,right kidney,True,False,9.0005,0.05372
+amos22_mri,hridoy,amos_0555,4,right kidney,left kidney,False,True,2.6609,0.01585
+amos22_mri,hridoy,amos_0555,4,right kidney,right adrenal gland,False,False,0.4154,4.2e-05
+amos22_mri,hridoy,amos_0555,4,right kidney,left adrenal gland,False,False,0.5385,3.6e-05
+amos22_mri,hridoy,amos_0555,4,left kidney,right kidney,False,True,4.1697,0.024887
+amos22_mri,hridoy,amos_0555,4,left kidney,left kidney,True,False,10.1758,0.060612
+amos22_mri,hridoy,amos_0555,4,left kidney,right adrenal gland,False,False,0.3033,3e-05
+amos22_mri,hridoy,amos_0555,4,left kidney,left adrenal gland,False,False,0.8546,5.7e-05
+amos22_mri,hridoy,amos_0555,4,right adrenal gland,right kidney,False,False,1.322,0.007891
+amos22_mri,hridoy,amos_0555,4,right adrenal gland,left kidney,False,False,0.4286,0.002553
+amos22_mri,hridoy,amos_0555,4,right adrenal gland,right adrenal gland,True,False,0.438,4.4e-05
+amos22_mri,hridoy,amos_0555,4,right adrenal gland,left adrenal gland,False,True,0.4494,3e-05
+amos22_mri,hridoy,amos_0555,4,left adrenal gland,right kidney,False,False,0.5757,0.003436
+amos22_mri,hridoy,amos_0555,4,left adrenal gland,left kidney,False,False,0.6779,0.004038
+amos22_mri,hridoy,amos_0555,4,left adrenal gland,right adrenal gland,False,True,0.3041,3.1e-05
+amos22_mri,hridoy,amos_0555,4,left adrenal gland,left adrenal gland,True,False,0.6932,4.7e-05
+amos22_mri,hridoy,amos_0555,5,right kidney,right kidney,True,False,5.1563,0.030776
+amos22_mri,hridoy,amos_0555,5,right kidney,left kidney,False,True,1.9757,0.011768
+amos22_mri,hridoy,amos_0555,5,right kidney,right adrenal gland,False,False,0.7631,7.7e-05
+amos22_mri,hridoy,amos_0555,5,right kidney,left adrenal gland,False,False,0.7625,5.1e-05
+amos22_mri,hridoy,amos_0555,5,left kidney,right kidney,False,True,2.1111,0.0126
+amos22_mri,hridoy,amos_0555,5,left kidney,left kidney,True,False,4.8904,0.02913
+amos22_mri,hridoy,amos_0555,5,left kidney,right adrenal gland,False,False,0.5667,5.7e-05
+amos22_mri,hridoy,amos_0555,5,left kidney,left adrenal gland,False,False,1.4241,9.6e-05
+amos22_mri,hridoy,amos_0555,5,right adrenal gland,right kidney,False,False,1.339,0.007992
+amos22_mri,hridoy,amos_0555,5,right adrenal gland,left kidney,False,False,0.5254,0.00313
+amos22_mri,hridoy,amos_0555,5,right adrenal gland,right adrenal gland,True,False,0.9739,9.8e-05
+amos22_mri,hridoy,amos_0555,5,right adrenal gland,left adrenal gland,False,True,0.8432,5.7e-05
+amos22_mri,hridoy,amos_0555,5,left adrenal gland,right kidney,False,False,0.5583,0.003332
+amos22_mri,hridoy,amos_0555,5,left adrenal gland,left kidney,False,False,0.7492,0.004463
+amos22_mri,hridoy,amos_0555,5,left adrenal gland,right adrenal gland,False,True,0.4961,5e-05
+amos22_mri,hridoy,amos_0555,5,left adrenal gland,left adrenal gland,True,False,1.3271,8.9e-05
+amos22_mri,hridoy,amos_0555,6,right kidney,right kidney,True,False,5.5241,0.032971
+amos22_mri,hridoy,amos_0555,6,right kidney,left kidney,False,True,2.6249,0.015635
+amos22_mri,hridoy,amos_0555,6,right kidney,right adrenal gland,False,False,1.2347,0.000124
+amos22_mri,hridoy,amos_0555,6,right kidney,left adrenal gland,False,False,2.2233,0.000149
+amos22_mri,hridoy,amos_0555,6,left kidney,right kidney,False,True,2.7034,0.016135
+amos22_mri,hridoy,amos_0555,6,left kidney,left kidney,True,False,4.4175,0.026313
+amos22_mri,hridoy,amos_0555,6,left kidney,right adrenal gland,False,False,1.9556,0.000197
+amos22_mri,hridoy,amos_0555,6,left kidney,left adrenal gland,False,False,2.314,0.000155
+amos22_mri,hridoy,amos_0555,6,right adrenal gland,right kidney,False,False,1.704,0.010171
+amos22_mri,hridoy,amos_0555,6,right adrenal gland,left kidney,False,False,1.1417,0.006801
+amos22_mri,hridoy,amos_0555,6,right adrenal gland,right adrenal gland,True,False,2.1549,0.000217
+amos22_mri,hridoy,amos_0555,6,right adrenal gland,left adrenal gland,False,True,2.0963,0.000141
+amos22_mri,hridoy,amos_0555,6,left adrenal gland,right kidney,False,False,1.1133,0.006645
+amos22_mri,hridoy,amos_0555,6,left adrenal gland,left kidney,False,False,0.9711,0.005784
+amos22_mri,hridoy,amos_0555,6,left adrenal gland,right adrenal gland,False,True,1.6103,0.000162
+amos22_mri,hridoy,amos_0555,6,left adrenal gland,left adrenal gland,True,False,3.1005,0.000208

@@ -1,0 +1,2 @@
+dataset,slope,intercept,r_squared,n_points,interpretation
+neurite_oasis,-174.394689,82.003375,0.227694,16,flat/negative slope: text difference does not predict where the model points (shortcut/memorized)

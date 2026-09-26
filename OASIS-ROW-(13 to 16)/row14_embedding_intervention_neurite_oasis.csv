@@ -1,0 +1,271 @@
+dataset,person,subject_id,pair,variant,dst,src,alpha,layer,agreement_with_source_baseline,n_pred_voxels,cov_left_organ,cov_right_organ,dice_left_organ,dice_right_organ,call,moved_to_source_side
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,baseline,left,,nan,-1,nan,261538,0.8042,0.0,0.8735,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,baseline,right,,nan,-1,nan,300257,0.0003,0.8678,0.0003,0.8959,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,blend,left,right,-0.5,-1,nan,28985,0.0912,0.0,0.1669,0.0,neither,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,blend,left,right,0.25,-1,nan,246701,0.7723,0.0014,0.8612,0.0016,left,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,blend,left,right,0.5,-1,nan,264044,0.319,0.5103,0.3449,0.5594,both,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,blend,left,right,0.75,-1,nan,281384,0.0028,0.8362,0.0029,0.8904,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,blend,left,right,1.5,-1,nan,264552,0.0,0.774,0.0,0.8478,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,left,right,nan,0,nan,250233,0.7809,0.0003,0.8652,0.0003,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,left,right,nan,1,nan,255373,0.7935,0.0001,0.8713,0.0001,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,left,right,nan,2,nan,262000,0.8085,0.0001,0.8774,0.0001,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,left,right,nan,3,nan,266950,0.8184,0.0001,0.8806,0.0001,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,left,right,nan,4,nan,266068,0.8154,0.0,0.8787,0.0001,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,left,right,nan,5,nan,259523,0.7994,0.0,0.8714,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,updates_from_layer,left,right,nan,0,nan,254762,0.0284,0.7485,0.0312,0.8339,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,updates_from_layer,left,right,nan,3,nan,235684,0.7274,0.0111,0.8274,0.0128,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,whole_state_control,left,right,nan,0,0.999988,300244,0.0003,0.8678,0.0003,0.8959,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,whole_state_control,left,right,nan,5,1.0,300257,0.0003,0.8678,0.0003,0.8959,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,right,left,nan,0,nan,286193,0.0015,0.8444,0.0016,0.892,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,right,left,nan,1,nan,297268,0.001,0.8649,0.001,0.8972,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,right,left,nan,2,nan,288695,0.001,0.8496,0.001,0.8938,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,right,left,nan,3,nan,287419,0.0005,0.8464,0.0006,0.8923,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,right,left,nan,4,nan,288599,0.0008,0.849,0.0008,0.8933,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,single_layer_update,right,left,nan,5,nan,294002,0.0008,0.859,0.0008,0.8959,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,updates_from_layer,right,left,nan,0,nan,52099,0.1658,0.0013,0.2839,0.0022,neither,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,updates_from_layer,right,left,nan,3,nan,169021,0.0023,0.5204,0.0029,0.6813,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,whole_state_control,right,left,nan,0,0.999983,261448,0.804,0.0,0.8734,0.0,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter,whole_state_control,right,left,nan,5,1.0,261538,0.8042,0.0,0.8735,0.0,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,baseline,left,,nan,-1,nan,75230,0.8791,0.0042,0.86,0.0041,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,baseline,right,,nan,-1,nan,67147,0.0,0.7414,0.0,0.7744,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,blend,left,right,-0.5,-1,nan,61083,0.7365,0.0,0.7971,0.0,left,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,blend,left,right,0.25,-1,nan,73224,0.8164,0.0435,0.8097,0.0436,left,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,blend,left,right,0.5,-1,nan,80705,0.3267,0.5817,0.3082,0.5541,both,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,blend,left,right,0.75,-1,nan,68161,0.0002,0.754,0.0002,0.782,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,blend,left,right,1.5,-1,nan,44388,0.0,0.5229,0.0,0.6517,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,left,right,nan,0,nan,71865,0.8267,0.0261,0.8277,0.0264,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,left,right,nan,1,nan,75640,0.8699,0.0222,0.8487,0.0219,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,left,right,nan,2,nan,74516,0.858,0.0209,0.8435,0.0207,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,left,right,nan,3,nan,73999,0.8538,0.0204,0.8424,0.0203,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,left,right,nan,4,nan,73800,0.8515,0.0197,0.8412,0.0196,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,left,right,nan,5,nan,73935,0.8514,0.0184,0.8403,0.0183,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,updates_from_layer,left,right,nan,0,nan,55746,0.0171,0.6175,0.0193,0.7019,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,updates_from_layer,left,right,nan,3,nan,62477,0.624,0.1134,0.6683,0.1225,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,whole_state_control,left,right,nan,0,0.999995,67146,0.0,0.7414,0.0,0.7744,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,whole_state_control,left,right,nan,5,1.0,67147,0.0,0.7414,0.0,0.7744,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,right,left,nan,0,nan,70031,0.0,0.7794,0.0,0.7977,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,right,left,nan,1,nan,67703,0.0,0.7571,0.0,0.7877,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,right,left,nan,2,nan,67526,0.0,0.7549,0.0,0.7864,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,right,left,nan,3,nan,67791,0.0,0.755,0.0,0.785,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,right,left,nan,4,nan,68058,0.0,0.7583,0.0,0.7869,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,single_layer_update,right,left,nan,5,nan,67566,0.0,0.7549,0.0,0.7861,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,updates_from_layer,right,left,nan,0,nan,34024,0.1438,0.227,0.1954,0.3102,neither,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,updates_from_layer,right,left,nan,3,nan,62549,0.001,0.7074,0.0011,0.7639,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,whole_state_control,right,left,nan,0,0.999996,75216,0.8789,0.0042,0.8599,0.0041,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex,whole_state_control,right,left,nan,5,0.999996,75235,0.8791,0.0042,0.86,0.0041,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,baseline,left,,nan,-1,nan,242786,0.8406,0.0,0.9032,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,baseline,right,,nan,-1,nan,258316,0.0,0.8729,0.0,0.9199,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,blend,left,right,-0.5,-1,nan,45182,0.1585,0.0,0.2732,0.0,neither,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,blend,left,right,0.25,-1,nan,208333,0.7331,0.0002,0.8431,0.0002,left,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,blend,left,right,0.5,-1,nan,104157,0.0859,0.2777,0.1255,0.4078,neither,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,blend,left,right,0.75,-1,nan,243085,0.0003,0.8337,0.0003,0.9038,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,blend,left,right,1.5,-1,nan,208034,0.0,0.7021,0.0,0.815,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,left,right,nan,0,nan,212649,0.7485,0.0,0.8532,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,left,right,nan,1,nan,230792,0.8098,0.0,0.8905,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,left,right,nan,2,nan,234351,0.8192,0.0,0.8946,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,left,right,nan,3,nan,244195,0.8494,0.0,0.9102,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,left,right,nan,4,nan,236892,0.8257,0.0,0.8973,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,left,right,nan,5,nan,231681,0.8088,0.0,0.8878,0.0,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,updates_from_layer,left,right,nan,0,nan,194175,0.0036,0.6688,0.0043,0.7986,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,updates_from_layer,left,right,nan,3,nan,173688,0.6105,0.0032,0.7555,0.004,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,whole_state_control,left,right,nan,0,0.99999,258289,0.0,0.8729,0.0,0.9199,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,whole_state_control,left,right,nan,5,1.0,258316,0.0,0.8729,0.0,0.9199,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,right,left,nan,0,nan,254615,0.0,0.8648,0.0,0.9175,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,right,left,nan,1,nan,260052,0.0,0.8769,0.0,0.9212,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,right,left,nan,2,nan,252064,0.0,0.857,0.0,0.9136,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,right,left,nan,3,nan,246204,0.0,0.8396,0.0,0.9048,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,right,left,nan,4,nan,253144,0.0,0.8598,0.0,0.9147,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,single_layer_update,right,left,nan,5,nan,256972,0.0,0.8702,0.0,0.9193,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,updates_from_layer,right,left,nan,0,nan,16690,0.0589,0.0003,0.1112,0.0005,neither,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,updates_from_layer,right,left,nan,3,nan,123606,0.0002,0.4277,0.0002,0.5984,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,whole_state_control,right,left,nan,0,0.999988,242749,0.8405,0.0,0.9032,0.0,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter,whole_state_control,right,left,nan,5,1.0,242786,0.8406,0.0,0.9032,0.0,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,baseline,left,,nan,-1,nan,56736,0.8475,0.0041,0.8646,0.0042,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,baseline,right,,nan,-1,nan,58383,0.0,0.7903,0.0,0.7991,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,blend,left,right,-0.5,-1,nan,46670,0.7185,0.0,0.8028,0.0,left,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,blend,left,right,0.25,-1,nan,56164,0.8094,0.0414,0.8299,0.0426,left,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,blend,left,right,0.5,-1,nan,62788,0.3962,0.5327,0.3841,0.5192,both,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,blend,left,right,0.75,-1,nan,59708,0.0109,0.8136,0.0108,0.8135,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,blend,left,right,1.5,-1,nan,38813,0.0,0.5709,0.0,0.692,right,nan
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,left,right,nan,0,nan,55756,0.8209,0.0257,0.8446,0.0266,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,left,right,nan,1,nan,57917,0.8533,0.0216,0.8618,0.022,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,left,right,nan,2,nan,57227,0.8439,0.0208,0.8573,0.0212,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,left,right,nan,3,nan,56835,0.84,0.02,0.8563,0.0205,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,left,right,nan,4,nan,56690,0.8379,0.0186,0.8552,0.0191,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,left,right,nan,5,nan,56044,0.8294,0.0153,0.8513,0.0158,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,updates_from_layer,left,right,nan,0,nan,44312,0.0425,0.5919,0.0486,0.6795,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,updates_from_layer,left,right,nan,3,nan,47886,0.6334,0.0966,0.6996,0.1072,left,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,whole_state_control,left,right,nan,0,0.999996,58398,0.0,0.7905,0.0,0.7991,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,whole_state_control,left,right,nan,5,1.0,58383,0.0,0.7903,0.0,0.7991,right,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,right,left,nan,0,nan,61089,0.0015,0.8336,0.0015,0.824,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,right,left,nan,1,nan,58758,0.0002,0.8075,0.0002,0.8139,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,right,left,nan,2,nan,58499,0.0002,0.8033,0.0002,0.8114,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,right,left,nan,3,nan,58714,0.0002,0.8031,0.0002,0.8097,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,right,left,nan,4,nan,59033,0.0001,0.8084,0.0001,0.8129,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,single_layer_update,right,left,nan,5,nan,58733,0.0002,0.8077,0.0002,0.8143,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,updates_from_layer,right,left,nan,0,nan,21249,0.1584,0.1567,0.233,0.2311,neither,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,updates_from_layer,right,left,nan,3,nan,54874,0.0157,0.7633,0.0163,0.7954,right,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,whole_state_control,right,left,nan,0,0.999996,56724,0.8473,0.0041,0.8645,0.0042,left,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex,whole_state_control,right,left,nan,5,0.999998,56742,0.8476,0.0041,0.8646,0.0042,left,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,baseline,left,,nan,-1,nan,225651,0.8431,0.0,0.9043,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,baseline,right,,nan,-1,nan,239287,0.0,0.8771,0.0,0.9173,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,blend,left,right,-0.5,-1,nan,69065,0.2602,0.0,0.4116,0.0,neither,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,blend,left,right,0.25,-1,nan,202410,0.7667,0.0005,0.8636,0.0005,left,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,blend,left,right,0.5,-1,nan,156098,0.1746,0.4203,0.2185,0.5269,right,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,blend,left,right,0.75,-1,nan,225271,0.0003,0.8435,0.0003,0.9075,right,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,blend,left,right,1.5,-1,nan,181710,0.0,0.668,0.0,0.7891,right,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,left,right,nan,0,nan,201918,0.7658,0.0,0.8635,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,left,right,nan,1,nan,213238,0.8071,0.0,0.8884,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,left,right,nan,2,nan,217224,0.8193,0.0,0.8943,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,left,right,nan,3,nan,225431,0.8458,0.0,0.9077,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,left,right,nan,4,nan,221184,0.8315,0.0,0.9002,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,left,right,nan,5,nan,217871,0.8203,0.0,0.8942,0.0,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,updates_from_layer,left,right,nan,0,nan,190173,0.0114,0.7088,0.0132,0.8217,right,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,updates_from_layer,left,right,nan,3,nan,175741,0.6645,0.0042,0.7942,0.005,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,whole_state_control,left,right,nan,0,0.99999,239294,0.0,0.8771,0.0,0.9173,right,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,whole_state_control,left,right,nan,5,1.0,239287,0.0,0.8771,0.0,0.9173,right,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,right,left,nan,0,nan,236400,0.0001,0.8746,0.0001,0.9199,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,right,left,nan,1,nan,240177,0.0,0.8823,0.0,0.9211,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,right,left,nan,2,nan,233563,0.0,0.8658,0.0,0.9159,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,right,left,nan,3,nan,227292,0.0,0.8465,0.0,0.9069,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,right,left,nan,4,nan,233476,0.0,0.8654,0.0,0.9156,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,single_layer_update,right,left,nan,5,nan,237511,0.0,0.8764,0.0,0.9198,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,updates_from_layer,right,left,nan,0,nan,33353,0.1258,0.0014,0.2231,0.0026,neither,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,updates_from_layer,right,left,nan,3,nan,146004,0.0005,0.5525,0.0007,0.7098,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,whole_state_control,right,left,nan,0,0.999992,225660,0.8431,0.0,0.9043,0.0,left,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter,whole_state_control,right,left,nan,5,1.0,225651,0.8431,0.0,0.9043,0.0,left,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,baseline,left,,nan,-1,nan,72206,0.869,0.0114,0.8723,0.0114,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,baseline,right,,nan,-1,nan,63126,0.0,0.7426,0.0,0.7958,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,blend,left,right,-0.5,-1,nan,60838,0.7618,0.0,0.8297,0.0,left,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,blend,left,right,0.25,-1,nan,67166,0.7735,0.0473,0.8043,0.0492,left,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,blend,left,right,0.5,-1,nan,57532,0.1178,0.5968,0.1315,0.6669,right,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,blend,left,right,0.75,-1,nan,63822,0.0058,0.7573,0.0062,0.8074,right,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,blend,left,right,1.5,-1,nan,36004,0.0,0.4523,0.0,0.6054,right,nan
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,left,right,nan,0,nan,67908,0.8032,0.0324,0.8308,0.0335,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,left,right,nan,1,nan,72096,0.8516,0.032,0.8554,0.0321,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,left,right,nan,2,nan,71014,0.8392,0.0311,0.8493,0.0315,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,left,right,nan,3,nan,70353,0.8336,0.0297,0.8476,0.0302,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,left,right,nan,4,nan,70892,0.8412,0.0265,0.852,0.0269,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,left,right,nan,5,nan,67638,0.8055,0.0241,0.8348,0.025,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,updates_from_layer,left,right,nan,0,nan,51500,0.0302,0.6219,0.0353,0.7287,right,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,updates_from_layer,left,right,nan,3,nan,44184,0.4719,0.0795,0.5872,0.099,left,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,whole_state_control,left,right,nan,0,0.999995,63143,0.0,0.7428,0.0,0.7959,right,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,whole_state_control,left,right,nan,5,1.0,63126,0.0,0.7426,0.0,0.7958,right,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,right,left,nan,0,nan,67489,0.0012,0.8009,0.0012,0.8316,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,right,left,nan,1,nan,64784,0.0003,0.7723,0.0003,0.8176,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,right,left,nan,2,nan,64117,0.0002,0.7647,0.0002,0.8136,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,right,left,nan,3,nan,64105,0.0002,0.7622,0.0002,0.811,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,right,left,nan,4,nan,64404,0.0001,0.7715,0.0001,0.8191,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,single_layer_update,right,left,nan,5,nan,65054,0.0002,0.7796,0.0002,0.8237,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,updates_from_layer,right,left,nan,0,nan,20326,0.0563,0.2038,0.088,0.3187,neither,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,updates_from_layer,right,left,nan,3,nan,58666,0.0065,0.7197,0.0072,0.7974,right,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,whole_state_control,right,left,nan,0,0.999996,72203,0.869,0.0114,0.8723,0.0114,left,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex,whole_state_control,right,left,nan,5,0.999997,72204,0.869,0.0114,0.8722,0.0114,left,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,baseline,left,,nan,-1,nan,220560,0.8092,0.0,0.8815,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,baseline,right,,nan,-1,nan,234110,0.0,0.8601,0.0,0.9112,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,blend,left,right,-0.5,-1,nan,63762,0.2359,0.0,0.3799,0.0,neither,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,blend,left,right,0.25,-1,nan,195875,0.732,0.0009,0.8402,0.001,left,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,blend,left,right,0.5,-1,nan,148978,0.1914,0.3729,0.2446,0.4765,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,blend,left,right,0.75,-1,nan,220810,0.0017,0.8232,0.0019,0.896,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,blend,left,right,1.5,-1,nan,183398,0.0,0.6721,0.0,0.7928,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,left,right,nan,0,nan,196415,0.7344,0.0001,0.8419,0.0001,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,left,right,nan,1,nan,206581,0.7707,0.0,0.8644,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,left,right,nan,2,nan,211879,0.7866,0.0001,0.8725,0.0001,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,left,right,nan,3,nan,222203,0.8184,0.0001,0.8885,0.0001,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,left,right,nan,4,nan,216211,0.7985,0.0,0.8777,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,left,right,nan,5,nan,212104,0.7845,0.0,0.8698,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,updates_from_layer,left,right,nan,0,nan,186252,0.0295,0.6741,0.0346,0.7902,right,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,updates_from_layer,left,right,nan,3,nan,174631,0.6532,0.0023,0.786,0.0027,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,whole_state_control,left,right,nan,0,0.999991,234117,0.0,0.8601,0.0,0.9112,right,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,whole_state_control,left,right,nan,5,1.0,234110,0.0,0.8601,0.0,0.9112,right,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,right,left,nan,0,nan,228859,0.0004,0.8472,0.0004,0.9071,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,right,left,nan,1,nan,238065,0.0,0.8717,0.0,0.9162,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,right,left,nan,2,nan,229108,0.0001,0.8479,0.0001,0.9073,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,right,left,nan,3,nan,222158,0.0,0.8258,0.0,0.8963,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,right,left,nan,4,nan,228806,0.0,0.8468,0.0,0.9068,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,single_layer_update,right,left,nan,5,nan,232578,0.0,0.8579,0.0,0.9117,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,updates_from_layer,right,left,nan,0,nan,35395,0.1316,0.0019,0.2321,0.0034,neither,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,updates_from_layer,right,left,nan,3,nan,139466,0.0016,0.5248,0.0021,0.6865,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,whole_state_control,right,left,nan,0,0.999988,220552,0.8092,0.0,0.8814,0.0,left,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter,whole_state_control,right,left,nan,5,1.0,220560,0.8092,0.0,0.8815,0.0,left,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,baseline,left,,nan,-1,nan,68431,0.8673,0.008,0.8718,0.008,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,baseline,right,,nan,-1,nan,50090,0.0,0.6343,0.0,0.739,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,blend,left,right,-0.5,-1,nan,54452,0.7129,0.0,0.7977,0.0,left,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,blend,left,right,0.25,-1,nan,67658,0.8221,0.0449,0.831,0.0456,left,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,blend,left,right,0.5,-1,nan,56880,0.3143,0.4307,0.3449,0.4749,both,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,blend,left,right,0.75,-1,nan,52715,0.0025,0.6695,0.0028,0.7633,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,blend,left,right,1.5,-1,nan,29517,0.0,0.4032,0.0,0.5669,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,left,right,nan,0,nan,65246,0.8131,0.0301,0.8367,0.0312,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,left,right,nan,1,nan,69603,0.8658,0.0273,0.863,0.0273,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,left,right,nan,2,nan,68925,0.8579,0.0264,0.8593,0.0266,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,left,right,nan,3,nan,68945,0.8588,0.0264,0.86,0.0266,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,left,right,nan,4,nan,69082,0.8604,0.0259,0.8608,0.0261,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,left,right,nan,5,nan,67621,0.8445,0.0223,0.8539,0.0227,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,updates_from_layer,left,right,nan,0,nan,35645,0.0089,0.464,0.0118,0.6146,right,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,updates_from_layer,left,right,nan,3,nan,52628,0.6066,0.0765,0.6889,0.0873,left,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,whole_state_control,left,right,nan,0,0.999993,50111,0.0,0.6344,0.0,0.739,right,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,whole_state_control,left,right,nan,5,1.0,50090,0.0,0.6343,0.0,0.739,right,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,right,left,nan,0,nan,57274,0.0005,0.7314,0.0006,0.804,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,right,left,nan,1,nan,53539,0.0,0.6877,0.0,0.7788,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,right,left,nan,2,nan,52883,0.0,0.6799,0.0,0.7741,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,right,left,nan,3,nan,52400,0.0,0.6715,0.0,0.7675,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,right,left,nan,4,nan,52379,0.0,0.6714,0.0,0.7675,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,single_layer_update,right,left,nan,5,nan,52785,0.0,0.6791,0.0,0.7738,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,updates_from_layer,right,left,nan,0,nan,20278,0.1468,0.1163,0.227,0.1803,neither,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,updates_from_layer,right,left,nan,3,nan,48335,0.003,0.6278,0.0035,0.7423,right,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,whole_state_control,right,left,nan,0,0.999995,68443,0.8674,0.008,0.8718,0.0081,left,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex,whole_state_control,right,left,nan,5,0.999996,68433,0.8673,0.008,0.8718,0.008,left,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,baseline,left,,nan,-1,nan,220250,0.8317,0.0,0.8965,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,baseline,right,,nan,-1,nan,232421,0.0,0.8641,0.0,0.9152,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,blend,left,right,-0.5,-1,nan,61933,0.2365,0.0,0.3812,0.0,neither,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,blend,left,right,0.25,-1,nan,190342,0.7313,0.0,0.8409,0.0,left,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,blend,left,right,0.5,-1,nan,117316,0.1148,0.3351,0.1577,0.4627,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,blend,left,right,0.75,-1,nan,217561,0.0,0.8207,0.0,0.8963,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,blend,left,right,1.5,-1,nan,169967,0.0,0.6328,0.0,0.7672,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,left,right,nan,0,nan,192377,0.7389,0.0,0.8458,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,left,right,nan,1,nan,207463,0.7943,0.0,0.8797,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,left,right,nan,2,nan,211039,0.805,0.0,0.8847,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,left,right,nan,3,nan,220742,0.8372,0.0,0.9015,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,left,right,nan,4,nan,214591,0.8161,0.0,0.8902,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,left,right,nan,5,nan,210071,0.8,0.0,0.8811,0.0,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,updates_from_layer,left,right,nan,0,nan,172534,0.0059,0.6518,0.007,0.7856,right,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,updates_from_layer,left,right,nan,3,nan,148908,0.5739,0.001,0.7272,0.0013,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,whole_state_control,left,right,nan,0,0.999991,232439,0.0,0.8641,0.0,0.9152,right,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,whole_state_control,left,right,nan,5,1.0,232421,0.0,0.8641,0.0,0.9152,right,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,right,left,nan,0,nan,228751,0.0,0.8541,0.0,0.9114,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,right,left,nan,1,nan,233553,0.0,0.8665,0.0,0.9157,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,right,left,nan,2,nan,226362,0.0,0.8473,0.0,0.9086,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,right,left,nan,3,nan,220320,0.0,0.8272,0.0,0.8981,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,right,left,nan,4,nan,227343,0.0,0.8503,0.0,0.91,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,single_layer_update,right,left,nan,5,nan,230754,0.0,0.8606,0.0,0.9146,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,updates_from_layer,right,left,nan,0,nan,24303,0.0935,0.0001,0.1709,0.0001,neither,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,updates_from_layer,right,left,nan,3,nan,125861,0.0001,0.4794,0.0001,0.6474,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,whole_state_control,right,left,nan,0,0.999986,220330,0.832,0.0,0.8967,0.0,left,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter,whole_state_control,right,left,nan,5,1.0,220250,0.8317,0.0,0.8965,0.0,left,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,baseline,left,,nan,-1,nan,71179,0.8681,0.0035,0.8727,0.0036,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,baseline,right,,nan,-1,nan,67307,0.0,0.7881,0.0,0.8186,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,blend,left,right,-0.5,-1,nan,59004,0.7466,0.0,0.8204,0.0,left,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,blend,left,right,0.25,-1,nan,68578,0.8078,0.0328,0.8272,0.0338,left,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,blend,left,right,0.5,-1,nan,66307,0.2633,0.5622,0.274,0.5882,neither,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,blend,left,right,0.75,-1,nan,68954,0.0045,0.8107,0.0046,0.8322,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,blend,left,right,1.5,-1,nan,40515,0.0,0.515,0.0,0.6614,right,nan
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,left,right,nan,0,nan,66365,0.7972,0.0191,0.8294,0.02,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,left,right,nan,1,nan,70493,0.8461,0.0167,0.8548,0.017,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,left,right,nan,2,nan,69609,0.8355,0.0164,0.8493,0.0167,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,left,right,nan,3,nan,69052,0.8304,0.016,0.8475,0.0164,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,left,right,nan,4,nan,69033,0.8291,0.0159,0.8462,0.0163,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,left,right,nan,5,nan,66491,0.8034,0.0128,0.8351,0.0134,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,updates_from_layer,left,right,nan,0,nan,49706,0.0259,0.604,0.0306,0.7175,right,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,updates_from_layer,left,right,nan,3,nan,50006,0.572,0.0541,0.6749,0.0642,left,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,whole_state_control,left,right,nan,0,0.999994,67332,0.0,0.7883,0.0,0.8187,right,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,whole_state_control,left,right,nan,5,1.0,67307,0.0,0.7881,0.0,0.8186,right,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,right,left,nan,0,nan,71551,0.0,0.8369,0.0,0.8436,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,right,left,nan,1,nan,68891,0.0,0.8127,0.0,0.8347,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,right,left,nan,2,nan,68568,0.0,0.8095,0.0,0.8333,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,right,left,nan,3,nan,68790,0.0,0.8087,0.0,0.8311,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,right,left,nan,4,nan,69349,0.0,0.8142,0.0,0.8335,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,single_layer_update,right,left,nan,5,nan,69622,0.0,0.8185,0.0,0.8363,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,updates_from_layer,right,left,nan,0,nan,16612,0.0889,0.1154,0.1445,0.1879,neither,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,updates_from_layer,right,left,nan,3,nan,64264,0.0082,0.7763,0.0087,0.8243,right,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,whole_state_control,right,left,nan,0,0.999996,71199,0.8683,0.0035,0.8728,0.0036,left,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex,whole_state_control,right,left,nan,5,0.999998,71182,0.8681,0.0035,0.8728,0.0036,left,True

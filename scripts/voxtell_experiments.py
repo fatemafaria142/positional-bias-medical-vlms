@@ -98,30 +98,47 @@ def _region_metrics(mask, region, orig_voxels):
             "empty": n == 0}
 
 
-def run_erasure(predictor, img_arr, label_vol, organs, ids, prompts, seed=0):
+def run_erasure(predictor, img_arr, label_vol, organs, ids, prompts, seed=0, return_slices=False):
+    """Row 13. With return_slices=True it returns (rows, slices): for every prompt organ and condition one 2-D plane of the image
+    the model received (float16) and of the predicted mask (uint8), plus the true organs on the same plane, so that the
+    experiment can be drawn on real scan images. The plane cuts the volume across its thinnest axis at the named organ's centroid."""
     rng = np.random.default_rng(seed)
     regions = {o: label_vol == ids[o] for o in organs}
     orig = predict_masks(predictor, img_arr, [prompts[o] for o in organs])
     orig_n = {o: int(orig[k].sum()) for k, o in enumerate(organs)}
-    rows = []
+    rows, slices = [], {}
+    axis = int(np.argmin(label_vol.shape))                  # through-plane axis of the scan
+    plane = {o: int(round(centroid(regions[o])[axis])) if regions[o].any() else label_vol.shape[axis] // 2 for o in organs}
 
-    def add(cond, o, mask):
+    def add(cond, o, mask, img):
         rows.append({"organ": o, "condition": cond, "prompt": prompts[o],
                      **_region_metrics(mask, regions[o], orig_n[o])})
+        if return_slices:
+            i = plane[o]
+            slices[f"{o}|{cond}|image"] = np.take(img[0], i, axis=axis).astype(np.float16)
+            slices[f"{o}|{cond}|mask"] = np.take(mask, i, axis=axis).astype(np.uint8)
 
     for k, o in enumerate(organs):
-        add("original", o, orig[k])
+        add("original", o, orig[k], img_arr)
     for o in organs:                                        # only the named organ replaced by noise
         img = noise_region(img_arr, regions[o], rng)
-        add("noise_target", o, predict_masks(predictor, img, [prompts[o]])[0])
+        add("noise_target", o, predict_masks(predictor, img, [prompts[o]])[0], img)
     for o in [x for x in organs if x.startswith("left") and mirror(x) in organs]:   # both organs of the pair replaced by noise
         img = noise_region(noise_region(img_arr, regions[o], rng), regions[mirror(o)], rng)
         m = predict_masks(predictor, img, [prompts[o], prompts[mirror(o)]])
-        add("noise_pair", o, m[0])
-        add("noise_pair", mirror(o), m[1])
-    noisy = predict_masks(predictor, noise_image(img_arr, rng), [prompts[o] for o in organs])
+        add("noise_pair", o, m[0], img)
+        add("noise_pair", mirror(o), m[1], img)
+    nimg = noise_image(img_arr, rng)
+    noisy = predict_masks(predictor, nimg, [prompts[o] for o in organs])
     for k, o in enumerate(organs):
-        add("noise_image", o, noisy[k])
+        add("noise_image", o, noisy[k], nimg)
+    if return_slices:
+        for o in organs:
+            slices[f"{o}|axis"] = np.array(axis)
+            slices[f"{o}|index"] = np.array(plane[o])
+            for p_ in organs:
+                slices[f"{o}|true|{p_}"] = np.take(regions[p_], plane[o], axis=axis).astype(np.uint8)
+        return rows, slices
     return rows
 
 
@@ -136,6 +153,9 @@ class LayerDistanceRecorder:
     def __init__(self, pair_defs, union_crop):
         self.pair_defs, self.union_crop = pair_defs, union_crop      # [(name, row_i, row_j)]
         self.union_padded = None
+        self.cos, self.l2, self.flags = [], [], []
+
+    def reset(self):
         self.cos, self.l2, self.flags = [], [], []
 
     def on_patch(self, slicer, states, attns, ctx):
@@ -198,9 +218,44 @@ def _attention_rows(attn, organs, regions_crop, rl_axis):
     return rows, com_rows
 
 
+_OOM = getattr(torch, "OutOfMemoryError", torch.cuda.OutOfMemoryError)      # older torch only has the cuda one
+
+
+def _run_chunked(predictor, data, emb_all, outputs, bbox, orig_shape, attn_factory, attn_rows, on_patch, reset, chunk=12):
+    """Run the (many) outputs in chunks so the logits / decoder activations fit on the GPU. The attention and the layer
+    recorder only need one pass, so they ride on the first chunk. A chunk that runs out of memory is retried with half the
+    size. Returns (bool masks (n_out, X, Y, Z) in the original grid, attention or None)."""
+    import gc
+    masks, attn, i = [], None, 0
+    while i < len(outputs):
+        part, first = outputs[i:i + chunk], i == 0
+        oom = False
+        try:
+            logits, a = vm.run_outputs(predictor, data, emb_all, part,
+                                       attn_acc_factory=attn_factory if first else None,
+                                       attn_rows=attn_rows if first else None, on_patch=on_patch if first else None)
+        except _OOM:
+            oom = True
+        if oom:                                   # clean up outside the except block so the failed frames are released
+            gc.collect(); torch.cuda.empty_cache()
+            if chunk == 1:
+                raise RuntimeError("out of GPU memory even with one output per pass")
+            chunk = max(1, chunk // 2)
+            if first:
+                reset()
+            continue
+        masks.append(_to_full_masks(logits, bbox, orig_shape))
+        del logits
+        if first:
+            attn = a.cpu() if a is not None else None
+        i += len(part)
+        gc.collect(); torch.cuda.empty_cache()
+    return np.concatenate(masks), attn
+
+
 def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_axis=2,
                       alphas=(-0.5, 0.25, 0.5, 0.75, 1.5), single_layers=range(6), from_layers=(0, 3),
-                      state_layers=(0, 5), map_downsample=4):
+                      state_layers=(0, 5), map_downsample=4, out_chunk=12):
     """Returns dict(row14=[...], row15=[...], row15_centre=[...], row16=[...], attention_maps={name: float16 array})."""
     pairs = [(o, mirror(o)) for o in organs if o.startswith("left") and mirror(o) in organs]
     data, bbox, orig_shape = predictor.preprocess(img_arr)
@@ -253,13 +308,10 @@ def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_ax
             ref_pairs.append((f"{L.split(None, 1)[1]}: {L} vs {others[0]} (reference)", row_of[L], row_of[others[0]]))
     recorder = LayerDistanceRecorder(ref_pairs, union_crop)
 
-    logits, attn = vm.run_outputs(
-        predictor, data, emb_all, outputs,
-        attn_acc_factory=lambda shape, n_layers, n_rows: vm.AttnAccumulator(shape, n_layers, n_rows, predictor.patch_size, predictor.device),
-        attn_rows=len(organs), on_patch=recorder.on_patch)
-
-    masks = _to_full_masks(logits, bbox, orig_shape)
-    del logits
+    masks, attn = _run_chunked(
+        predictor, data, emb_all, outputs, bbox, orig_shape,
+        attn_factory=lambda shape, n_layers, n_rows: vm.AttnAccumulator(shape, n_layers, n_rows, predictor.patch_size, predictor.device),
+        attn_rows=len(organs), on_patch=recorder.on_patch, reset=recorder.reset, chunk=out_chunk)
     base_idx = {(m["pair"], m["dst"]): k for k, m in enumerate(meta) if m["variant"] == "baseline"}
     rows14 = []
     for k, m in enumerate(meta):

@@ -1,0 +1,2 @@
+dataset,slope,intercept,r_squared,n_points,interpretation
+amos22_mri,-4156.424826,794.248544,0.513626,20,flat/negative slope: text difference does not predict where the model points (shortcut/memorized)

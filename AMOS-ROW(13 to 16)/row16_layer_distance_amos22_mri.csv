@@ -1,0 +1,169 @@
+dataset,person,subject_id,pair,scope,layer,n_patches,cosine_distance,relative_l2_distance
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,0,6,0.243932,0.699376
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,1,6,0.268265,0.733683
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,2,6,0.277616,0.746506
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,3,6,0.281954,0.751967
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,4,6,0.283535,0.753858
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,5,6,0.28144,0.751244
+amos22_mri,nipu,amos_0508,kidney: left vs right,organ_patches,6,6,0.273581,0.740694
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,0,6,0.368861,0.859343
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,1,6,0.377508,0.869052
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,2,6,0.40866,0.904081
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,3,6,0.446677,0.945142
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,4,6,0.478248,0.978146
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,5,6,0.506841,1.008061
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),organ_patches,6,6,0.525946,1.028612
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,0,6,0.24498,0.69998
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,1,6,0.241856,0.695807
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,2,6,0.232501,0.682301
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,3,6,0.222675,0.667795
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,4,6,0.209596,0.64793
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,5,6,0.185459,0.609782
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,organ_patches,6,6,0.16283,0.571881
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,0,6,0.368861,0.859343
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,1,6,0.377508,0.869052
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,2,6,0.40866,0.904081
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,3,6,0.446677,0.945142
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,4,6,0.478248,0.978146
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,5,6,0.506841,1.008061
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,6,6,0.525946,1.028612
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,0,6,0.243932,0.699376
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,1,6,0.268265,0.733683
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,2,6,0.277616,0.746506
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,3,6,0.281954,0.751967
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,4,6,0.283535,0.753858
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,5,6,0.28144,0.751244
+amos22_mri,nipu,amos_0508,kidney: left vs right,all_patches,6,6,0.273581,0.740694
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,0,6,0.368861,0.859343
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,1,6,0.377508,0.869052
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,2,6,0.40866,0.904081
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,3,6,0.446677,0.945142
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,4,6,0.478248,0.978146
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,5,6,0.506841,1.008061
+amos22_mri,nipu,amos_0508,kidney: left kidney vs left adrenal gland (reference),all_patches,6,6,0.525946,1.028612
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,0,6,0.24498,0.69998
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,1,6,0.241856,0.695807
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,2,6,0.232501,0.682301
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,3,6,0.222675,0.667795
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,4,6,0.209596,0.64793
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,5,6,0.185459,0.609782
+amos22_mri,nipu,amos_0508,adrenal gland: left vs right,all_patches,6,6,0.16283,0.571881
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,0,6,0.368861,0.859343
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,1,6,0.377508,0.869052
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,2,6,0.40866,0.904081
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,3,6,0.446677,0.945142
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,4,6,0.478248,0.978146
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,5,6,0.506841,1.008061
+amos22_mri,nipu,amos_0508,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,6,6,0.525946,1.028612
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,0,6,0.243932,0.699376
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,1,6,0.306146,0.785753
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,2,6,0.339546,0.823187
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,3,6,0.352587,0.83711
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,4,6,0.359285,0.842589
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,5,6,0.383063,0.870283
+amos22_mri,faria,amos_0530,kidney: left vs right,organ_patches,6,6,0.396138,0.887133
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,0,6,0.368861,0.859343
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,1,6,0.374784,0.866001
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,2,6,0.413442,0.909598
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,3,6,0.453194,0.951989
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,4,6,0.486835,0.986703
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,5,6,0.510975,1.009348
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),organ_patches,6,6,0.513975,1.009914
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,0,6,0.24498,0.69998
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,1,6,0.258127,0.720478
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,2,6,0.252511,0.713032
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,3,6,0.246265,0.704837
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,4,6,0.236548,0.691174
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,5,6,0.210133,0.655354
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,organ_patches,6,6,0.188051,0.624974
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,0,6,0.368861,0.859343
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,1,6,0.374784,0.866001
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,2,6,0.413442,0.909598
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,3,6,0.453194,0.951989
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,4,6,0.486835,0.986703
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,5,6,0.510975,1.009348
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,6,6,0.513975,1.009914
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,0,6,0.243932,0.699376
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,1,6,0.306146,0.785753
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,2,6,0.339546,0.823187
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,3,6,0.352587,0.83711
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,4,6,0.359285,0.842589
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,5,6,0.383063,0.870283
+amos22_mri,faria,amos_0530,kidney: left vs right,all_patches,6,6,0.396138,0.887133
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,0,6,0.368861,0.859343
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,1,6,0.374784,0.866001
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,2,6,0.413442,0.909598
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,3,6,0.453194,0.951989
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,4,6,0.486835,0.986703
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,5,6,0.510975,1.009348
+amos22_mri,faria,amos_0530,kidney: left kidney vs left adrenal gland (reference),all_patches,6,6,0.513975,1.009914
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,0,6,0.24498,0.69998
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,1,6,0.258127,0.720478
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,2,6,0.252511,0.713032
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,3,6,0.246265,0.704837
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,4,6,0.236548,0.691174
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,5,6,0.210133,0.655354
+amos22_mri,faria,amos_0530,adrenal gland: left vs right,all_patches,6,6,0.188051,0.624974
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,0,6,0.368861,0.859343
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,1,6,0.374784,0.866001
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,2,6,0.413442,0.909598
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,3,6,0.453194,0.951989
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,4,6,0.486835,0.986703
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,5,6,0.510975,1.009348
+amos22_mri,faria,amos_0530,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,6,6,0.513975,1.009914
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,0,4,0.243932,0.699376
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,1,4,0.27785,0.746953
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,2,4,0.290537,0.763539
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,3,4,0.297777,0.772615
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,4,4,0.29941,0.774342
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,5,4,0.310109,0.789341
+amos22_mri,hridoy,amos_0555,kidney: left vs right,organ_patches,6,4,0.315003,0.797969
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,0,4,0.368861,0.859343
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,1,4,0.379738,0.87168
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,2,4,0.41085,0.906568
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,3,4,0.446352,0.944787
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,4,4,0.474328,0.97397
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,5,4,0.491719,0.992096
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),organ_patches,6,4,0.487423,0.987692
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,0,4,0.24498,0.69998
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,1,4,0.238761,0.691638
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,2,4,0.229271,0.677847
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,3,4,0.219026,0.662697
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,4,4,0.206926,0.644258
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,5,4,0.178841,0.599667
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,organ_patches,6,4,0.1581,0.56498
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,0,4,0.368861,0.859343
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,1,4,0.379738,0.87168
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,2,4,0.41085,0.906568
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,3,4,0.446352,0.944787
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,4,4,0.474328,0.97397
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,5,4,0.491719,0.992096
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),organ_patches,6,4,0.487423,0.987692
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,0,4,0.243932,0.699376
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,1,4,0.27785,0.746953
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,2,4,0.290537,0.763539
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,3,4,0.297777,0.772615
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,4,4,0.29941,0.774342
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,5,4,0.310109,0.789341
+amos22_mri,hridoy,amos_0555,kidney: left vs right,all_patches,6,4,0.315003,0.797969
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,0,4,0.368861,0.859343
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,1,4,0.379738,0.87168
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,2,4,0.41085,0.906568
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,3,4,0.446352,0.944787
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,4,4,0.474328,0.97397
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,5,4,0.491719,0.992096
+amos22_mri,hridoy,amos_0555,kidney: left kidney vs left adrenal gland (reference),all_patches,6,4,0.487423,0.987692
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,0,4,0.24498,0.69998
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,1,4,0.238761,0.691638
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,2,4,0.229271,0.677847
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,3,4,0.219026,0.662697
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,4,4,0.206926,0.644258
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,5,4,0.178841,0.599667
+amos22_mri,hridoy,amos_0555,adrenal gland: left vs right,all_patches,6,4,0.1581,0.56498
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,0,4,0.368861,0.859343
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,1,4,0.379738,0.87168
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,2,4,0.41085,0.906568
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,3,4,0.446352,0.944787
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,4,4,0.474328,0.97397
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,5,4,0.491719,0.992096
+amos22_mri,hridoy,amos_0555,adrenal gland: left adrenal gland vs left kidney (reference),all_patches,6,4,0.487423,0.987692

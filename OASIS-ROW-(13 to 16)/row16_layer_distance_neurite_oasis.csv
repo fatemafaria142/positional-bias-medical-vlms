@@ -1,0 +1,281 @@
+dataset,person,subject_id,pair,scope,layer,n_patches,cosine_distance,relative_l2_distance
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,0,1,0.246952,0.703771
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,1,1,0.265195,0.729109
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,2,1,0.285771,0.756899
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,3,1,0.28682,0.759138
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,4,1,0.244075,0.703584
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,5,1,0.243081,0.703539
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,organ_patches,6,1,0.246035,0.707273
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,1,1,0.45247,0.954164
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,2,1,0.484972,0.987261
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,3,1,0.535358,1.035595
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,4,1,0.608945,1.104134
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,5,1,0.632593,1.125542
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,6,1,0.640297,1.132148
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,0,1,0.205091,0.640456
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,1,1,0.213578,0.653579
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,2,1,0.218811,0.661537
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,3,1,0.223187,0.668119
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,4,1,0.227973,0.67525
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,5,1,0.229889,0.678114
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,organ_patches,6,1,0.229503,0.677648
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,1,1,0.45247,0.954164
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,2,1,0.484972,0.987261
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,3,1,0.535358,1.035595
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,4,1,0.608945,1.104134
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,5,1,0.632593,1.125542
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,6,1,0.640297,1.132148
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,0,1,0.246952,0.703771
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,1,1,0.265195,0.729109
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,2,1,0.285771,0.756899
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,3,1,0.28682,0.759138
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,4,1,0.244075,0.703584
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,5,1,0.243081,0.703539
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left vs right,all_patches,6,1,0.246035,0.707273
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,1,1,0.45247,0.954164
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,2,1,0.484972,0.987261
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,3,1,0.535358,1.035595
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,4,1,0.608945,1.104134
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,5,1,0.632593,1.125542
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,6,1,0.640297,1.132148
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,0,1,0.205091,0.640456
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,1,1,0.213578,0.653579
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,2,1,0.218811,0.661537
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,3,1,0.223187,0.668119
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,4,1,0.227973,0.67525
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,5,1,0.229889,0.678114
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left vs right,all_patches,6,1,0.229503,0.677648
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,1,1,0.45247,0.954164
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,2,1,0.484972,0.987261
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,3,1,0.535358,1.035595
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,4,1,0.608945,1.104134
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,5,1,0.632593,1.125542
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,6,1,0.640297,1.132148
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,0,1,0.246952,0.703771
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,1,1,0.26349,0.726861
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,2,1,0.282907,0.753605
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,3,1,0.270329,0.737032
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,4,1,0.220414,0.6671
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,5,1,0.224154,0.672634
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,organ_patches,6,1,0.233382,0.685583
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,1,1,0.453226,0.955038
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,2,1,0.486838,0.989062
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,3,1,0.543578,1.042961
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,4,1,0.617806,1.113784
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,5,1,0.634696,1.128589
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,6,1,0.637349,1.130126
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,0,1,0.205091,0.640456
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,1,1,0.212427,0.651817
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,2,1,0.217113,0.65897
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,3,1,0.221285,0.665271
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,4,1,0.226146,0.672544
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,5,1,0.228342,0.675863
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,organ_patches,6,1,0.229746,0.678186
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,1,1,0.453226,0.955038
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,2,1,0.486838,0.989062
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,3,1,0.543578,1.042961
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,4,1,0.617806,1.113784
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,5,1,0.634696,1.128589
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,6,1,0.637349,1.130126
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,0,1,0.246952,0.703771
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,1,1,0.26349,0.726861
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,2,1,0.282907,0.753605
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,3,1,0.270329,0.737032
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,4,1,0.220414,0.6671
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,5,1,0.224154,0.672634
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left vs right,all_patches,6,1,0.233382,0.685583
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,1,1,0.453226,0.955038
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,2,1,0.486838,0.989062
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,3,1,0.543578,1.042961
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,4,1,0.617806,1.113784
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,5,1,0.634696,1.128589
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,6,1,0.637349,1.130126
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,0,1,0.205091,0.640456
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,1,1,0.212427,0.651817
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,2,1,0.217113,0.65897
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,3,1,0.221285,0.665271
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,4,1,0.226146,0.672544
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,5,1,0.228342,0.675863
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left vs right,all_patches,6,1,0.229746,0.678186
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,1,1,0.453226,0.955038
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,2,1,0.486838,0.989062
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,3,1,0.543578,1.042961
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,4,1,0.617806,1.113784
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,5,1,0.634696,1.128589
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,6,1,0.637349,1.130126
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,0,1,0.246952,0.703771
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,1,1,0.263528,0.726923
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,2,1,0.282146,0.752626
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,3,1,0.26587,0.730728
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,4,1,0.212718,0.654968
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,5,1,0.215818,0.659525
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,organ_patches,6,1,0.224812,0.672454
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,1,1,0.45351,0.955325
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,2,1,0.487674,0.989886
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,3,1,0.547425,1.046522
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,4,1,0.622104,1.118416
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,5,1,0.637238,1.131507
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,6,1,0.638692,1.131755
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,0,1,0.205091,0.640456
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,1,1,0.212872,0.652503
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,2,1,0.21749,0.659547
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,3,1,0.22154,0.665659
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,4,1,0.226159,0.67257
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,5,1,0.231275,0.680255
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,organ_patches,6,1,0.237044,0.689385
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,1,1,0.45351,0.955325
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,2,1,0.487674,0.989886
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,3,1,0.547425,1.046522
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,4,1,0.622104,1.118416
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,5,1,0.637238,1.131507
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,6,1,0.638692,1.131755
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,0,1,0.246952,0.703771
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,1,1,0.263528,0.726923
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,2,1,0.282146,0.752626
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,3,1,0.26587,0.730728
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,4,1,0.212718,0.654968
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,5,1,0.215818,0.659525
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left vs right,all_patches,6,1,0.224812,0.672454
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,1,1,0.45351,0.955325
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,2,1,0.487674,0.989886
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,3,1,0.547425,1.046522
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,4,1,0.622104,1.118416
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,5,1,0.637238,1.131507
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,6,1,0.638692,1.131755
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,0,1,0.205091,0.640456
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,1,1,0.212872,0.652503
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,2,1,0.21749,0.659547
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,3,1,0.22154,0.665659
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,4,1,0.226159,0.67257
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,5,1,0.231275,0.680255
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left vs right,all_patches,6,1,0.237044,0.689385
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,1,1,0.45351,0.955325
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,2,1,0.487674,0.989886
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,3,1,0.547425,1.046522
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,4,1,0.622104,1.118416
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,5,1,0.637238,1.131507
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,6,1,0.638692,1.131755
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,0,1,0.246952,0.703771
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,1,1,0.264486,0.728191
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,2,1,0.284996,0.756456
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,3,1,0.266726,0.732021
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,4,1,0.212126,0.654603
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,5,1,0.21583,0.660031
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,organ_patches,6,1,0.224594,0.672461
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,1,1,0.453128,0.954897
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,2,1,0.486339,0.988534
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,3,1,0.543807,1.043045
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,4,1,0.615558,1.112717
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,5,1,0.626321,1.121951
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,6,1,0.625578,1.120159
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,0,1,0.205091,0.640456
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,1,1,0.21344,0.653374
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,2,1,0.218738,0.661433
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,3,1,0.223341,0.668349
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,4,1,0.228399,0.675876
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,5,1,0.231242,0.680117
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,organ_patches,6,1,0.233152,0.68322
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,1,1,0.453128,0.954897
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,2,1,0.486339,0.988534
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,3,1,0.543807,1.043045
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,4,1,0.615558,1.112717
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,5,1,0.626321,1.121951
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,6,1,0.625578,1.120159
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,0,1,0.246952,0.703771
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,1,1,0.264486,0.728191
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,2,1,0.284996,0.756456
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,3,1,0.266726,0.732021
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,4,1,0.212126,0.654603
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,5,1,0.21583,0.660031
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left vs right,all_patches,6,1,0.224594,0.672461
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,1,1,0.453128,0.954897
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,2,1,0.486339,0.988534
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,3,1,0.543807,1.043045
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,4,1,0.615558,1.112717
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,5,1,0.626321,1.121951
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,6,1,0.625578,1.120159
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,0,1,0.205091,0.640456
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,1,1,0.21344,0.653374
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,2,1,0.218738,0.661433
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,3,1,0.223341,0.668349
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,4,1,0.228399,0.675876
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,5,1,0.231242,0.680117
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left vs right,all_patches,6,1,0.233152,0.68322
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,1,1,0.453128,0.954897
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,2,1,0.486339,0.988534
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,3,1,0.543807,1.043045
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,4,1,0.615558,1.112717
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,5,1,0.626321,1.121951
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,6,1,0.625578,1.120159
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,0,1,0.246952,0.703771
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,1,1,0.264073,0.727656
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,2,1,0.283311,0.754152
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,3,1,0.270419,0.736943
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,4,1,0.220795,0.66716
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,5,1,0.225264,0.673653
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,organ_patches,6,1,0.235229,0.687718
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,1,1,0.452995,0.954798
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,2,1,0.487293,0.989539
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,3,1,0.545706,1.044976
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,4,1,0.620223,1.115986
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,5,1,0.635647,1.129368
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),organ_patches,6,1,0.637004,1.12971
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,0,1,0.205091,0.640456
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,1,1,0.212978,0.652661
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,2,1,0.217543,0.659621
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,3,1,0.221601,0.665745
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,4,1,0.22622,0.672653
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,5,1,0.230901,0.6797
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,organ_patches,6,1,0.236824,0.689193
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,1,1,0.452995,0.954798
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,2,1,0.487293,0.989539
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,3,1,0.545706,1.044976
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,4,1,0.620223,1.115986
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,5,1,0.635647,1.129368
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),organ_patches,6,1,0.637004,1.12971
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,0,1,0.246952,0.703771
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,1,1,0.264073,0.727656
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,2,1,0.283311,0.754152
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,3,1,0.270419,0.736943
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,4,1,0.220795,0.66716
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,5,1,0.225264,0.673653
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left vs right,all_patches,6,1,0.235229,0.687718
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,1,1,0.452995,0.954798
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,2,1,0.487293,0.989539
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,3,1,0.545706,1.044976
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,4,1,0.620223,1.115986
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,5,1,0.635647,1.129368
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebral white matter: left cerebral white matter vs left cerebellum cortex (reference),all_patches,6,1,0.637004,1.12971
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,0,1,0.205091,0.640456
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,1,1,0.212978,0.652661
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,2,1,0.217543,0.659621
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,3,1,0.221601,0.665745
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,4,1,0.22622,0.672653
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,5,1,0.230901,0.6797
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left vs right,all_patches,6,1,0.236824,0.689193
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,0,1,0.442014,0.943462
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,1,1,0.452995,0.954798
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,2,1,0.487293,0.989539
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,3,1,0.545706,1.044976
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,4,1,0.620223,1.115986
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,5,1,0.635647,1.129368
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,cerebellum cortex: left cerebellum cortex vs left cerebral white matter (reference),all_patches,6,1,0.637004,1.12971

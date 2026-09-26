@@ -1,0 +1,81 @@
+dataset,person,subject_id,organ,condition,prompt,n_pred_voxels,size_vs_original,cov_of_noised_region,frac_of_mask_in_region,centroid_offset_vox,empty
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter,original,Segment the left cerebral white matter in this image.,261529,1.0,0.8042,0.9559,2.0,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex,original,Segment the left cerebellum cortex in this image.,75235,1.0,0.8791,0.8417,3.2,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral white matter,original,Segment the right cerebral white matter in this image.,300254,1.0,0.8678,0.9259,1.5,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum cortex,original,Segment the right cerebellum cortex in this image.,67146,1.0,0.7414,0.8105,6.6,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter,noise_target,Segment the left cerebral white matter in this image.,17032,0.0651,0.0126,0.2302,12.5,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex,noise_target,Segment the left cerebellum cortex in this image.,67485,0.897,0.8002,0.8542,1.2,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral white matter,noise_target,Segment the right cerebral white matter in this image.,75780,0.2524,0.1441,0.6093,5.2,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum cortex,noise_target,Segment the right cerebellum cortex in this image.,54430,0.8106,0.6489,0.875,6.9,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter,noise_pair,Segment the left cerebral white matter in this image.,11360,0.0434,0.0138,0.3789,7.5,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral white matter,noise_pair,Segment the right cerebral white matter in this image.,83743,0.2789,0.2117,0.81,6.0,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex,noise_pair,Segment the left cerebellum cortex in this image.,78383,1.0418,0.9027,0.8296,1.2,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum cortex,noise_pair,Segment the right cerebellum cortex in this image.,65334,0.973,0.7429,0.8347,6.7,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebral white matter,noise_image,Segment the left cerebral white matter in this image.,108476,0.4148,0.0002,0.0007,118.5,False
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,left cerebellum cortex,noise_image,Segment the left cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebral white matter,noise_image,Segment the right cerebral white matter in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,hridoy,OASIS_OAS1_0123_MR1,right cerebellum cortex,noise_image,Segment the right cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter,original,Segment the left cerebral white matter in this image.,242768,1.0,0.8406,0.9759,2.3,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex,original,Segment the left cerebellum cortex in this image.,56742,1.0,0.8476,0.8824,2.9,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral white matter,original,Segment the right cerebral white matter in this image.,258322,1.0,0.873,0.9722,2.1,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebellum cortex,original,Segment the right cerebellum cortex in this image.,58383,1.0,0.7903,0.8081,5.9,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter,noise_target,Segment the left cerebral white matter in this image.,11537,0.0475,0.0113,0.2761,5.9,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex,noise_target,Segment the left cerebellum cortex in this image.,44843,0.7903,0.6809,0.897,1.7,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral white matter,noise_target,Segment the right cerebral white matter in this image.,34840,0.1349,0.0487,0.402,12.2,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebellum cortex,noise_target,Segment the right cerebellum cortex in this image.,31686,0.5427,0.474,0.893,6.8,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter,noise_pair,Segment the left cerebral white matter in this image.,4513,0.0186,0.0047,0.2943,8.7,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral white matter,noise_pair,Segment the right cerebral white matter in this image.,60807,0.2354,0.1657,0.7841,5.8,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex,noise_pair,Segment the left cerebellum cortex in this image.,52109,0.9183,0.7983,0.905,1.9,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebellum cortex,noise_pair,Segment the right cerebellum cortex in this image.,41065,0.7034,0.6125,0.8904,7.5,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebral white matter,noise_image,Segment the left cerebral white matter in this image.,140453,0.5785,0.0795,0.1595,41.4,False
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,left cerebellum cortex,noise_image,Segment the left cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebral white matter,noise_image,Segment the right cerebral white matter in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,hridoy,OASIS_OAS1_0135_MR1,right cerebellum cortex,noise_image,Segment the right cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,original,Segment the left cerebral white matter in this image.,225631,1.0,0.843,0.9752,2.1,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,original,Segment the left cerebellum cortex in this image.,72204,1.0,0.869,0.8755,2.5,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,original,Segment the right cerebral white matter in this image.,239286,1.0,0.8771,0.9613,1.5,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,original,Segment the right cerebellum cortex in this image.,63119,1.0,0.7425,0.8572,5.1,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,noise_target,Segment the left cerebral white matter in this image.,14359,0.0636,0.012,0.2186,9.6,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,noise_target,Segment the left cerebellum cortex in this image.,52015,0.7204,0.6432,0.8996,2.9,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,noise_target,Segment the right cerebral white matter in this image.,47747,0.1995,0.0368,0.202,9.2,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,noise_target,Segment the right cerebellum cortex in this image.,37563,0.5951,0.4735,0.9185,5.0,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,noise_pair,Segment the left cerebral white matter in this image.,15451,0.0685,0.0108,0.1823,10.9,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,noise_pair,Segment the right cerebral white matter in this image.,53865,0.2251,0.1077,0.5244,4.8,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,noise_pair,Segment the left cerebellum cortex in this image.,67886,0.9402,0.8325,0.8922,0.7,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,noise_pair,Segment the right cerebellum cortex in this image.,48883,0.7745,0.6158,0.9179,5.5,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,noise_image,Segment the left cerebral white matter in this image.,560256,2.4831,0.2086,0.0972,24.2,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,noise_image,Segment the left cerebellum cortex in this image.,28705,0.3976,0.0,0.0,152.2,False
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,noise_image,Segment the right cerebral white matter in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,noise_image,Segment the right cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter,original,Segment the left cerebral white matter in this image.,220581,1.0,0.8093,0.9679,2.7,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex,original,Segment the left cerebellum cortex in this image.,68433,1.0,0.8673,0.8763,2.3,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral white matter,original,Segment the right cerebral white matter in this image.,234112,1.0,0.8601,0.9687,2.1,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebellum cortex,original,Segment the right cerebellum cortex in this image.,50082,1.0,0.6342,0.8851,5.9,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter,noise_target,Segment the left cerebral white matter in this image.,15270,0.0692,0.0134,0.2315,10.6,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex,noise_target,Segment the left cerebellum cortex in this image.,49658,0.7256,0.6353,0.8846,0.5,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral white matter,noise_target,Segment the right cerebral white matter in this image.,29509,0.126,0.0359,0.3206,15.3,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebellum cortex,noise_target,Segment the right cerebellum cortex in this image.,32259,0.6441,0.4355,0.9436,7.2,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter,noise_pair,Segment the left cerebral white matter in this image.,4525,0.0205,0.0048,0.2807,10.2,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral white matter,noise_pair,Segment the right cerebral white matter in this image.,56394,0.2409,0.172,0.8042,8.5,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex,noise_pair,Segment the left cerebellum cortex in this image.,62143,0.9081,0.7975,0.8873,1.5,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebellum cortex,noise_pair,Segment the right cerebellum cortex in this image.,43567,0.8699,0.5804,0.9312,7.5,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebral white matter,noise_image,Segment the left cerebral white matter in this image.,272168,1.2339,0.1567,0.1519,28.0,False
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,left cerebellum cortex,noise_image,Segment the left cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebral white matter,noise_image,Segment the right cerebral white matter in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,nipu,OASIS_OAS1_0062_MR1,right cerebellum cortex,noise_image,Segment the right cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,original,Segment the left cerebral white matter in this image.,220256,1.0,0.8318,0.9723,1.8,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,original,Segment the left cerebellum cortex in this image.,71182,1.0,0.8681,0.8775,3.3,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,original,Segment the right cerebral white matter in this image.,232420,1.0,0.8641,0.9728,1.6,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,original,Segment the right cerebellum cortex in this image.,67317,1.0,0.7882,0.8515,4.5,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,noise_target,Segment the left cerebral white matter in this image.,14852,0.0674,0.0127,0.2198,7.3,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,noise_target,Segment the left cerebellum cortex in this image.,51647,0.7256,0.6396,0.8911,2.3,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,noise_target,Segment the right cerebral white matter in this image.,78259,0.3367,0.0976,0.3265,12.4,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,noise_target,Segment the right cerebellum cortex in this image.,26065,0.3872,0.3342,0.9325,6.1,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,noise_pair,Segment the left cerebral white matter in this image.,17770,0.0807,0.0176,0.2546,4.8,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,noise_pair,Segment the right cerebral white matter in this image.,73265,0.3152,0.1604,0.5727,10.6,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,noise_pair,Segment the left cerebellum cortex in this image.,66884,0.9396,0.8261,0.8887,1.6,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,noise_pair,Segment the right cerebellum cortex in this image.,42053,0.6247,0.5413,0.936,6.8,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebral white matter,noise_image,Segment the left cerebral white matter in this image.,215312,0.9776,0.0392,0.0468,45.2,False
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,left cerebellum cortex,noise_image,Segment the left cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebral white matter,noise_image,Segment the right cerebral white matter in this image.,0,0.0,0.0,0.0,nan,True
+neurite_oasis,nipu,OASIS_OAS1_0076_MR1,right cerebellum cortex,noise_image,Segment the right cerebellum cortex in this image.,0,0.0,0.0,0.0,nan,True

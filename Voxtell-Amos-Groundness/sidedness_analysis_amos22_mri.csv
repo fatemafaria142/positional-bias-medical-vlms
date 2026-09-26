@@ -1,0 +1,21 @@
+dataset,subject_id,space,organ_pair_a,organ_pair_b,cosine_similarity
+amos22_mri,amos_0508,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0530,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0555,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0544,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0553,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0558,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0522,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0532,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0554,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0575,text,kidney,adrenal gland,0.962729
+amos22_mri,amos_0508,fused,kidney,adrenal gland,0.6514
+amos22_mri,amos_0530,fused,kidney,adrenal gland,0.661899
+amos22_mri,amos_0555,fused,kidney,adrenal gland,0.64603
+amos22_mri,amos_0544,fused,kidney,adrenal gland,0.75651
+amos22_mri,amos_0553,fused,kidney,adrenal gland,0.639894
+amos22_mri,amos_0558,fused,kidney,adrenal gland,0.748679
+amos22_mri,amos_0522,fused,kidney,adrenal gland,0.639495
+amos22_mri,amos_0532,fused,kidney,adrenal gland,0.651788
+amos22_mri,amos_0554,fused,kidney,adrenal gland,0.739189
+amos22_mri,amos_0575,fused,kidney,adrenal gland,0.668714

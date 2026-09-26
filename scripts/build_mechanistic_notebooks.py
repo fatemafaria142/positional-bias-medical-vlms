@@ -33,6 +33,9 @@ OASIS_SUBJECTS = [("faria", "OASIS_OAS1_0014_MR1"), ("faria", "OASIS_OAS1_0057_M
                   ("nipu", "OASIS_OAS1_0421_MR1")]
 # OASIS: only the structures VoxTell actually segments with the full prompt (Dice ~ 0.8-0.9); the other three pairs of
 # the earlier runs have Dice ~ 0 even with the full prompt, so an intervention on them cannot show anything.
+# Rows 13-16 OASIS notebook: the 5 subjects with the largest masks (sum of the 4 organs below, rotation 0).
+OASIS_TOP5 = [("hridoy", "OASIS_OAS1_0123_MR1"), ("hridoy", "OASIS_OAS1_0135_MR1"), ("faria", "OASIS_OAS1_0057_MR1"),
+              ("nipu", "OASIS_OAS1_0062_MR1"), ("nipu", "OASIS_OAS1_0076_MR1")]
 OASIS_CORES = ["cerebral white matter", "cerebellum cortex"]
 
 TITLE = """# VoxTell on {title} -- PLAN ROWS 12-16: image flip, organ noise, embedding intervention, attention, layer distance (Kaggle GPU)
@@ -332,3 +335,5 @@ if __name__ == "__main__":
           OASIS_CORES, "neurite_oasis", "voxtell-oasis-mechanistic-experiments-kaggle.ipynb")
     build("voxtell-amos-groundedness-investigation-kaggle.ipynb", "AMOS22 MRI", "amos22_mri", AMOS_SUBJECTS, None,
           "amos22_mri", "voxtell-amos-mechanistic-rows13-16-kaggle.ipynb", rows13_16=True)
+    build("voxtell-oasis-groundedness-investigation-batch1-kaggle.ipynb", "Neurite-OASIS", "neurite_oasis", OASIS_TOP5,
+          OASIS_CORES, "neurite_oasis", "voxtell-oasis-mechanistic-rows13-16-kaggle.ipynb", rows13_16=True)

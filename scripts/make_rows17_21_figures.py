@@ -515,12 +515,30 @@ def figure_row18_paper(subj, core, kl_left, kl_right, out_dir):
     return out, caption
 
 
+def _rounded_card(fig, rect, facecolor="white", edgecolor="#e4e6ec", lw=1.0, shadow=True, pad_in=0.0, zorder=-2):
+    """A rounded white "card" behind a panel, drawn in figure-fraction coordinates. `rect` =
+    (x0, y0, w, h) in figure fraction, same convention as fig.add_axes. A faint offset duplicate
+    underneath fakes a soft drop shadow -- the one cheap trick that reliably makes a flat matplotlib
+    layout read as "designed" instead of a bare default chart."""
+    from matplotlib.patches import FancyBboxPatch
+    x0, y0, w, h = rect
+    if shadow:
+        shadow_patch = FancyBboxPatch((x0 - pad_in + 0.004, y0 - pad_in - 0.006), w + 2 * pad_in, h + 2 * pad_in,
+                                       boxstyle="round,pad=0,rounding_size=0.012", transform=fig.transFigure,
+                                       linewidth=0, facecolor="#000000", alpha=0.06, zorder=zorder)
+        fig.add_artist(shadow_patch)
+    card = FancyBboxPatch((x0 - pad_in, y0 - pad_in), w + 2 * pad_in, h + 2 * pad_in,
+                           boxstyle="round,pad=0,rounding_size=0.012", transform=fig.transFigure,
+                           linewidth=lw, edgecolor=edgecolor, facecolor=facecolor, zorder=zorder + 1)
+    fig.add_artist(card)
+
+
 def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
-    """Professional, self-contained version: declarative scientific title (not a casual question),
-    a legend that says Left/Right/Gap only (the organ is already named once, in the title -- not
-    repeated three times across the figure), every data point labeled with its actual KL value (not
-    just "lower is better" left for the reader to eyeball), and a compact statistics box instead of
-    a conversational "Verdict:" sentence. Clean white/minimal-spine style throughout."""
+    """Self-contained, designed version: declarative title, Left/Right/Gap legend only (the organ
+    is already named once in the title), a compact statistics card instead of a prose "Verdict:"
+    sentence, and rounded card panels on a soft page background instead of a flat white chart --
+    the floating per-point KL value labels were dropped (the exact numbers already live in the
+    stats card; repeating all 12 of them on the chart was clutter, not clarity)."""
     left_organ, right_organ = f"left {core}", f"right {core}"
     img2, _, idx3 = subj.slice_of(left_organ)
     gt_l = subj.gt_mask(left_organ)[idx3]
@@ -538,57 +556,56 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     similar = abs(mean_gap) < 0.15 * max(mean_l, mean_r, 1e-6)
     worse_side = "Left" if mean_gap > 0 else "Right"
 
-    fig = plt.figure(figsize=(10.2, 4.8), dpi=220)
-    fig.patch.set_facecolor("white")
-    fig.text(0.5, 0.965, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
+    PAGE_BG = "#f4f5f8"
+    fig = plt.figure(figsize=(10.4, 4.9), dpi=220)
+    fig.patch.set_facecolor(PAGE_BG)
+    fig.text(0.5, 0.955, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
               ha="center", fontsize=13.5, fontweight="bold", color=PAPER_INK)
-    fig.text(0.5, 0.918,
+    fig.text(0.5, 0.905,
               "KL divergence between cross-attention density and the ground-truth mask, normalized against a generic prompt",
               ha="center", fontsize=9.5, color=PAPER_MUTED)
 
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
-    handles = [Line2D([0], [0], color=BLUE, lw=2.2, label="Left"),
-               Line2D([0], [0], color=ORANGE, lw=2.2, label="Right"),
+    handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
+               Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round"),
                Patch(facecolor=GRAY_MID, label="Gap")]
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=3, frameon=False, fontsize=9.5)
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.845), ncol=3, frameon=False, fontsize=9.5)
 
-    # --- panel (a): anatomical context --------------------------------------------------------------
-    ax_a = fig.add_axes([0.03, 0.13, 0.27, 0.62])
+    # --- panel (a): anatomical context, on its own card ---------------------------------------------
+    card_a = (0.035, 0.12, 0.26, 0.60)
+    _rounded_card(fig, card_a, pad_in=0.012)
+    ax_a = fig.add_axes([card_a[0] + 0.012, card_a[1] + 0.03, card_a[2] - 0.024, card_a[3] - 0.05])
     ax_a.imshow(img2c, cmap="gray", origin="lower")
     ax_a.set_xticks([]); ax_a.set_yticks([])
     for sp in ax_a.spines.values():
         sp.set_visible(False)
     if gt_lc.any():
-        ax_a.contour(gt_lc, levels=[0.5], colors=BLUE, linewidths=1.6)
+        ax_a.contour(gt_lc, levels=[0.5], colors=BLUE, linewidths=1.8)
     if gt_rc.any():
-        ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.6)
-    ax_a.text(0.03, 0.04, subj.left_label, transform=ax_a.transAxes, color="white", fontsize=9, fontweight="bold")
-    ax_a.text(0.97, 0.04, subj.right_label, transform=ax_a.transAxes, color="white", fontsize=9,
-              fontweight="bold", ha="right")
+        ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.8)
 
-    # --- panel (b): the data, with every value labeled ----------------------------------------------
-    ax_b = fig.add_axes([0.38, 0.24, 0.40, 0.52])
+    # --- panel (b): the data, on its own card --------------------------------------------------------
+    card_b = (0.345, 0.12, 0.415, 0.60)
+    _rounded_card(fig, card_b, pad_in=0.012)
+    ax_b = fig.add_axes([card_b[0] + 0.045, card_b[1] + 0.13, card_b[2] - 0.08, card_b[3] - 0.19])
     _paper_axes_style(ax_b)
-    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.8, markersize=5.5)
-    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.8, markersize=5.5)
-    ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.5, zorder=0)
-    y_span = max(dfl[col].max(), dfr[col].max()) - min(dfl[col].min(), dfr[col].min())
-    off = y_span * 0.06
-    for _, r in dfl.iterrows():
-        ax_b.annotate(f"{r[col]:.2f}", (r.layer, r[col]), textcoords="offset points", xytext=(0, 7),
-                      ha="center", fontsize=7.3, color=BLUE)
-    for _, r in dfr.iterrows():
-        ax_b.annotate(f"{r[col]:.2f}", (r.layer, r[col]), textcoords="offset points", xytext=(0, -11),
-                      ha="center", fontsize=7.3, color=ORANGE)
-    ax_b.margins(y=0.18)
+    ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.6, zorder=0)
+    ax_b.plot(dfl.layer, dfl[col], "-", color=BLUE, linewidth=2.4, zorder=3, solid_capstyle="round")
+    ax_b.plot(dfr.layer, dfr[col], "-", color=ORANGE, linewidth=2.4, zorder=3, solid_capstyle="round")
+    ax_b.scatter(dfl.layer, dfl[col], s=46, color=BLUE, edgecolor="white", linewidth=1.3, zorder=4)
+    ax_b.scatter(dfr.layer, dfr[col], s=46, color=ORANGE, edgecolor="white", linewidth=1.3, zorder=4)
+    ax_b.margins(y=0.15)
     ax_b.set_xlabel("Decoder layer", fontsize=10, color=PAPER_INK)
-    ax_b.set_ylabel("KL divergence (lower = better match)", fontsize=10, color=PAPER_INK)
-    ax_b.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
+    ax_b.set_ylabel("KL divergence (lower = better match)", fontsize=9.5, color=PAPER_INK)
+    ax_b.yaxis.grid(True, color="#e9eaef", linewidth=0.7, zorder=0)
     ax_b.set_axisbelow(True)
+    ax_b.set_facecolor("white")
 
-    # --- panel (c): compact statistics box, not a prose sentence -------------------------------------
-    ax_c = fig.add_axes([0.82, 0.24, 0.16, 0.52])
+    # --- panel (c): compact statistics card, not a prose sentence ------------------------------------
+    card_c = (0.80, 0.12, 0.165, 0.60)
+    _rounded_card(fig, card_c, pad_in=0.012)
+    ax_c = fig.add_axes([card_c[0] + 0.015, card_c[1] + 0.02, card_c[2] - 0.03, card_c[3] - 0.04])
     ax_c.axis("off")
     stat_rows = [
         ("Mean KL — Left", f"{mean_l:.3f}", BLUE),
@@ -596,17 +613,17 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
         ("Mean gap (L−R)", f"{mean_gap:+.3f}", PAPER_INK),
         ("Larger gap on", worse_side if not similar else "— (n.s.)", PAPER_INK),
     ]
-    y0 = 0.92
-    for label, value, color in stat_rows:
-        ax_c.text(0.0, y0, label, fontsize=8.8, color=PAPER_MUTED, transform=ax_c.transAxes, va="top")
-        ax_c.text(0.0, y0 - 0.13, value, fontsize=12.5, fontweight="bold", color=color, transform=ax_c.transAxes, va="top")
-        y0 -= 0.30
-    ax_c.add_patch(plt.Rectangle((-0.08, 0.02), 1.12, 0.98, transform=ax_c.transAxes, fill=False,
-                                  edgecolor=PAPER_GRID, linewidth=1.0))
+    y0 = 0.95
+    for i, (label, value, color) in enumerate(stat_rows):
+        ax_c.text(0.0, y0, label, fontsize=8.6, color=PAPER_MUTED, transform=ax_c.transAxes, va="top")
+        ax_c.text(0.0, y0 - 0.115, value, fontsize=13, fontweight="bold", color=color, transform=ax_c.transAxes, va="top")
+        y0 -= 0.245
+        if i < len(stat_rows) - 1:
+            ax_c.plot([0, 1], [y0 + 0.065, y0 + 0.065], color="#edeef2", linewidth=1, transform=ax_c.transAxes)
 
     fig.text(0.5, 0.045,
               f"Subject {subj.subject_id} ({subj.person}). KL divergence = distance between the model's cross-attention "
-              "and the true organ shape (0 = perfect match). Point labels show the exact KL value at each layer.",
+              "and the true organ shape (0 = perfect match).",
               ha="center", fontsize=8.3, color=PAPER_MUTED)
 
     return savefig(fig, out_dir / core.replace(" ", "_") / "row18_explainer.png")

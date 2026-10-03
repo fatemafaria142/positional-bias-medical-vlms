@@ -359,24 +359,32 @@ print('wrote', r20_path.name, 'and row20_fused_maps/*.npz')
 
 ROW_21_CELL = """import traceback
 
+# row21_coalition_dice_@@SUFFIX@@.csv carries the literal numbers the Shapley credit above is
+# computed FROM: the actual Dice score for each of the 8 image/organ-word/position-word present
+# combinations (e.g. "image only, no words at all" -> its own real Dice score) -- more intuitive to
+# read directly than the derived Shapley credit, at no extra model-call cost (same 8 predictions).
 ROW21_N_ORGANS = 1       # organs per subject (cheap: 8 model calls each, but keep default modest)
 r21_path = RESULTS_ROOT / f'row21_joint_shapley_@@SUFFIX@@.csv'
+r21_coal_path = RESULTS_ROOT / f'row21_coalition_dice_@@SUFFIX@@.csv'
 first = True
 for si, sid in enumerate(subject_organs, 1):
     t0 = time.time()
     try:
         person, img_arr, label_vol, organs, ids, prompts = load_subject(sid)
-        rows21 = []
+        rows21, coal21 = [], []
         for organ in organs[:ROW21_N_ORGANS]:
-            rows21 += ve.run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed=si)
+            r, c = ve.run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed=si, return_coalitions=True)
+            rows21 += r
+            coal21 += c
         append_csv(r21_path, tag(rows21, sid, person), first)
+        append_csv(r21_coal_path, tag(coal21, sid, person), first)
         first = False
         print(f'[{si}/{len(subject_organs)}] {sid}: row 21 done in {time.time() - t0:.0f}s')
     except Exception:
         print(f'[{si}/{len(subject_organs)}] {sid}: FAILED'); traceback.print_exc()
     finally:
         gc.collect(); torch.cuda.empty_cache()
-print('wrote', r21_path.name)
+print('wrote', r21_path.name, 'and', r21_coal_path.name)
 """
 
 ROW_22_CELL = """import traceback
@@ -518,6 +526,10 @@ print('\\n=== Row 21: joint image / organ-word / position-word Shapley (f_dice_g
 d = R('row21_joint_shapley')
 print(d[d.metric == 'f_dice_gt'].groupby('role').shapley_value.mean().round(3))
 
+print('\\n=== Row 21: raw Dice score per role-combination (the numbers the Shapley credit above comes from) ===')
+dc = R('row21_coalition_dice')
+print(dc[['roles_present', 'dice_gt', 'dice_self']].to_string(index=False))
+
 print('\\n=== Row 22: is left/right linearly decodable at each layer? (leave-one-pair-out CV accuracy) ===')
 d = R('row22_laterality_probing')
 print(d.groupby('layer')[['cv_accuracy', 'train_accuracy']].mean().round(3))
@@ -557,6 +569,7 @@ END_MD = """## Outputs (all under `results/`)
 | `row20_fused_activation_overlap_@@SUFFIX@@.csv` | 20 | per organ and condition (matched / mismatched_side / mismatched_organ): IoU of the fused spatial feature map's hot region with the GT mask |
 | `row20_fused_maps/<subject>.npz` | 20 | per organ x condition: the fused-feature map itself, upsampled to the crop frame and downsampled for storage, for plotting |
 | `row21_joint_shapley_@@SUFFIX@@.csv` | 21 | per organ, role (image / organ_word / position_word) and metric: Shapley credit on one common scale |
+| `row21_coalition_dice_@@SUFFIX@@.csv` | 21 | per organ and role-combination (`roles_present`): the literal Dice score for that combination (e.g. image only, no words at all), against ground truth (`dice_gt`) and against the full-coalition baseline (`dice_self`) -- the raw numbers the Shapley credit above is computed from |
 | `row22_laterality_probing_@@SUFFIX@@.csv` | 22 | per decoder layer: leave-one-pair-out cross-validated and train accuracy of a linear probe predicting left/right from the hidden state alone, `n_pairs` |
 | `row23_embedding_geometry_@@SUFFIX@@.csv` | 23 | pairwise cosine similarity between every two organs' "right - left" text-embedding difference vectors (`kind='pair'`), plus one `kind='summary'` row: mean cosine similarity and `coherence_ratio` (1 = one shared left->right direction, 0 = a different, unrelated direction per organ) |
 | `row24_attention_head_ablation_@@SUFFIX@@.csv` | 24 | per organ, layer and head: Dice vs. GT and vs. the unablated baseline after zero-ablating that one cross-attention head, plus `call` (does the mask still land on this organ, its mirror, both, or neither) |
@@ -755,6 +768,10 @@ print('\\n=== Row 21: joint image / organ-word / position-word Shapley (f_dice_g
 d = R('row21_joint_shapley')
 print(d[d.metric == 'f_dice_gt'].groupby('role').shapley_value.mean().round(3))
 
+print('\\n=== Row 21: raw Dice score per role-combination (the numbers the Shapley credit above comes from) ===')
+dc = R('row21_coalition_dice')
+print(dc[['roles_present', 'dice_gt', 'dice_self']].to_string(index=False))
+
 zip_path = WORKING_DIR / 'voxtell_@@SUFFIX@@_rows17_21_results'
 shutil.make_archive(str(zip_path), 'zip', str(RESULTS_ROOT))
 print('\\nArchive:', str(zip_path) + '.zip')
@@ -774,6 +791,7 @@ END_MD_17_21 = """## Outputs (all under `results/`)
 | `row20_fused_activation_overlap_@@SUFFIX@@.csv` | 20 | per organ and condition (matched / mismatched_side / mismatched_organ): IoU of the fused spatial feature map's hot region with the GT mask |
 | `row20_fused_maps/<subject>.npz` | 20 | per organ x condition: the fused-feature map itself, upsampled to the crop frame and downsampled for storage, for plotting |
 | `row21_joint_shapley_@@SUFFIX@@.csv` | 21 | per organ, role (image / organ_word / position_word) and metric: Shapley credit on one common scale |
+| `row21_coalition_dice_@@SUFFIX@@.csv` | 21 | per organ and role-combination (`roles_present`): the literal Dice score for that combination (e.g. image only, no words at all), against ground truth (`dice_gt`) and against the full-coalition baseline (`dice_self`) -- the raw numbers the Shapley credit above is computed from |
 """
 
 
@@ -858,10 +876,11 @@ def build_17_21(base_nb, title, dataset, subjects, cores, suffix, out_name, incl
     if include_22_24:
         summary_cell_text = summary_cell_text.replace("\nzip_path =", ROWS_22_24_SUMMARY_APPEND + "\nzip_path =")
         summary_cell_text = summary_cell_text.replace("rows17_21_results", "rows17_24_results")
-        end_md_text = end_md_text.replace(
-            "| `row21_joint_shapley_@@SUFFIX@@.csv` | 21 | per organ, role (image / organ_word / position_word) and metric: Shapley credit on one common scale |\n".replace("@@SUFFIX@@", suffix),
-            "| `row21_joint_shapley_" + suffix + ".csv` | 21 | per organ, role (image / organ_word / position_word) and metric: Shapley credit on one common scale |\n"
-            + sub(ROWS_22_24_END_MD_ROWS))
+        anchor = ("| `row21_coalition_dice_@@SUFFIX@@.csv` | 21 | per organ and role-combination (`roles_present`): "
+                  "the literal Dice score for that combination (e.g. image only, no words at all), against ground "
+                  "truth (`dice_gt`) and against the full-coalition baseline (`dice_self`) -- the raw numbers the "
+                  "Shapley credit above is computed from |\n").replace("@@SUFFIX@@", suffix)
+        end_md_text = end_md_text.replace(anchor, anchor + sub(ROWS_22_24_END_MD_ROWS))
     summary_heading = "## 12. Summary and archive" if include_22_24 else "## 9. Summary and archive"
     nb["cells"] += [
         cell("markdown", "## 1. Load the experiment code"),

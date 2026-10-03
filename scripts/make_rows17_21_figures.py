@@ -668,10 +668,89 @@ def figure_row21(organ, rows, out_dir):
     ax.axhline(0, color=INK2, linewidth=1)
     ax.set_xticks(x)
     ax.set_xticklabels([ROLE_LABEL[r] for r in roles])
-    style_bars(ax, f"{organ} -- image vs. word contribution (joint Shapley)", "Shapley credit (dice)")
+    style_bars(ax, f"{organ} -- image vs. word contribution to Dice score",
+               "Dice-score contribution\n(Shapley credit, in Dice units)")
     ax.legend(frameon=False, fontsize=9.5, loc="best")
     fig.tight_layout()
     return savefig(fig, out_dir / organ.replace(" ", "_") / "row21_joint_image_word_shapley.png")
+
+
+_ROLE_SET_ORDER = ["none", "image", "organ_word", "position_word", "image+organ_word",
+                   "image+position_word", "organ_word+position_word", "image+organ_word+position_word"]
+_ROLE_SET_LABEL = {
+    "none": "Nothing\n(blank prompt, noised image)",
+    "image": "Image only",
+    "organ_word": "Organ word only",
+    "position_word": "Position word only",
+    "image+organ_word": "Image +\norgan word",
+    "image+position_word": "Image +\nposition word",
+    "organ_word+position_word": "Organ word +\nposition word",
+    "image+organ_word+position_word": "All three\n(full prompt, real image)",
+}
+
+
+def figure_row21_coalition_dice(organ, coalition_rows, out_dir):
+    """The literal version of "which matters more, by Dice score": one bar per one of the 8
+    image/organ-word/position-word present-or-absent combinations, showing the ACTUAL Dice score
+    VoxTell achieves with exactly that information available -- no Shapley math, no derived credit,
+    just "if you only give it X, what Dice do you get." Professional, declarative, self-contained,
+    matching the row 18 explainer style: title states the finding's subject, legend has no redundant
+    repetition, every bar labeled with its exact value."""
+    df = pd.DataFrame(coalition_rows).set_index("roles_present").loc[_ROLE_SET_ORDER].reset_index()
+    singleton_or_none = df.roles_present.isin(["none", "image", "organ_word", "position_word"])
+    colors = [BLUE if ("image" in r and "organ_word" not in r and "position_word" not in r) else
+              ORANGE if ("organ_word" in r and "image" not in r and "position_word" not in r) else
+              AQUA if ("position_word" in r and "image" not in r and "organ_word" not in r) else
+              PAPER_MUTED if r == "none" else "#9c9c94" for r in df.roles_present]
+
+    full = float(df.loc[df.roles_present == "image+organ_word+position_word", "dice_gt"].iloc[0])
+    baseline = float(df.loc[df.roles_present == "none", "dice_gt"].iloc[0])
+    singles = {r: float(df.loc[df.roles_present == r, "dice_gt"].iloc[0]) for r in ["image", "organ_word", "position_word"]}
+    best_single = max(singles, key=singles.get)
+    best_single_label = {"image": "the image alone", "organ_word": "the organ word alone", "position_word": "the position word alone"}[best_single]
+
+    fig = plt.figure(figsize=(10.5, 5.2), dpi=220)
+    fig.patch.set_facecolor("white")
+    fig.text(0.5, 0.965, f"Which Input Matters Most for Segmenting {organ.title()}, by Dice Score",
+              ha="center", fontsize=13.5, fontweight="bold", color=PAPER_INK)
+    fig.text(0.5, 0.918,
+              "Actual Dice score when VoxTell is given only this combination of image / organ word / position word",
+              ha="center", fontsize=9.5, color=PAPER_MUTED)
+
+    ax = fig.add_axes([0.08, 0.20, 0.88, 0.62])
+    _paper_axes_style(ax)
+    x = np.arange(len(df))
+    ax.bar(x, df.dice_gt, color=colors, width=0.62, zorder=3)
+    for xi, v in zip(x, df.dice_gt):
+        ax.annotate(f"{v:.3f}", (xi, v), textcoords="offset points", xytext=(0, 5), ha="center",
+                     fontsize=9, fontweight="bold", color=PAPER_INK)
+    ax.axhline(full, color=PAPER_MUTED, linewidth=1, linestyle="--", zorder=1)
+    ax.axhline(baseline, color=PAPER_MUTED, linewidth=1, linestyle=":", zorder=1)
+    ax.set_xticks(x)
+    ax.set_xticklabels([_ROLE_SET_LABEL[r] for r in df.roles_present], fontsize=8.6)
+    ax.set_ylabel("Dice score vs. ground truth", fontsize=10.5, color=PAPER_INK)
+    ax.set_ylim(0, max(1.0, df.dice_gt.max() * 1.15))
+    ax.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
+    ax.set_axisbelow(True)
+
+    from matplotlib.lines import Line2D
+    handles = [Line2D([0], [0], color=BLUE, lw=6, label="Image"),
+               Line2D([0], [0], color=ORANGE, lw=6, label="Organ word"),
+               Line2D([0], [0], color=AQUA, lw=6, label="Position word"),
+               Line2D([0], [0], color="#9c9c94", lw=6, label="Combination"),
+               Line2D([0], [0], color=PAPER_MUTED, lw=6, label="Nothing")]
+    ax.legend(handles=handles, loc="upper left", frameon=False, fontsize=8.6, ncol=1)
+
+    fig.text(0.5, 0.075,
+              f"Best single input: {best_single_label} ({singles[best_single]:.3f} Dice) — "
+              f"full prompt + real image reaches {full:.3f}, nothing reaches {baseline:.3f}.",
+              ha="center", fontsize=10.5, fontweight="bold", color=PAPER_INK)
+    fig.text(0.5, 0.025,
+              "Dashed line = Dice with everything (full prompt + real image). Dotted line = Dice with nothing "
+              "(blank prompt + noised image, i.e. the model's uninformed baseline).",
+              ha="center", fontsize=8.3, color=PAPER_MUTED)
+
+    return savefig(fig, out_dir / organ.replace(" ", "_") / "row21_coalition_dice.png")
 
 
 def figure_row21_summary(all_rows, out_dir):
@@ -693,7 +772,8 @@ def figure_row21_summary(all_rows, out_dir):
     ax.axhline(0, color=INK2, linewidth=1)
     ax.set_xticks(x)
     ax.set_xticklabels(organs, rotation=45, ha="right", fontsize=9)
-    style_bars(ax, "Row 21 summary -- image vs. word contribution, every organ (f_dice_gt)", "Shapley credit (dice)")
+    style_bars(ax, "Row 21 summary -- image vs. word contribution to Dice score, every organ",
+               "Dice-score contribution (Shapley credit, Dice units)")
     ax.legend(frameon=False, fontsize=9.5, loc="best")
     fig.tight_layout()
     return savefig(fig, out_dir / "row21_summary_all_organs.png")
@@ -733,7 +813,8 @@ def figure_row21_image_vs_word(all_rows, out_dir):
     ax.axhline(0, color=INK2, linewidth=1)
     ax.set_xticks(x)
     ax.set_xticklabels(organs, rotation=45, ha="right", fontsize=9)
-    style_bars(ax, "Row 21 -- image vs. word, 2-way (f_dice_gt)", "Shapley credit (dice)")
+    style_bars(ax, "Row 21 -- image vs. word, 2-way contribution to Dice score",
+               "Dice-score contribution (Shapley credit, Dice units)")
     ax.legend(frameon=False, fontsize=9.5, loc="best")
     fig.tight_layout()
     out_path = savefig(fig, out_dir / "row21_image_vs_word_2way.png")
@@ -787,6 +868,7 @@ def main():
     row19 = read_csv(args.results_dir, "row19_gradient_saliency", args.suffix)
     row20 = read_csv(args.results_dir, "row20_fused_activation_overlap", args.suffix)
     row21 = read_csv(args.results_dir, "row21_joint_shapley", args.suffix)
+    row21_coal = read_csv(args.results_dir, "row21_coalition_dice", args.suffix)
 
     all_row21_rows = []
     for (person, subject_id), sub0 in row0.groupby(["person", "subject_id"]):
@@ -846,6 +928,10 @@ def main():
                     if r:
                         all_row21_rows += r
                         print("wrote", rel(figure_row21(organ, r, out_dir), args.repo))
+                if not row21_coal.empty:
+                    rc = row21_coal[(row21_coal.subject_id == subject_id) & (row21_coal.organ == organ)].to_dict("records")
+                    if rc:
+                        print("wrote", rel(figure_row21_coalition_dice(organ, rc, out_dir), args.repo))
             except Exception as e:
                 print(f"[error] {subject_id}/{organ}: {e}")
 

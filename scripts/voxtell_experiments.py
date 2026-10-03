@@ -716,13 +716,22 @@ def export_baseline_masks(predictor, img_arr, label_vol, organs, ids, prompts, i
     return rows
 
 
-def run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed=0):
+def run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed=0, return_coalitions=False):
     """Row 21. Three roles -- image (intact / noised over the organ's own GT region, reusing row 13's
     `noise_region`), organ_word, position_word (reusing the same prompt-building logic as rows 5-11) --
     give 2**3=8 coalitions, scored by both f_dice_gt and f_dice_self and fed into the same
     `shapley_values` used for row 17 and the word-attribution rows. This is the single number that
     puts image contribution and word contribution on one common scale. Returns rows: organ, role,
-    metric, shapley_value."""
+    metric, shapley_value (already in Dice-score units: shapley_value is literally "how many Dice
+    points this role is worth, averaged fairly over every order the roles could be added in").
+
+    return_coalitions=True additionally returns the literal, un-derived numbers the Shapley credit
+    above is computed FROM: the actual Dice score for each of the 8 present/absent combinations
+    (e.g. "if the model only gets the image, no words at all, what Dice does it get?"). These are
+    more intuitive to read directly but don't have the Shapley math's fairness guarantees (e.g. they
+    don't sum to the total the way the credits do) -- returns (summary_rows, coalition_rows), where
+    coalition_rows has columns: organ, roles_present, image, organ_word, position_word, dice_gt,
+    dice_self."""
     rng = np.random.default_rng(seed)
     gt = label_vol == ids[organ]
     roles = ["image", "organ_word", "position_word"]
@@ -739,7 +748,17 @@ def run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed
     for r in roles:
         rows.append({"organ": organ, "role": r, "metric": "f_dice_gt", "shapley_value": round(phi_gt[r], 6)})
         rows.append({"organ": organ, "role": r, "metric": "f_dice_self", "shapley_value": round(phi_self[r], 6)})
-    return rows
+    if not return_coalitions:
+        return rows
+    coalition_rows = []
+    for key in v_gt:
+        coalition_rows.append({
+            "organ": organ,
+            "roles_present": "+".join(sorted(key)) if key else "none",
+            "image": "image" in key, "organ_word": "organ_word" in key, "position_word": "position_word" in key,
+            "dice_gt": round(v_gt[key], 4), "dice_self": round(v_self[key], 4),
+        })
+    return rows, coalition_rows
 
 
 # ------------------------------------------------------------------------------------------------

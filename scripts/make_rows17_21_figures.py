@@ -553,33 +553,41 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
 
     dfl = pd.DataFrame(kl_left).sort_values("layer")
     dfr = pd.DataFrame(kl_right).sort_values("layer")
-    col = "kl_divergence_vs_generic_normalized"
-    mean_l, mean_r = float(dfl[col].mean()), float(dfr[col].mean())
+    col_actual = "kl_divergence"
+    col_norm = "kl_divergence_vs_generic_normalized"
+    mean_l, mean_r = float(dfl[col_actual].mean()), float(dfr[col_actual].mean())
     mean_gap = mean_l - mean_r
-    gap_by_layer = dfl[col].values - dfr[col].values
+    gap_actual_by_layer = dfl[col_actual].values - dfr[col_actual].values
+    gap_norm_by_layer = dfl[col_norm].values - dfr[col_norm].values
 
     GAP_C = "#7a5c3e"  # darker, warm neutral -- reads clearly against the light page/card background
 
     PAGE_BG = "#f4f5f8"
-    fig = plt.figure(figsize=(13.0, 4.9), dpi=220)
+    fig = plt.figure(figsize=(13.0, 5.1), dpi=220)
     fig.patch.set_facecolor(PAGE_BG)
-    fig.text(0.5, 0.955, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
+    fig.text(0.5, 0.960, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
               ha="center", fontsize=13.5, fontweight="bold", color=PAPER_INK)
-    fig.text(0.5, 0.905,
-              "KL divergence between cross-attention density and the ground-truth mask, normalized against a generic prompt",
+    fig.text(0.5, 0.916,
+              "KL divergence between cross-attention density and the ground-truth mask",
               ha="center", fontsize=9.5, color=PAPER_MUTED)
 
     from matplotlib.lines import Line2D
     lr_handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
                   Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round")]
     gap_handle = [Line2D([0], [0], color=GAP_C, lw=2.6, label="Gap", solid_capstyle="round")]
-    leg1 = fig.legend(handles=lr_handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=2,
+    leg1 = fig.legend(handles=lr_handles, loc="upper center", bbox_to_anchor=(0.5, 0.872), ncol=2,
                        frameon=False, fontsize=9.5)
     fig.add_artist(leg1)
-    fig.legend(handles=gap_handle, loc="upper center", bbox_to_anchor=(0.5, 0.825), ncol=1,
-               frameon=False, fontsize=9.5)
+    leg2 = fig.legend(handles=gap_handle, loc="upper center", bbox_to_anchor=(0.5, 0.836), ncol=1,
+                       frameon=False, fontsize=9.5)
+    fig.add_artist(leg2)
 
-    CARD_Y, CARD_H = 0.12, 0.60
+    style_handles = [Line2D([0], [0], color="#777777", lw=2.0, linestyle="-", label="Actual KL divergence"),
+                      Line2D([0], [0], color="#777777", lw=2.0, linestyle="--", label="Normalized (vs. generic prompt)")]
+    fig.legend(handles=style_handles, loc="upper center", bbox_to_anchor=(0.5, 0.800), ncol=2,
+               frameon=False, fontsize=8.6, labelcolor=PAPER_MUTED)
+
+    CARD_Y, CARD_H = 0.10, 0.56
 
     # --- panel (a): anatomical context, on its own card ---------------------------------------------
     card_a = (0.022, CARD_Y, 0.155, CARD_H)
@@ -594,18 +602,22 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     if gt_rc.any():
         ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.8)
 
-    # --- panels (b1)/(b2)/(b3): Left, Right, and Gap each as their own small chart -------------------
-    y_lo = min(dfl[col].min(), dfr[col].min())
-    y_hi = max(dfl[col].max(), dfr[col].max())
+    # --- panels (b1)/(b2)/(b3): Left, Right, and Gap each as their own small chart, actual (solid) -----
+    # and normalized (dashed) plotted together so the reader always sees the real measured number,
+    # not just the generic-prompt-normalized ratio.
+    y_lo = min(dfl[col_actual].min(), dfr[col_actual].min(), dfl[col_norm].min(), dfr[col_norm].min())
+    y_hi = max(dfl[col_actual].max(), dfr[col_actual].max(), dfl[col_norm].max(), dfr[col_norm].max())
     y_pad = (y_hi - y_lo) * 0.18 or 0.05
 
-    def _mini_chart(x0, layer, values, color, title):
+    def _mini_chart(x0, layer, actual_vals, norm_vals, color, title):
         card = (x0, CARD_Y, 0.178, CARD_H)
         _rounded_card(fig, card, pad_in=0.012)
         ax = fig.add_axes([card[0] + 0.040, card[1] + 0.13, card[2] - 0.075, card[3] - 0.24])
         _paper_axes_style(ax)
-        ax.plot(layer, values, "-", color=color, linewidth=2.4, zorder=3, solid_capstyle="round")
-        ax.scatter(layer, values, s=42, color=color, edgecolor="white", linewidth=1.2, zorder=4)
+        ax.plot(layer, actual_vals, "-", color=color, linewidth=2.4, zorder=3, solid_capstyle="round")
+        ax.scatter(layer, actual_vals, s=42, color=color, edgecolor="white", linewidth=1.2, zorder=4)
+        ax.plot(layer, norm_vals, "--", color=color, linewidth=1.6, alpha=0.55, zorder=2, dash_capstyle="round")
+        ax.scatter(layer, norm_vals, s=20, color=color, alpha=0.55, zorder=2)
         ax.set_xlabel("Decoder layer", fontsize=9.5, color=PAPER_INK)
         ax.yaxis.grid(True, color="#e9eaef", linewidth=0.7, zorder=0)
         ax.set_axisbelow(True)
@@ -615,17 +627,19 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
                   fontweight="bold", color=color)
         return ax
 
-    ax_left = _mini_chart(0.205, dfl.layer, dfl[col], BLUE, "Left")
+    ax_left = _mini_chart(0.205, dfl.layer, dfl[col_actual], dfl[col_norm], BLUE, "Left")
     ax_left.set_ylim(y_lo - y_pad, y_hi + y_pad)
     ax_left.set_ylabel("KL divergence\n(lower = better match)", fontsize=8.6, color=PAPER_INK)
 
-    ax_right = _mini_chart(0.408, dfr.layer, dfr[col], ORANGE, "Right")
+    ax_right = _mini_chart(0.408, dfr.layer, dfr[col_actual], dfr[col_norm], ORANGE, "Right")
     ax_right.set_ylim(y_lo - y_pad, y_hi + y_pad)
 
-    ax_gap = _mini_chart(0.611, dfl.layer, gap_by_layer, GAP_C, "Gap (Left − Right)")
+    ax_gap = _mini_chart(0.611, dfl.layer, gap_actual_by_layer, gap_norm_by_layer, GAP_C, "Gap (Left − Right)")
     ax_gap.axhline(0, color=PAPER_GRID, linewidth=1.0, zorder=1)
-    g_pad = (max(abs(gap_by_layer.min()), abs(gap_by_layer.max())) * 0.3) or 0.02
-    ax_gap.set_ylim(gap_by_layer.min() - g_pad, gap_by_layer.max() + g_pad)
+    g_lo = min(gap_actual_by_layer.min(), gap_norm_by_layer.min())
+    g_hi = max(gap_actual_by_layer.max(), gap_norm_by_layer.max())
+    g_pad = (max(abs(g_lo), abs(g_hi)) * 0.3) or 0.02
+    ax_gap.set_ylim(g_lo - g_pad, g_hi + g_pad)
 
     # --- panel (c): compact statistics card, not a prose sentence ------------------------------------
     card_c = (0.828, CARD_Y, 0.15, CARD_H)
@@ -633,8 +647,8 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     ax_c = fig.add_axes([card_c[0] + 0.013, card_c[1] + 0.02, card_c[2] - 0.026, card_c[3] - 0.04])
     ax_c.axis("off")
     stat_rows = [
-        ("Mean KL — Left", f"{mean_l:.3f}", BLUE),
-        ("Mean KL — Right", f"{mean_r:.3f}", ORANGE),
+        ("Mean actual KL — Left", f"{mean_l:.3f}", BLUE),
+        ("Mean actual KL — Right", f"{mean_r:.3f}", ORANGE),
         ("Mean gap (L−R)", f"{mean_gap:+.3f}", GAP_C),
     ]
     y0 = 0.90

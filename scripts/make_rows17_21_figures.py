@@ -508,46 +508,47 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     fig.patch.set_facecolor("white")
     fig.text(0.5, 0.965, f"Does VoxTell's attention find the {core} equally well on both sides?",
               ha="center", fontsize=14.5, fontweight="bold", color=PAPER_INK)
-    fig.text(0.5, 0.925,
-              "Cross-attention vs. ground-truth alignment (KL divergence) at each of the 6 decoder layers, left vs. right",
+    fig.text(0.5, 0.918, "How closely attention matches the organ, layer by layer — left vs. right",
               ha="center", fontsize=10.5, color=PAPER_MUTED)
 
+    # one shared legend for both panels (colors mean the same thing throughout) -- avoids repeating
+    # the organ name in two separate legend boxes, and no per-panel titles below it either (the
+    # title + subtitle above already say what both panels are) -- one clear statement, not three.
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    handles = [Line2D([0], [0], color=BLUE, lw=2.2, label=f"Left {core}"),
+               Line2D([0], [0], color=ORANGE, lw=2.2, label=f"Right {core}"),
+               Patch(facecolor=GRAY_MID, label="Gap between sides")]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.855), ncol=3, frameon=False, fontsize=9.5)
+
     # --- panel (a): anatomical context --------------------------------------------------------------
-    ax_a = fig.add_axes([0.04, 0.14, 0.27, 0.67])
+    ax_a = fig.add_axes([0.03, 0.14, 0.30, 0.62])
     ax_a.imshow(img2c, cmap="gray", origin="lower")
     ax_a.set_xticks([]); ax_a.set_yticks([])
     for sp in ax_a.spines.values():
         sp.set_visible(False)
     if gt_lc.any():
-        ax_a.contour(gt_lc, levels=[0.5], colors=BLUE, linewidths=1.5)
+        ax_a.contour(gt_lc, levels=[0.5], colors=BLUE, linewidths=1.6)
     if gt_rc.any():
-        ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.5)
+        ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.6)
     ax_a.text(0.03, 0.04, subj.left_label, transform=ax_a.transAxes, color="white", fontsize=9, fontweight="bold")
     ax_a.text(0.97, 0.04, subj.right_label, transform=ax_a.transAxes, color="white", fontsize=9,
               fontweight="bold", ha="right")
-    ax_a.set_title("Where the organ actually is", fontsize=10.5, color=PAPER_INK, pad=6)
-    from matplotlib.lines import Line2D
-    handles = [Line2D([0], [0], color=BLUE, lw=2, label=f"Left {core}"),
-               Line2D([0], [0], color=ORANGE, lw=2, label=f"Right {core}")]
-    ax_a.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.04), ncol=1, frameon=False, fontsize=9)
 
-    # --- panel (b): the data, with a full legend --------------------------------------------------
-    ax_b = fig.add_axes([0.42, 0.21, 0.53, 0.60])
+    # --- panel (b): the data -------------------------------------------------------------------------
+    ax_b = fig.add_axes([0.42, 0.24, 0.53, 0.52])
     _paper_axes_style(ax_b)
-    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.8, markersize=5.5, label=f"Left {core}")
-    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.8, markersize=5.5, label=f"Right {core}")
-    ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.5, zorder=0,
-                       label="Left–right gap")
-    ax_b.set_xlabel("Decoder layer  (1 = earliest, 6 = final)", fontsize=10, color=PAPER_INK)
-    ax_b.set_ylabel("KL divergence\n(lower = attention matches\nthe true organ better)", fontsize=10, color=PAPER_INK)
-    ax_b.set_title("How well attention matches the real organ, at each layer", fontsize=10.5, color=PAPER_INK, pad=6)
+    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.8, markersize=5.5)
+    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.8, markersize=5.5)
+    ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.5, zorder=0)
+    ax_b.set_xlabel("Decoder layer", fontsize=10, color=PAPER_INK)
+    ax_b.set_ylabel("KL divergence (lower = better match)", fontsize=10, color=PAPER_INK)
     ax_b.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
     ax_b.set_axisbelow(True)
-    ax_b.legend(frameon=False, fontsize=9, loc="best", handlelength=1.6)
 
-    fig.text(0.5, 0.075, f"Verdict: {verdict}", ha="center", fontsize=11, fontweight="bold",
+    fig.text(0.5, 0.115, f"Verdict: {verdict}", ha="center", fontsize=11, fontweight="bold",
               color=(INK if similar else RED))
-    fig.text(0.5, 0.025,
+    fig.text(0.5, 0.055,
               f"Subject {subj.subject_id} ({subj.person}) • KL divergence measures how far the model's attention "
               "is from the organ's true shape; 0 would mean a perfect match.",
               ha="center", fontsize=8.5, color=PAPER_MUTED)

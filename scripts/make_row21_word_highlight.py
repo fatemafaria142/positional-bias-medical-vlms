@@ -44,7 +44,7 @@ GREY, GREY_TEXT = "#ebebe8", "#5a5954"
 INK, INK2 = "#0b0b0b", "#52514e"
 FS = 12.5
 
-METRIC_LABEL = {"f_dice_gt": "vs. Ground Truth (f_dice_gt)", "f_dice_self": "vs. Full-Prompt Prediction (f_dice_self)"}
+METRIC_LABEL = {"f_dice_gt": "Ground Truth", "f_dice_self": "Full-Prompt Prediction"}
 
 
 def method_values(df: pd.DataFrame, organ: str) -> dict:

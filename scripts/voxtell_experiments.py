@@ -484,7 +484,15 @@ def run_attention_kl(predictor, img_arr, label_vol, organs, ids, prompts,
 
     return_maps=True also returns a dict (same convention as `run_interventions`'s `attention_maps`):
     per organ, the last-layer and mean-of-layers attention density, downsampled by `map_downsample`
-    -- an actual spatial map to overlay on the image/GT (row 0), not just the scalar KL above."""
+    -- an actual spatial map to overlay on the image/GT (row 0), not just the scalar KL above. Also
+    includes `__bbox__` (the crop box from `predictor.preprocess`, shape (3, 2)) and
+    `__crop_shape__` (the map's own shape before downsampling): `attn`'s spatial frame is exactly
+    `label_vol[bbox[0,0]:bbox[0,1], bbox[1,0]:bbox[1,1], bbox[2,0]:bbox[2,1]]` (same crop as
+    `label_crop` above), so with these two a caller can upsample a map back to the crop's native
+    resolution, place it into a full label_vol-shaped array at `bbox`, and then register it onto
+    the real scan exactly the way row 17's voxel_map already is (same transpose + canonical-affine +
+    nibabel-resample trick) -- unlike row 17, this was not previously recoverable because the crop
+    box was computed but never saved alongside the map."""
     data, bbox, orig_shape = predictor.preprocess(img_arr)
     emb_real = predictor.embed_text_prompts([prompts[o] for o in organs])
     emb_generic = predictor.embed_text_prompts([generic_prompt])
@@ -531,6 +539,8 @@ def run_attention_kl(predictor, img_arr, label_vol, organs, ids, prompts,
         mean = pool(attn[:, p].float().mean(0)[None, None])[0, 0]
         maps[f"{organ}__last_layer"] = last.half().cpu().numpy()
         maps[f"{organ}__mean_of_layers"] = mean.half().cpu().numpy()
+    maps["__bbox__"] = np.asarray(bbox)
+    maps["__crop_shape__"] = np.asarray(attn.shape[-3:])
     return rows, maps
 
 

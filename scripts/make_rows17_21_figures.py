@@ -55,6 +55,7 @@ import nibabel.processing
 import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
+from scipy.ndimage import zoom as _ndi_zoom
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -103,6 +104,28 @@ def resample_model_array(arr, ref_path: Path, target_nii, order: int, valid: np.
         valid_out = nibabel.processing.resample_from_to(valid_img, target_nii, order=0).get_fdata().astype(bool)
         out = np.where(valid_out, out, np.nan)
     return out
+
+
+def reconstruct_cropped_map(maps: dict, key: str, label_shape) -> np.ndarray:
+    """Row 18's attention maps (unlike row 17's) are saved downsampled AND cropped to a bounding
+    box (`__bbox__`) that was not previously exported -- `voxtell_experiments.run_attention_kl` now
+    also saves `__bbox__` and `__crop_shape__` alongside the maps, which is everything needed to put
+    a map back into the FULL label-volume frame (upsample to `__crop_shape__`, then place at
+    `__bbox__`), after which it can go through the exact same `resample_model_array` registration
+    row 17's map already uses. Returns None if `key`, `__bbox__` or `__crop_shape__` are missing
+    (e.g. a map downloaded before this was added) -- callers must fall back gracefully, not guess."""
+    if key not in maps or "__bbox__" not in maps or "__crop_shape__" not in maps:
+        return None
+    small = np.asarray(maps[key], dtype=np.float32)
+    crop_shape = tuple(int(s) for s in np.asarray(maps["__crop_shape__"]))
+    zoom_factors = [c / s for c, s in zip(crop_shape, small.shape)]
+    upsampled = _ndi_zoom(small, zoom_factors, order=1)
+    upsampled = upsampled[tuple(slice(0, c) for c in crop_shape)]  # guard rounding overshoot
+    bbox = np.asarray(maps["__bbox__"]).astype(int)
+    full = np.full(tuple(label_shape), np.nan, dtype=np.float32)
+    sl = tuple(slice(int(bbox[a, 0]), int(bbox[a, 0]) + upsampled.shape[a]) for a in range(3))
+    full[sl] = upsampled
+    return full
 
 
 def load_manifest_label_ids(repo: Path, person: str, dataset: str, subject_id: str) -> dict:
@@ -204,6 +227,18 @@ class Subject:
         self.left_label, self.right_label = side_labels(self.img_nii, self.slice_axis)
         self.label_ids = load_manifest_label_ids(repo, person, dataset, subject_id)
         self.label_path_abs = base / label_path
+        self._model_space_shape = None
+
+    @property
+    def model_space_shape(self):
+        """Shape of the array frame VoxTell's own code (voxtell_mechanistic/voxtell_experiments)
+        works in -- REVERSED axis order relative to the canonical-RAS shape (verified empirically:
+        this is `nib.as_closest_canonical(...).shape[::-1]`, same convention as row 17's `label_vol`
+        and now row 18's reconstructed attention maps)."""
+        if self._model_space_shape is None:
+            canon_shape = nib.as_closest_canonical(nib.load(str(self.label_path_abs))).shape
+            self._model_space_shape = tuple(int(s) for s in canon_shape[::-1])
+        return self._model_space_shape
 
     def gt_mask(self, organ):
         return self.label == self.label_ids[organ]
@@ -577,6 +612,77 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     return savefig(fig, out_dir / core.replace(" ", "_") / "row18_explainer.png")
 
 
+def figure_row18_attention_overlay(subj, core, maps, out_dir):
+    """THE direct answer to "where is the model looking": the actual cross-attention density,
+    registered and overlaid on the real scan (same registration trick as row 17's Shapley map --
+    reconstruct_cropped_map + resample_model_array), for both the left and right organ side by
+    side. Requires `__bbox__`/`__crop_shape__` in `maps` (added to voxtell_experiments.py's
+    run_attention_kl -- re-run row 18 on Kaggle to get these in your .npz if they're missing).
+    Returns None (and prints why) if the map can't be reconstructed, rather than silently drawing
+    something misleading."""
+    left_organ, right_organ = f"left {core}", f"right {core}"
+    shape = subj.model_space_shape
+    panels = []
+    for organ in (left_organ, right_organ):
+        full = reconstruct_cropped_map(maps, f"{organ}__last_layer", shape)
+        if full is None:
+            print(f"[skip] row18 attention overlay for {organ}: __bbox__/__crop_shape__ not in this "
+                  "npz (re-run row 18 on Kaggle with the updated code to get them)")
+            return None
+        valid = ~np.isnan(full)
+        registered = resample_model_array(full, subj.label_path_abs, subj.img_nii, order=1, valid=valid)
+        panels.append(registered)
+    reg_l, reg_r = panels
+
+    img2, _, idx3 = subj.slice_of(left_organ)
+    gt_l = subj.gt_mask(left_organ)[idx3]
+    gt_r = subj.gt_mask(right_organ)[idx3]
+    map_l, map_r = reg_l[idx3], reg_r[idx3]
+    img2t, gt_lt, gt_rt, map_lt, map_rt = img2.T, gt_l.T, gt_r.T, map_l.T, map_r.T
+    union = gt_lt | gt_rt
+    win = bbox_2d(union, 20, union.shape)
+    img2c = crop(img2t, win)
+    gt_lc, gt_rc = crop(gt_lt, win), crop(gt_rt, win)
+    map_lc, map_rc = crop(map_lt, win), crop(map_rt, win)
+
+    fig = plt.figure(figsize=(10.4, 5.2), dpi=220)
+    fig.patch.set_facecolor("white")
+    fig.text(0.5, 0.965, f"Where Does VoxTell's Attention Actually Land? {core.title()} (Left vs. Right)",
+              ha="center", fontsize=13.5, fontweight="bold", color=PAPER_INK)
+    fig.text(0.5, 0.918,
+              "Last-decoder-layer cross-attention density, registered onto the real scan; dashed outline = true organ shape",
+              ha="center", fontsize=9.5, color=PAPER_MUTED)
+
+    vmax = float(np.nanmax([np.nanmax(map_lc) if np.isfinite(map_lc).any() else 0,
+                             np.nanmax(map_rc) if np.isfinite(map_rc).any() else 0]))
+    vmax = vmax if vmax > 0 else 1.0
+    axes_specs = [(0.05, "Left " + core, map_lc, gt_lc), (0.53, "Right " + core, map_rc, gt_rc)]
+    last_im = None
+    for x0, label, m, gtc in axes_specs:
+        ax = fig.add_axes([x0, 0.14, 0.40, 0.68])
+        ax.imshow(img2c, cmap="gray", origin="lower")
+        heat = np.ma.masked_invalid(m)
+        last_im = ax.imshow(heat, cmap=SEQ_BLUE, origin="lower", alpha=0.65, vmin=0, vmax=vmax)
+        if gtc.any():
+            ax.contour(gtc, levels=[0.5], colors=RED, linewidths=1.6, linestyles="--")
+        ax.set_xticks([]); ax.set_yticks([])
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+        ax.set_title(label, fontsize=11, fontweight="bold", color=PAPER_INK, pad=6)
+        ax.text(0.03, 0.04, subj.left_label, transform=ax.transAxes, color="white", fontsize=9, fontweight="bold")
+        ax.text(0.97, 0.04, subj.right_label, transform=ax.transAxes, color="white", fontsize=9,
+                fontweight="bold", ha="right")
+    cax = fig.add_axes([0.945, 0.18, 0.015, 0.60])
+    fig.colorbar(last_im, cax=cax, label="Attention density")
+
+    fig.text(0.5, 0.045,
+              f"Subject {subj.subject_id} ({subj.person}). Blue = where the model's cross-attention concentrated; "
+              "red dashed outline = true organ location. Overlap = attention genuinely finds the organ.",
+              ha="center", fontsize=8.3, color=PAPER_MUTED)
+
+    return savefig(fig, out_dir / core.replace(" ", "_") / "row18_attention_overlay.png")
+
+
 # --------------------------------------------------------------------------------------------------
 # row 19 -- gradient saliency + Grad-CAM (maps NOT registered: VoxTell's own cropped patch)
 # --------------------------------------------------------------------------------------------------
@@ -897,6 +1003,9 @@ def main():
                         paper_path, caption = figure_row18_paper(subj, core, left_rows, right_rows, out_dir)
                         print("wrote", rel(paper_path, args.repo))
                         captions.append(caption)
+                        overlay_path = figure_row18_attention_overlay(subj, core, maps18, out_dir)
+                        if overlay_path:
+                            print("wrote", rel(overlay_path, args.repo))
                     except Exception as e:
                         print(f"[error] {subject_id}/row18/{core}: {e}")
             if captions:

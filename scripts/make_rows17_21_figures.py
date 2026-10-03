@@ -902,36 +902,68 @@ def image_vs_word_totals(all_rows) -> pd.DataFrame:
 
 
 def figure_row21_image_vs_word(all_rows, out_dir):
-    """The direct answer to "is image or word contributing more?": one 2-bar-per-organ chart
-    (f_dice_gt only -- the metric scored against real ground truth, not the model's own prediction),
-    plus a printed verdict per organ and overall."""
+    """The headline figure for the project's core question: professional style matching the row 18
+    explainer (declarative title, exact values where it matters, a stats box with the overall
+    verdict) -- not just a bare per-organ bar chart left for the reader to average in their head."""
     totals = image_vs_word_totals(all_rows)
     t = totals[totals.metric == "f_dice_gt"].copy()
     organs = sorted(t.organ.unique(), key=lambda o: (o.split(None, 1)[1], o.split(None, 1)[0]) if " " in o else (o,))
     t = t.set_index("organ").loc[organs]
+    n_word, n_image = int(t.word_wins.sum()), int((~t.word_wins).sum())
+    mean_image, mean_word = float(t["image"].mean()), float(t["word"].mean())
+    ratio = mean_word / mean_image if mean_image > 1e-9 else float("inf")
+    overall = "WORD" if mean_word > mean_image else "IMAGE"
 
-    fig, ax = plt.subplots(figsize=(max(7.5, 0.6 * len(organs) + 2), 5.2), dpi=170)
-    fig.patch.set_facecolor(SURFACE)
+    fig = plt.figure(figsize=(max(10.5, 0.55 * len(organs) + 3), 7.2), dpi=220)
+    fig.patch.set_facecolor("white")
+    fig.text(0.5, 0.965, "Word Information Outweighs Image Content for Most Organs",
+              ha="center", fontsize=14, fontweight="bold", color=PAPER_INK)
+    fig.text(0.5, 0.925,
+              "Dice-score contribution of the image vs. the words (organ name + position), per organ, joint Shapley decomposition",
+              ha="center", fontsize=9.8, color=PAPER_MUTED)
+
+    ax = fig.add_axes([0.06, 0.30, 0.72, 0.60])
+    _paper_axes_style(ax)
     x = np.arange(len(organs))
     width = 0.36
-    ax.bar(x - width / 2, t["image"], width=width, color=BLUE, label="image", zorder=3)
-    ax.bar(x + width / 2, t["word"], width=width, color=ORANGE, label="word (organ word + position word)", zorder=3)
-    ax.axhline(0, color=INK2, linewidth=1)
+    ax.bar(x - width / 2, t["image"], width=width, color=BLUE, label="Image", zorder=3)
+    ax.bar(x + width / 2, t["word"], width=width, color=ORANGE, label="Word (organ + position)", zorder=3)
+    ax.axhline(0, color=PAPER_INK, linewidth=0.8)
     ax.set_xticks(x)
-    ax.set_xticklabels(organs, rotation=45, ha="right", fontsize=9)
-    style_bars(ax, "Row 21 -- image vs. word, 2-way contribution to Dice score",
-               "Dice-score contribution (Shapley credit, Dice units)")
-    ax.legend(frameon=False, fontsize=9.5, loc="best")
-    fig.tight_layout()
+    ax.set_xticklabels(organs, rotation=45, ha="right", fontsize=8.6)
+    ax.set_ylabel("Dice-score contribution\n(Shapley credit)", fontsize=10, color=PAPER_INK)
+    ax.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(frameon=False, fontsize=9.5, loc="upper right")
+
+    ax_c = fig.add_axes([0.82, 0.30, 0.16, 0.60])
+    ax_c.axis("off")
+    stat_rows = [
+        ("Mean contribution — Image", f"{mean_image:.3f}", BLUE),
+        ("Mean contribution — Word", f"{mean_word:.3f}", ORANGE),
+        ("Word / Image ratio", f"{ratio:.1f}×", PAPER_INK),
+        ("Organs where word wins", f"{n_word} / {len(t)}", PAPER_INK),
+        ("Overall", overall, RED if overall == "WORD" else BLUE),
+    ]
+    y0 = 0.94
+    for label, value, color in stat_rows:
+        ax_c.text(0.0, y0, label, fontsize=8.4, color=PAPER_MUTED, transform=ax_c.transAxes, va="top", wrap=True)
+        ax_c.text(0.0, y0 - 0.10, value, fontsize=13, fontweight="bold", color=color, transform=ax_c.transAxes, va="top")
+        y0 -= 0.205
+    ax_c.add_patch(plt.Rectangle((-0.10, 0.02), 1.18, 0.98, transform=ax_c.transAxes, fill=False,
+                                  edgecolor=PAPER_GRID, linewidth=1.0))
+
+    fig.text(0.5, 0.045,
+              "Shapley decomposition over 3 roles (image, organ word, position word), scored against ground truth (f_dice_gt). "
+              "\"Word\" = organ word + position word combined.",
+              ha="center", fontsize=8.2, color=PAPER_MUTED)
+
     out_path = savefig(fig, out_dir / "row21_image_vs_word_2way.png")
 
     print("\n=== Image vs. word contribution (f_dice_gt), per organ ===")
     for organ, row in t.iterrows():
         winner = "WORD" if row.word_wins else "IMAGE"
         print(f"  {organ:28s} image={row['image']:+.4f}  word={row['word']:+.4f}  -> {winner} contributes more")
-    n_word, n_image = int(t.word_wins.sum()), int((~t.word_wins).sum())
-    mean_image, mean_word = float(t["image"].mean()), float(t["word"].mean())
-    overall = "WORD" if mean_word > mean_image else "IMAGE"
     print(f"\n  Across {len(t)} organ(s): word wins on {n_word}, image wins on {n_image}.")
     print(f"  Mean Shapley credit: image={mean_image:+.4f}, word={mean_word:+.4f}  -> overall, {overall} contributes more.")
     return out_path

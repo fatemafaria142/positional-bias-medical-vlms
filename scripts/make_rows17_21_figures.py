@@ -566,11 +566,14 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
               ha="center", fontsize=9.5, color=PAPER_MUTED)
 
     from matplotlib.lines import Line2D
-    from matplotlib.patches import Patch
-    handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
-               Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round"),
-               Patch(facecolor=GRAY_MID, label="Gap")]
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.845), ncol=3, frameon=False, fontsize=9.5)
+    lr_handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
+                  Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round")]
+    gap_handle = [Line2D([0], [0], color=GRAY_MID, lw=2.6, label="Gap", solid_capstyle="round")]
+    leg1 = fig.legend(handles=lr_handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=2,
+                       frameon=False, fontsize=9.5)
+    fig.add_artist(leg1)
+    fig.legend(handles=gap_handle, loc="upper center", bbox_to_anchor=(0.5, 0.825), ncol=1,
+               frameon=False, fontsize=9.5)
 
     # --- panel (a): anatomical context, on its own card ---------------------------------------------
     card_a = (0.035, 0.12, 0.26, 0.60)
@@ -597,7 +600,7 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     ax_b.scatter(dfr.layer, dfr[col], s=46, color=ORANGE, edgecolor="white", linewidth=1.3, zorder=4)
     ax_b.margins(y=0.15)
     ax_b.set_xlabel("Decoder layer", fontsize=10, color=PAPER_INK)
-    ax_b.set_ylabel("KL divergence (lower = better match)", fontsize=9.5, color=PAPER_INK)
+    ax_b.set_ylabel("KL divergence\n(lower = better match)", fontsize=9.5, color=PAPER_INK)
     ax_b.yaxis.grid(True, color="#e9eaef", linewidth=0.7, zorder=0)
     ax_b.set_axisbelow(True)
     ax_b.set_facecolor("white")

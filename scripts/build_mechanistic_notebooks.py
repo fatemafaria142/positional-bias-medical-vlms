@@ -27,6 +27,10 @@ SCRIPTS = Path(__file__).resolve().parent
 AMOS_SUBJECTS = [("nipu", "amos_0508"), ("faria", "amos_0530"), ("hridoy", "amos_0555"), ("faria", "amos_0544"),
                  ("nipu", "amos_0553"), ("hridoy", "amos_0558"), ("nipu", "amos_0522"), ("faria", "amos_0532"),
                  ("hridoy", "amos_0554"), ("nipu", "amos_0575")]
+# Rows 17-24 AMOS notebook: 3 subjects, one per annotator (the first 3 of AMOS_SUBJECTS above).
+# cores=None -> every bilateral organ AMOS has, i.e. left/right kidney and left/right adrenal gland
+# (the only two bilateral organ pairs in this dataset's manifest).
+AMOS_THREE_SUBJECTS = AMOS_SUBJECTS[:3]
 OASIS_SUBJECTS = [("faria", "OASIS_OAS1_0014_MR1"), ("faria", "OASIS_OAS1_0057_MR1"), ("hridoy", "OASIS_OAS1_0123_MR1"),
                   ("hridoy", "OASIS_OAS1_0135_MR1"), ("nipu", "OASIS_OAS1_0062_MR1"), ("faria", "OASIS_OAS1_0363_MR1"),
                   ("hridoy", "OASIS_OAS1_0419_MR1"), ("nipu", "OASIS_OAS1_0076_MR1"), ("nipu", "OASIS_OAS1_0151_MR1"),
@@ -773,17 +777,92 @@ END_MD_17_21 = """## Outputs (all under `results/`)
 """
 
 
-def build_17_21(base_nb, title, dataset, subjects, cores, suffix, out_name):
+ROWS_22_24_TITLE_ROWS = (
+    "| 22 | Linear probe for left/right at every decoder layer | Is laterality linearly DECODABLE in the hidden "
+    "state, independent of what mask comes out -- stricter than row 16's distance |\n"
+    "| 23 | \"right - left\" embedding geometry across organs | Is there one reusable \"left->right\" direction, "
+    "or a different, unrelated one per organ (is \"left\" a composable concept)? |\n"
+    "| 24 | Zero-ablate one cross-attention head at a time | Which SPECIFIC head, not just which layer, is "
+    "causally responsible for laterality |\n"
+)
+
+ROWS_22_24_SUMMARY_APPEND = """
+print('\\n=== Row 22: is left/right linearly decodable at each layer? (leave-one-pair-out CV accuracy) ===')
+d = R('row22_laterality_probing')
+print(d.groupby('layer')[['cv_accuracy', 'train_accuracy']].mean().round(3))
+
+print('\\n=== Row 23: is there one consistent "left -> right" direction across organs? ===')
+d = R('row23_embedding_geometry')
+s = d[d.kind == 'summary']
+print(s[['mean_cosine_similarity', 'coherence_ratio', 'n_organs']].to_string(index=False))
+
+print('\\n=== Row 24: cross-attention head ablation -- dice vs. GT after zeroing each head, by layer ===')
+d = R('row24_attention_head_ablation')
+print(d.groupby(['layer', 'head'])[['dice_vs_gt', 'dice_vs_baseline']].mean().round(3))
+"""
+
+ROWS_22_24_END_MD_ROWS = (
+    "| `row22_laterality_probing_@@SUFFIX@@.csv` | 22 | per decoder layer: leave-one-pair-out cross-validated and "
+    "train accuracy of a linear probe predicting left/right from the hidden state alone, `n_pairs` |\n"
+    "| `row23_embedding_geometry_@@SUFFIX@@.csv` | 23 | pairwise cosine similarity between every two organs' "
+    "\"right - left\" text-embedding difference vectors (`kind='pair'`), plus one `kind='summary'` row: mean "
+    "cosine similarity and `coherence_ratio` |\n"
+    "| `row24_attention_head_ablation_@@SUFFIX@@.csv` | 24 | per organ, layer and head: Dice vs. GT and vs. the "
+    "unablated baseline after zero-ablating that one cross-attention head, plus `call` |\n"
+)
+
+
+def build_17_21(base_nb, title, dataset, subjects, cores, suffix, out_name, include_22_24=False):
     """Rows 17-21 only (plus the shared row-0 baseline/GT export) -- for when rows 1-16 are
-    already covered by other notebooks and only the image-region attribution suite is needed."""
+    already covered by other notebooks and only the image-region attribution suite is needed.
+    include_22_24=True extends this to rows 17-24, adding the model-internals suite (probing,
+    embedding geometry, head ablation) -- those three need no spatial maps/row0-registration of
+    their own, so they bolt on cleanly after row 21 without changing anything above it."""
     nb = json.loads((REPO / base_nb).read_text(encoding="utf-8"))
     nb["cells"] = nb["cells"][:16]
     subj_str = ", ".join(sid for _, sid in subjects)
     organs = ", ".join(cores) if cores else "every bilateral organ"
-    nb["cells"][0] = cell("markdown", TITLE_17_21.format(title=title, n_subjects=len(subjects), subjects=subj_str, organs=organs))
+    title_md = TITLE_17_21.format(title=title, n_subjects=len(subjects), subjects=subj_str, organs=organs)
+    if include_22_24:
+        title_md = title_md.replace("PLAN ROWS 17-21: image-region attribution suite",
+                                     "PLAN ROWS 17-24: image-region attribution + model-internals suite")
+        title_md = title_md.replace(
+            "| 21 | Joint Shapley over image / organ word / position word | Puts image contribution and word contribution on one common scale |\n",
+            "| 21 | Joint Shapley over image / organ word / position word | Puts image contribution and word contribution on one common scale |\n"
+            + ROWS_22_24_TITLE_ROWS)
+    nb["cells"][0] = cell("markdown", title_md)
     sub = lambda t: (t.replace("@@SUFFIX@@", suffix).replace("@@DATASET@@", dataset))
     mech = json.dumps((SCRIPTS / "voxtell_mechanistic.py").read_text(encoding="utf-8"))
     exp = json.dumps((SCRIPTS / "voxtell_experiments.py").read_text(encoding="utf-8"))
+    rows_22_24_cells = [
+        cell("markdown", "## 9. Row 22 -- linear probing: is left/right linearly decodable at each layer?\n\n"
+                         "A stricter question than row 16's cosine distance: distance can stay small while a "
+                         "linear probe still finds a perfectly usable separating direction. If a layer's probe is "
+                         "near-perfect but the final mask still gets the side wrong, that is direct evidence the "
+                         "DECODER discards information that was already there."),
+        cell("code", sub(ROW_22_CELL)),
+        cell("markdown", "## 10. Row 23 -- embedding geometry: one shared \"left -> right\" direction, or one per organ?\n\n"
+                         "The classic word-vector-arithmetic test (\"king - man + woman\"), applied to "
+                         "\"right X - left X\" across every organ. Pure text-embedding arithmetic -- no image, "
+                         "no sliding window, the cheapest row in this notebook."),
+        cell("code", sub(ROW_23_CELL)),
+        cell("markdown", "## 11. Row 24 -- cross-attention head ablation: which specific head?\n\n"
+                         "Zero-ablates one cross-attention head at a time (`voxtell_mechanistic.HeadAblation`) and "
+                         "re-predicts the full mask -- row 15/18's whole-layer attention cannot tell \"one head does "
+                         "this\" from \"every head does this a little\"; this can. Validated once per notebook run: "
+                         "ablating zero heads must reproduce the unablated prediction exactly."),
+        cell("code", sub(ROW_24_CELL)),
+    ] if include_22_24 else []
+    summary_cell_text = sub(SUMMARY_17_21_CELL)
+    end_md_text = sub(END_MD_17_21)
+    if include_22_24:
+        summary_cell_text = summary_cell_text.replace("\nzip_path =", ROWS_22_24_SUMMARY_APPEND + "\nzip_path =")
+        summary_cell_text = summary_cell_text.replace("rows17_21_results", "rows17_24_results")
+        end_md_text = end_md_text.replace(
+            "| `row21_joint_shapley_@@SUFFIX@@.csv` | 21 | per organ, role (image / organ_word / position_word) and metric: Shapley credit on one common scale |\n".replace("@@SUFFIX@@", suffix),
+            "| `row21_joint_shapley_" + suffix + ".csv` | 21 | per organ, role (image / organ_word / position_word) and metric: Shapley credit on one common scale |\n"
+            + sub(ROWS_22_24_END_MD_ROWS))
+    summary_heading = "## 12. Summary and archive" if include_22_24 else "## 9. Summary and archive"
     nb["cells"] += [
         cell("markdown", "## 1. Load the experiment code"),
         cell("code", SRC_CELL.replace("@@MECH@@", repr(mech)).replace("@@EXP@@", repr(exp))),
@@ -820,9 +899,10 @@ def build_17_21(base_nb, title, dataset, subjects, cores, suffix, out_name):
                          "Three roles (image intact/noised, organ word, position word), 8 coalitions, one Shapley "
                          "table that puts image contribution and word contribution on the same scale."),
         cell("code", sub(ROW_21_CELL)),
-        cell("markdown", "## 9. Summary and archive"),
-        cell("code", sub(SUMMARY_17_21_CELL)),
-        cell("markdown", sub(END_MD_17_21)),
+        *rows_22_24_cells,
+        cell("markdown", summary_heading),
+        cell("code", summary_cell_text),
+        cell("markdown", end_md_text),
     ]
     out = REPO / out_name
     out.write_text(json.dumps(nb, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -844,3 +924,8 @@ if __name__ == "__main__":
     # deliberately NOT included in this image-attribution-only standalone notebook).
     build_17_21("voxtell-oasis-groundedness-investigation-batch1-kaggle.ipynb", "Neurite-OASIS", "neurite_oasis",
                 OASIS_ONE_SUBJECT, OASIS_RICH_CORES, "neurite_oasis", "voxtell-oasis-rows17-21-kaggle.ipynb")
+    # Standalone AMOS rows 17-24 notebook: 3 subjects (one per annotator), every bilateral organ
+    # (kidney + adrenal gland, left/right) -- includes the model-internals suite (22-24) too, unlike
+    # the OASIS rows17-21 notebook above, since this is the first and only AMOS rows17+ notebook.
+    build_17_21("voxtell-amos-groundedness-investigation-kaggle.ipynb", "AMOS22 MRI", "amos22_mri",
+                AMOS_THREE_SUBJECTS, None, "amos22_mri", "voxtell-amos-rows17-24-kaggle.ipynb", include_22_24=True)

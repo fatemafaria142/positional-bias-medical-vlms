@@ -570,13 +570,10 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
               ha="center", fontsize=9.5, color=PAPER_MUTED)
 
     from matplotlib.lines import Line2D
-    lr_handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
-                  Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round")]
-    gap_handle = [Line2D([0], [0], color=GAP_C, lw=2.6, label="Gap", solid_capstyle="round")]
-    leg1 = fig.legend(handles=lr_handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=2,
-                       frameon=False, fontsize=9.5)
-    fig.add_artist(leg1)
-    fig.legend(handles=gap_handle, loc="upper center", bbox_to_anchor=(0.5, 0.825), ncol=1,
+    handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
+               Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round"),
+               Line2D([0], [0], color=GAP_C, lw=2.6, label="Gap", solid_capstyle="round")]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=3,
                frameon=False, fontsize=9.5)
 
     CARD_Y, CARD_H = 0.12, 0.60

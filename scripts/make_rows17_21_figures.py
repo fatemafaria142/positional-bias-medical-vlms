@@ -243,7 +243,7 @@ def figure_row17(subj, organ, shap_rows, voxel_map, out_dir):
     panel_image(axes[0], img2c, "Scan + ground truth", subj.left_label, subj.right_label)
     overlay(axes[0], gt2c, AQUA)
     v = np.nanmax(np.abs(map2c)) if np.isfinite(map2c).any() else 1e-6
-    im = heat_panel(axes[1], map2c, "Row 17: voxel-block Shapley credit\n(blue = helps the mask, red = hurts it)",
+    im = heat_panel(axes[1], map2c, "Row 17: voxel-block Shapley credit\n(red = helps the mask, blue = hurts it)",
                      DIVERGING, vmin=-v, vmax=v)
     overlay(axes[1], gt2c, AQUA, alpha=0.0)
     if gt2c.any():
@@ -256,7 +256,7 @@ def figure_row17(subj, organ, shap_rows, voxel_map, out_dir):
     df = pd.DataFrame(shap_rows).sort_values("shapley_value", ascending=False)
     fig, ax = plt.subplots(figsize=(6.4, 4), dpi=170)
     fig.patch.set_facecolor(SURFACE)
-    colors = [BLUE if v >= 0 else RED for v in df.shapley_value]
+    colors = [RED if v >= 0 else BLUE for v in df.shapley_value]  # matches the map's red=helps/blue=hurts legend
     ax.bar(df.block_id.astype(str), df.shapley_value, color=colors, width=0.62, zorder=3)
     ax.axhline(0, color=INK2, linewidth=1)
     style_bars(ax, f"{organ} -- Shapley credit per voxel block", "Shapley credit (f_dice_gt)")
@@ -516,10 +516,10 @@ def main():
         first = sub0.iloc[0]
         subj = Subject(args.repo, person, first["dataset"] if "dataset" in sub0.columns else args.suffix,
                         subject_id, first["image_path"], first["label_path"])
-        maps17 = _load_npz(args.results_dir / "row17_shapley_maps" / f"{subject_id}.npz")
-        maps18 = _load_npz(args.results_dir / "row18_attention_maps" / f"{subject_id}.npz")
-        maps19 = _load_npz(args.results_dir / "row19_saliency_maps" / f"{subject_id}.npz")
-        maps20 = _load_npz(args.results_dir / "row20_fused_maps" / f"{subject_id}.npz")
+        maps17 = _load_npz(_find_npz(args.results_dir, 17, "row17_shapley_maps", subject_id))
+        maps18 = _load_npz(_find_npz(args.results_dir, 18, "row18_attention_maps", subject_id))
+        maps19 = _load_npz(_find_npz(args.results_dir, 19, "row19_saliency_maps", subject_id))
+        maps20 = _load_npz(_find_npz(args.results_dir, 20, "row20_fused_maps", subject_id))
 
         for organ in sub0.index:
             if organ not in subj.label_ids:
@@ -554,6 +554,29 @@ def main():
     if all_row21_rows:
         print("wrote", rel(figure_row21_summary(all_row21_rows, out_dir), args.repo))
         print("wrote", rel(figure_row21_image_vs_word(all_row21_rows, out_dir), args.repo))
+
+
+def _find_npz(results_dir: Path, row: int, folder_name: str, subject_id: str) -> Path:
+    """The notebook writes these to `<folder_name>/<subject_id>.npz` (e.g. `row17_shapley_maps/
+    OASIS_OAS1_0057_MR1.npz`), but a manual download from Kaggle's flat Output tab often lands as
+    `Row<row>-<subject_id>.npz` (or lowercase, or with underscores) directly in the results dir
+    instead -- try the real structure first, then those common flattened variants, case-insensitively,
+    before giving up."""
+    candidates = [
+        results_dir / folder_name / f"{subject_id}.npz",
+        results_dir / f"Row{row}-{subject_id}.npz",
+        results_dir / f"row{row}-{subject_id}.npz",
+        results_dir / f"Row{row}_{subject_id}.npz",
+        results_dir / f"row{row}_{subject_id}.npz",
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    if results_dir.is_dir():
+        for p in results_dir.iterdir():
+            if p.is_file() and p.suffix == ".npz" and p.stem.lower() in (f"row{row}-{subject_id}".lower(), f"row{row}_{subject_id}".lower()):
+                return p
+    return candidates[0]  # doesn't exist -- _load_npz will just return {}
 
 
 def _load_npz(path: Path) -> dict:

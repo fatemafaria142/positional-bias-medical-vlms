@@ -481,10 +481,11 @@ def figure_row18_paper(subj, core, kl_left, kl_right, out_dir):
 
 
 def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
-    """Self-contained version: one clean figure with a title, subtitle, legend, axis labels and a
-    one-line definition note -- everything a reader needs is ON the image, no external caption or
-    verbal explanation required. Same clean two-panel layout as figure_row18_paper (not the numbered
-    "1/2/3" story version), but with enough built-in text to stand alone."""
+    """Professional, self-contained version: declarative scientific title (not a casual question),
+    a legend that says Left/Right/Gap only (the organ is already named once, in the title -- not
+    repeated three times across the figure), every data point labeled with its actual KL value (not
+    just "lower is better" left for the reader to eyeball), and a compact statistics box instead of
+    a conversational "Verdict:" sentence. Clean white/minimal-spine style throughout."""
     left_organ, right_organ = f"left {core}", f"right {core}"
     img2, _, idx3 = subj.slice_of(left_organ)
     gt_l = subj.gt_mask(left_organ)[idx3]
@@ -497,32 +498,28 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     dfl = pd.DataFrame(kl_left).sort_values("layer")
     dfr = pd.DataFrame(kl_right).sort_values("layer")
     col = "kl_divergence_vs_generic_normalized"
-    mean_gap = float(np.mean(dfl[col].values - dfr[col].values))
-    similar = abs(mean_gap) < 0.15 * max(dfl[col].mean(), dfr[col].mean(), 1e-6)
-    worse_side = "left" if mean_gap > 0 else "right"
-    verdict = (f"No meaningful left/right gap (Δ={abs(mean_gap):.2f}) — attention is side-symmetric for this organ."
-               if similar else
-               f"{worse_side.capitalize()} side matches worse (Δ={abs(mean_gap):.2f} KL) — a possible positional asymmetry.")
+    mean_l, mean_r = float(dfl[col].mean()), float(dfr[col].mean())
+    mean_gap = mean_l - mean_r
+    similar = abs(mean_gap) < 0.15 * max(mean_l, mean_r, 1e-6)
+    worse_side = "Left" if mean_gap > 0 else "Right"
 
-    fig = plt.figure(figsize=(9.6, 4.6), dpi=220)
+    fig = plt.figure(figsize=(10.2, 4.8), dpi=220)
     fig.patch.set_facecolor("white")
-    fig.text(0.5, 0.965, f"Does VoxTell's attention find the {core} equally well on both sides?",
-              ha="center", fontsize=14.5, fontweight="bold", color=PAPER_INK)
-    fig.text(0.5, 0.918, "How closely attention matches the organ, layer by layer — left vs. right",
-              ha="center", fontsize=10.5, color=PAPER_MUTED)
+    fig.text(0.5, 0.965, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
+              ha="center", fontsize=13.5, fontweight="bold", color=PAPER_INK)
+    fig.text(0.5, 0.918,
+              "KL divergence between cross-attention density and the ground-truth mask, normalized against a generic prompt",
+              ha="center", fontsize=9.5, color=PAPER_MUTED)
 
-    # one shared legend for both panels (colors mean the same thing throughout) -- avoids repeating
-    # the organ name in two separate legend boxes, and no per-panel titles below it either (the
-    # title + subtitle above already say what both panels are) -- one clear statement, not three.
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
-    handles = [Line2D([0], [0], color=BLUE, lw=2.2, label=f"Left {core}"),
-               Line2D([0], [0], color=ORANGE, lw=2.2, label=f"Right {core}"),
-               Patch(facecolor=GRAY_MID, label="Gap between sides")]
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.855), ncol=3, frameon=False, fontsize=9.5)
+    handles = [Line2D([0], [0], color=BLUE, lw=2.2, label="Left"),
+               Line2D([0], [0], color=ORANGE, lw=2.2, label="Right"),
+               Patch(facecolor=GRAY_MID, label="Gap")]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=3, frameon=False, fontsize=9.5)
 
     # --- panel (a): anatomical context --------------------------------------------------------------
-    ax_a = fig.add_axes([0.03, 0.14, 0.30, 0.62])
+    ax_a = fig.add_axes([0.03, 0.13, 0.27, 0.62])
     ax_a.imshow(img2c, cmap="gray", origin="lower")
     ax_a.set_xticks([]); ax_a.set_yticks([])
     for sp in ax_a.spines.values():
@@ -535,23 +532,47 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     ax_a.text(0.97, 0.04, subj.right_label, transform=ax_a.transAxes, color="white", fontsize=9,
               fontweight="bold", ha="right")
 
-    # --- panel (b): the data -------------------------------------------------------------------------
-    ax_b = fig.add_axes([0.42, 0.24, 0.53, 0.52])
+    # --- panel (b): the data, with every value labeled ----------------------------------------------
+    ax_b = fig.add_axes([0.38, 0.24, 0.40, 0.52])
     _paper_axes_style(ax_b)
     ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.8, markersize=5.5)
     ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.8, markersize=5.5)
     ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.5, zorder=0)
+    y_span = max(dfl[col].max(), dfr[col].max()) - min(dfl[col].min(), dfr[col].min())
+    off = y_span * 0.06
+    for _, r in dfl.iterrows():
+        ax_b.annotate(f"{r[col]:.2f}", (r.layer, r[col]), textcoords="offset points", xytext=(0, 7),
+                      ha="center", fontsize=7.3, color=BLUE)
+    for _, r in dfr.iterrows():
+        ax_b.annotate(f"{r[col]:.2f}", (r.layer, r[col]), textcoords="offset points", xytext=(0, -11),
+                      ha="center", fontsize=7.3, color=ORANGE)
+    ax_b.margins(y=0.18)
     ax_b.set_xlabel("Decoder layer", fontsize=10, color=PAPER_INK)
     ax_b.set_ylabel("KL divergence (lower = better match)", fontsize=10, color=PAPER_INK)
     ax_b.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
     ax_b.set_axisbelow(True)
 
-    fig.text(0.5, 0.115, f"Verdict: {verdict}", ha="center", fontsize=11, fontweight="bold",
-              color=(INK if similar else RED))
-    fig.text(0.5, 0.055,
-              f"Subject {subj.subject_id} ({subj.person}) • KL divergence measures how far the model's attention "
-              "is from the organ's true shape; 0 would mean a perfect match.",
-              ha="center", fontsize=8.5, color=PAPER_MUTED)
+    # --- panel (c): compact statistics box, not a prose sentence -------------------------------------
+    ax_c = fig.add_axes([0.82, 0.24, 0.16, 0.52])
+    ax_c.axis("off")
+    stat_rows = [
+        ("Mean KL — Left", f"{mean_l:.3f}", BLUE),
+        ("Mean KL — Right", f"{mean_r:.3f}", ORANGE),
+        ("Mean gap (L−R)", f"{mean_gap:+.3f}", PAPER_INK),
+        ("Larger gap on", worse_side if not similar else "— (n.s.)", PAPER_INK),
+    ]
+    y0 = 0.92
+    for label, value, color in stat_rows:
+        ax_c.text(0.0, y0, label, fontsize=8.8, color=PAPER_MUTED, transform=ax_c.transAxes, va="top")
+        ax_c.text(0.0, y0 - 0.13, value, fontsize=12.5, fontweight="bold", color=color, transform=ax_c.transAxes, va="top")
+        y0 -= 0.30
+    ax_c.add_patch(plt.Rectangle((-0.08, 0.02), 1.12, 0.98, transform=ax_c.transAxes, fill=False,
+                                  edgecolor=PAPER_GRID, linewidth=1.0))
+
+    fig.text(0.5, 0.045,
+              f"Subject {subj.subject_id} ({subj.person}). KL divergence = distance between the model's cross-attention "
+              "and the true organ shape (0 = perfect match). Point labels show the exact KL value at each layer.",
+              ha="center", fontsize=8.3, color=PAPER_MUTED)
 
     return savefig(fig, out_dir / core.replace(" ", "_") / "row18_explainer.png")
 

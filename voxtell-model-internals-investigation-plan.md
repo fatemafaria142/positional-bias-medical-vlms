@@ -16,11 +16,25 @@ each row spells out, in full, what result points which way — no shorthand code
 
 ## Research questions at a glance
 
-One core question and 16 row-level questions (17 in total). Each row-level question is answered
-by the row of the same number in the master table below. Rows 1–11 have been run. **Rows 12–16 are
-implemented in the two "mechanistic" notebooks but have not been run yet** that cover what rows 1–11 cannot answer: whether "left" means
-anatomy or image coordinates, whether the model uses a location prior instead of the image, a real
-embedding intervention, cross-attention evidence, and where in the network left/right diverge.
+One core question and 24 row-level questions (25 in total). Each row-level question is answered
+by the row of the same number in the master table below. Rows 1–11 have been run. Rows 13–16 have
+a 3-subject pilot run (see `voxtell-mechanistic-results-amos-rows13-16.md`); row 12 and **rows
+17–24 are implemented in `scripts/voxtell_mechanistic.py`/`scripts/voxtell_experiments.py` and the
+five mechanistic Kaggle notebooks but not yet run**. Rows 12–16 cover what rows 1–11 cannot answer:
+whether "left" means anatomy or image coordinates, whether the model uses a location prior instead
+of the image, a real embedding intervention, cross-attention evidence, and where in the network
+left/right diverge. **Rows 17–21** add the image-region-wise attribution suite that rows 1–16
+lacked: an exact image-occlusion Shapley map (17, the image analogue of rows 5–11's word-Shapley),
+per-layer attention/KL-divergence diagnostics (18), a cheap gradient-based approximation to row 17
+(19), a resolution of row 1/4's "needs hook" blocker via a genuine spatial fused-feature map (20),
+and a joint image-vs-word Shapley that puts image and word contribution on one common scale (21).
+**Rows 22–24** go one level deeper, into the model's own weights and representations rather than
+its outputs: a linear probe at every decoder layer testing whether laterality is actually decodable
+in the hidden state, independent of what mask comes out (22, stricter than row 16's distance metric);
+whether the text encoder has learned one reusable "left → right" direction shared across organs, or
+a different, unrelated one per organ (23, pure embedding-space geometry, the classic word-vector-
+arithmetic test); and zero-ablation of individual cross-attention heads, one at a time, to find which
+*specific* head (not just which layer) is causally responsible for laterality (24).
 
 | ID | Group | Research question |
 |---|---|---|
@@ -41,6 +55,37 @@ embedding intervention, cross-attention evidence, and where in the network left/
 | 14 *(notebook ready, not yet run)* | Fusion | In a real intervention, where does the mask move when the "left" representation is blended with, or partly replaced by, the "right" one, and at which decoder layer is the side decided? |
 | 15 *(notebook ready, not yet run)* | Image-Text Alignment | Does the cross-attention of "left kidney" concentrate on the left kidney rather than the right kidney or another organ? |
 | 16 *(notebook ready, not yet run)* | Fusion | At which decoder layer do the left and right representations first diverge, compared with the gap between two different organs? |
+| 17 *(notebook ready, not yet run)* | Image Attribution | Which region/block of the image, if occluded, changes the mask the most — the image analogue of the word-Shapley table (rows 5–11)? |
+| 18 *(notebook ready, not yet run)* | Image-Text Alignment | At which decoder layer does cross-attention best match (lowest KL divergence against) the ground-truth organ region? |
+| 19 *(notebook ready, not yet run)* | Image Attribution | Does a cheap one-pass gradient/Grad-CAM saliency map agree with row 17's exact occlusion map? |
+| 20 *(notebook ready, not yet run)* | Image-Text Alignment | Does VoxTellDecoder's spatial fused feature map's hot region move with the prompt (matched vs. mismatched side/organ) — a deeper, intermediate-layer repeat of row 1, which was already run using the final pre-sigmoid logits as its "internal representation" (see Implementation status below) |
+| 21 *(notebook ready, not yet run)* | Image Attribution | On one common scale, which contributes more to the output: the image, the organ word, or the position word? |
+| 22 *(notebook ready, not yet run)* | Model Internals: Probing | Is left/right linearly decodable from the hidden state at each decoder layer, independent of what mask the model actually outputs — not just "how different" (row 16) but "is the difference a usable signal"? |
+| 23 *(notebook ready, not yet run)* | Model Internals: Representation Geometry | Does the text encoder use one consistent "left → right" direction across every organ (a reusable, composable spatial concept), or a different, unrelated direction per organ (position re-derived per organ, not a shared concept)? |
+| 24 *(notebook ready, not yet run)* | Model Internals: Causal Ablation | Zero-ablating one cross-attention head at a time: which *specific* head, not just which layer, is causally responsible for the model's laterality decision? |
+
+---
+
+## Rows 17–24, broken into answerable sub-questions
+
+Rows 17–24 give **8 headline questions** (one per row, table above), but each row's CSV supports
+several more specific sub-questions once real results come in. ~20 answerable sub-questions total.
+
+| Row | Headline question | Sub-questions answerable from its CSV |
+|---|---|---|
+| 17 | Which image region matters most to the prediction? | Which block is most positive / most negative? Does the important region sit inside or outside the true organ? |
+| 18 | Which decoder layer's attention best matches the true organ region? | Does KL improve or worsen after dividing out a generic prompt? At which layer is attention closest to GT? |
+| 19 | Does cheap gradient saliency agree with row 17's exact map? | Is saliency enriched inside vs. outside the organ? Does Grad-CAM agree with vanilla gradient? |
+| 20 | Does the fused feature map move with the prompt? | Does IoU drop more for mismatched *side* or mismatched *organ* (tests whether side-sensitivity is weaker than organ-sensitivity)? |
+| 21 | Image vs. organ-word vs. position-word — which contributes more? | Per organ, does image or word win (the 2-way `image_vs_word_totals` rollup)? Does the answer differ between `f_dice_gt` and `f_dice_self`? |
+| 22 | Is left/right linearly decodable in the hidden state? | At which layer does probe accuracy first exceed chance? Does `cv_accuracy` diverge from `train_accuracy` (overfitting on small `n_pairs`)? |
+| 23 | Is there one shared "left→right" direction across organs? | Which organ pairs are most/least aligned (the pairwise cosine matrix)? Is `coherence_ratio` closer to 1 (shared concept) or 0 (per-organ, memorized)? |
+| 24 | Which specific attention head is responsible for laterality? | Which `(layer, head)` pair causes the biggest `dice_vs_baseline` drop? Does any single head's ablation flip the predicted side (`call`)? |
+
+**Mapped to the core question** (positional bias vs. memorization, see Section 0):
+- **Positional bias (where/how side is handled):** rows 17, 18, 20, 22, 24
+- **Memorization vs. genuine grounding:** row 19 (saliency outside the true organ = a hallucinated
+  prior), row 21 (image vs. word reliance), row 23 (a reusable concept vs. a memorized-per-organ one)
 
 ---
 
@@ -125,6 +170,11 @@ code is currently **unverified** — see the **Prerequisite** note below the tab
 | 14 *(notebook ready, not yet run)* | Fusion — Real embedding intervention | Embedding blend and per-layer patching | • Blend the text embeddings of "left X" and "right X" (e.g. weights 0, 0.25, 0.5, 0.75, 1, plus −0.5 and 1.5 to extrapolate) and run each on the same image.<br>• Separately, run "left X" but, at decoder layer *k* (0–5), replace that layer's update (its change to the query state) with the update computed for "right X" on the same patch. Do this for each single layer, and for all layers from *k* onward, in both directions (L→R and R→L).<br>• As a control, patch the whole query state at a layer, which should exactly reproduce the source prompt's mask.<br>• Score each output by side and by Dice against each side's ground truth. | • Passing the right embedding to the model is the same as prompting "right", so a real test has to intervene inside the model or interpolate.<br>• Patching the update, not the full state, matters: the decoder is pre-norm and the state only carries the text through the residual stream, so a full-state patch is trivially the source prompt.<br>• The blend gives a dose-response curve, and the per-layer patch shows which layers carry the side. | Side call and Dice per blend weight and per patched layer, plus the weight or layer at which the side flips. | • Smooth, monotonic side shift with blend weight and a clear set of layers that flip the side → the side is causally carried by the text representation and decided in identifiable layers — supports genuine grounding.<br>• The side flips abruptly or only at extreme weights → a threshold-like or brittle representation.<br>• Patching layers does not move the mask → the side is decided elsewhere (image side or later decoder) — supports a non-text shortcut.<br>• The control fails to reproduce the source mask → a bug in the intervention; results are not valid. |
 | 15 *(notebook ready, not yet run)* | Image-Text Alignment — Cross-attention maps | Per-layer cross-attention of the text query over image tokens | • Record the cross-attention weights of every decoder layer (averaged over heads) for all four prompts of a subject.<br>• Map each weight from the image-token grid (12×12×12 per patch, ordered height-width-depth) back into voxel space, with the same Gaussian patch weighting as inference.<br>• For each prompt and layer, compute the attention density inside each of the four ground-truth regions relative to the volume average.<br>• Also record the attention centre of mass along the right-left axis against each organ's centroid. | • Rows 1 and 4 used final masks or logits, so the internal word-region link is untested.<br>• The cross-attention is where the text query reads the image, so it is the most direct evidence for alignment. | Attention enrichment (density in a region ÷ mean density) for matched, wrong-side and other-organ regions, per layer; centre of mass nearer to the named organ or not. | • Higher enrichment on the named organ than on the other side or other organs, in the late layers → the text query attends to the right place — supports genuine grounding.<br>• Equal enrichment on both sides → attention is side-blind; any side selection happens after attention.<br>• High enrichment on the organ regardless of the side word → attention finds the organ only (organ identity), leaving the side to another mechanism. |
 | 16 *(notebook ready, not yet run)* | Fusion — Per-layer divergence | Left-vs-right query state distance at each decoder layer | • From the same run as row 15, record the query state after every decoder layer (plus the input state) for all four prompts.<br>• Per patch, compute the cosine and L2 distance between "left X" and "right X" at each layer, averaged over patches that overlap the organs and separately over all patches.<br>• Use the distance between "left X" and a different organ ("left Y") as a reference scale.<br>• Also compare the difference between the two prompts' attention maps per layer. | • The notebooks only saved the final fused vector, so where the left/right difference is created, kept or lost is unknown.<br>• A reference organ pair shows whether the side difference is small or large relative to what the layers already distinguish. | Left/right distance per layer, as a ratio to the input distance and to the organ-vs-organ reference distance. | • The left/right distance grows in the layers after attention and stays large → the fusion builds a side-specific state — supports genuine grounding.<br>• The distance is present at the input and shrinks through the layers → the side signal is washed out before the mask is produced.<br>• The distance is always small compared with the organ-vs-organ reference → side is a minor component of the representation. |
+| 17 *(notebook ready, not yet run)* | Image Attribution — voxel-grid occlusion Shapley (`run_grid_occlusion`) | Which image region matters, exactly | • Tile a padded box around one organ's GT region into 8 blocks.<br>• Noise each coalition's absent blocks (reusing row 13's `noise_region`), run all 2**8=256 coalitions, score `f_dice_gt`.<br>• Feed the 256 payoffs into the same exact-Shapley code used for rows 5-11 (`shapley_values`), with blocks as the players instead of words. | • Direct image-side counterpart of the word-Shapley table — same fairness guarantees (efficiency, symmetry), same affordability argument (2**8 is cheap, matching row 5's own word count). | Exact Shapley value per block. | • Credit concentrated on blocks overlapping the organ itself → the model needs that specific image region, not a shortcut.<br>• Credit spread evenly or concentrated elsewhere → the organ's own appearance isn't what's driving the mask there. |
+| 18 *(notebook ready, not yet run)* | Image-Text Alignment — attention/KL diagnostic (`run_attention_kl`) | Which decoder layer's attention is best grounded | • Reuse row 15's cross-attention density per layer.<br>• Normalize the GT organ mask and the attention map into probability distributions over voxels; compute `KL(GT ‖ attention)` per layer.<br>• Also run one generic, non-spatial prompt ("segment the anatomy") per subject and divide its attention map out before computing KL (the VGMED/VGRefine paper's reference-prompt normalization), isolating prompt-specific attention from VoxTell's default gaze. | • Standard metric from the medical-MLLM visual-grounding literature (arXiv 2603.14323); gives a single, comparable number per layer instead of row 15's scalar enrichment ratio. | KL divergence per layer, raw and generic-normalized. | • Lowest KL at an early/mid layer, stable across organs → attention is reliably grounded starting early.<br>• KL stays high (no layer matches well) even though row 15 showed enrichment → the "enrichment" signal was weaker than it looked once compared on a proper distributional metric. |
+| 19 *(notebook ready, not yet run)* | Image Attribution — gradient/Grad-CAM saliency (`run_gradient_saliency`) | Cheap approximation to row 17 | • One patch centred on the organ's GT centroid; backprop the summed output logits to the input voxels (vanilla gradient) and to the bottleneck feature map (Grad-CAM), bypassing `inference_mode` (must run with gradients enabled, unlike every other row here).<br>• Compare saliency/CAM mean inside vs. outside the organ mask. | • Same relationship LIME has to exact Shapley for words: one backward pass instead of 256 forward passes. Useful as a fast screening tool and as a consistency check against row 17. | Saliency/CAM enrichment ratio (inside vs. outside the organ). | • High enrichment, agreeing with row 17's block credit → the cheap approximation is trustworthy for screening more organs/subjects.<br>• Disagrees with row 17 → gradient saliency is misleading here (known failure mode of vanilla gradients on deep nets), prefer row 17's exact map. |
+| 20 *(notebook ready, not yet run)* | Image-Text Alignment — fused spatial feature map (`run_activation_overlap`, `FusedSpatialCapture`) | A deeper repeat of row 1 at a true intermediate layer | • Row 1 (already run) used the final pre-sigmoid logits as its stand-in "internal representation" — convenient (no hook needed) but it's effectively output-level, one step before thresholding. Row 20 instead hooks VoxTellDecoder's per-stage spatial `fusion_features` (image x text product at 24/48/96/192³ resolution, found at `voxtell_model.py:445-461`), a genuinely intermediate, multi-resolution spatial map, unlike the single global `mask_emb` vector used by rows 4/14-16 or row 1's logits.<br>• Run the matched prompt and two mismatches (wrong side via `mirror`, wrong organ); threshold the top-activation region; compute IoU against the GT mask for each, at every stage resolution. | • Checks whether row 1's "genuine grounding" conclusion (drawn from the output layer) already holds earlier inside the network, or only emerges late — and does so at finer spatial resolution than row 1's thresholded output mask. | IoU with GT, per condition (matched / mismatched_side / mismatched_organ) and per stage. | • High IoU only when matched, at an early/mid stage too → the grounding row 1 found at the output is present earlier, not just a late correction — stronger support for genuine grounding.<br>• High IoU only at the last stage, flat/mismatched-insensitive at earlier stages → the earlier network is prompt-agnostic and the correct answer only crystallizes very late — a more nuanced reading than row 1 alone could give. |
+| 21 *(notebook ready, not yet run)* | Image Attribution — joint image/word Shapley (`run_joint_image_word_shapley`) | Image vs. word contribution on one scale | • Three roles: image (intact / noised over the organ's own GT region), organ word, position word — 2**3=8 coalitions.<br>• Score each coalition's mask by both `f_dice_gt` and `f_dice_self`; feed into the same `shapley_values` code as rows 5-11 and row 17. | • Rows 13 (image corruption) and 5-11 (word ablation) answer "does X matter" separately, on different scales; this row answers "which matters *more*" directly, the single number the earlier two experiments could only be compared informally. | Shapley credit per role (image / organ_word / position_word), per metric. | • Image and organ word together hold most of the credit, position word a small but positive share → matches rows 1-11's "organ identity drives *what*, position drives *which side*" finding, now including the image explicitly in the same comparison.<br>• Position word's credit is near zero while image/organ word hold everything → position is decorative relative to the image, a positional-bias signature on this specific scale. |
 
 ---
 
@@ -174,6 +224,30 @@ needed) is what's left to answer "does fusion listen to text" observationally, n
      `predictor.network.transformer_decoder`. Rows 15 and 16 share one recording run; row 14 reuses
      it for its patched variants. Verify the loop first by matching the predictor's own logits, and
      by checking that the full-state patch control reproduces the source prompt.
+5. **Rows 17–21 (image-region attribution, planned extensions)** — none has been run.
+   - **Row 18** (attention KL) is cheapest to trust: it's a pure post-processing step on row 15's
+     existing attention pipeline, no new hook.
+   - **Row 17** (grid-occlusion Shapley) and **row 21** (joint image/word Shapley) only need the
+     public API (`predict_masks`) plus the exact-Shapley code already used for rows 5-11 — run these
+     next.
+   - **Row 19** (gradient saliency) needs gradients enabled, unlike every other row in this plan
+     (all others only ever run inference) — verify it isn't accidentally called inside
+     `inference_mode`/`no_grad` before trusting its output.
+   - **Row 20** is blocked on the same kind of hook-discovery risk as rows 1/3/4: its hook point
+     (`VoxTellDecoder`'s per-stage `fusion_features`, captured via a `forward_pre_hook` on
+     `seg_layers`) is implemented but **unverified against a live model** — the first real run
+     should print the captured stage shapes and confirm they match the documented
+     24/48/96/192³ resolutions before trusting any IoU number from it.
+6. **Rows 22–24 (model-internals/circuit, planned extensions)** — none has been run.
+   - **Row 23** (embedding geometry) first — pure text-embedding arithmetic, no sliding window,
+     the cheapest row in the whole plan.
+   - **Row 22** (laterality probing) next — reuses rows 14–16's already-validated custom loop, no
+     new hook-discovery risk, just a `sklearn` fit per layer.
+   - **Row 24** (head ablation) last — the new hook (`HeadAblation`) is verified locally against a
+     real `nn.MultiheadAttention`, but the notebook's own `validate_head_ablation_noop` check (must
+     return ≈1.0) is the one that matters on the actual model; do not trust any row 24 result if
+     that check fails. Also the most expensive of the three (n_organs × n_layers × n_heads full
+     sliding-window predictions), so run it last in case time runs out.
 
 ---
 
@@ -222,6 +296,77 @@ local folder would silently overwrite one batch's files with the other's.
 - Checked locally on a tiny stand-in model (custom sliding-window loop == the predictor's own loop; whole-state patch
   reproduces the source; every CSV and the summary cell run end to end). **Not run on the real model yet.**
 - The notebooks verify the custom loop against the real predictor first (section 3) and stop if it does not match.
+
+**Rows 17–21 -- implemented, not yet run.** Same four notebooks as rows 12–16 (sections 6–10),
+built by the same `scripts/build_mechanistic_notebooks.py` from the same two modules:
+
+- Row 17 (`run_grid_occlusion`): default 8-block (2×2×2) grid around the first bilateral organ per
+  subject, 256 coalitions, exact Shapley — the image-region analogue of rows 5–11's word table.
+- Row 18 (`run_attention_kl`): per-layer KL divergence between the GT mask and row 15's existing
+  cross-attention density, raw and generic-prompt-normalized (method from VGMED/VGRefine, arXiv
+  2603.14323). With `return_maps=True` also saves the actual per-organ attention density (last
+  layer + mean of layers) to `row18_attention_maps/<subject>.npz` — the CSV alone is scalar-only.
+- Row 19 (`run_gradient_saliency`): one patch per organ, vanilla-gradient + Grad-CAM saliency —
+  the only row in this whole plan that needs gradients enabled (explicitly bypasses
+  `inference_mode`/`no_grad`, unlike every other row here). `return_maps=True` saves the actual
+  saliency/CAM voxel maps to `row19_saliency_maps/<subject>.npz`.
+- Row 20 (`run_activation_overlap`, `FusedSpatialCapture`): hooks VoxTellDecoder's spatial
+  `fusion_features` via a `forward_pre_hook` on `seg_layers` — **unverified against a live model**;
+  the notebook cell prints the captured stage shapes on the first subject so this can be sanity
+  checked (expected: 24/48/96/192³) before trusting any IoU number from it. `return_maps=True`
+  saves the fused-feature map itself (per organ x condition), upsampled into the crop frame and
+  downsampled for storage, to `row20_fused_maps/<subject>.npz`.
+- Row 17's `return_map=True` (already the notebook default) reassembles the per-block Shapley
+  credit into a full voxel-shaped map, `row17_shapley_maps/<subject>.npz`.
+- **Only row 21 has no spatial map** — it's inherently a 3-number (image/organ-word/position-word)
+  comparison, not a region-wise result.
+- Row 21 (`run_joint_image_word_shapley`): 3 roles (image, organ word, position word), 8
+  coalitions, exact Shapley on `f_dice_gt` and `f_dice_self` — one number comparing image and word
+  contribution on the same scale.
+- Checked locally (CPU, no voxtell/GPU needed) against tiny stand-in models and a fake predictor
+  exercising the real `predict_masks`/`_to_full_masks` plumbing: Shapley math, prompt-building,
+  KL-divergence math, gradient flow shapes, and the hook mechanics all pass. **Not run on the real
+  model yet** — row 20's hook point is the one genuinely unverified piece (see above).
+
+**Rows 22–24 -- implemented, not yet run.** Added to the same `scripts/build_mechanistic_notebooks.py`
+generator (sections 11–13) and the same two modules — model-internals/circuit experiments, not
+output- or image-region attribution:
+
+- Row 22 (`run_laterality_probing`): for every bilateral organ pair, trains a linear probe
+  (`sklearn.linear_model.LogisticRegression`) at each of the 7 decoder states (the projected text
+  embedding, then after each of the 6 decoder layers) to predict left vs. right, reading the hidden
+  state from the one sliding-window patch containing that organ's own GT centroid (`_home_patch_indices`,
+  reuses the same `voxtell_mechanistic.run_outputs`/`on_patch` machinery, and the same section-3
+  custom-loop validation, as rows 14–16). Cross-validated leave-one-organ-pair-out; small-n caveat
+  (`n_pairs`) stated explicitly in every row. Verified locally (no GPU) with a monkeypatched
+  `run_outputs` and synthetic, perfectly-separable fake states: the home-patch indexing, the
+  on_patch capture order, and the leave-one-group-out probing pipeline all produce exactly the
+  expected 1.0 accuracy end to end.
+- Row 23 (`run_embedding_geometry`): pure text-embedding arithmetic (`embed("right X") -
+  embed("left X")` per organ, pairwise cosine similarity, and a `coherence_ratio` summarizing
+  whether every organ shares one direction or each has its own) — no image, no sliding window, no
+  model forward pass beyond the text encoder. Verified locally end to end with a fake predictor:
+  a shared-direction synthetic embedding gives coherence_ratio ≈ 0.94, a fully random one ≈ 0.53
+  (low-dimensional-chance floor) with near-zero mean cosine similarity, confirming the diagnostic
+  separates the two cases as intended.
+- Row 24 (`run_attention_head_ablation`, `voxtell_mechanistic.HeadAblation`): zero-ablates one
+  cross-attention head at a time (default: last decoder layer only, same affordability trade-off as
+  row 17's block count) and re-predicts the full mask through the predictor's own public API.
+  **The hook mechanism went through one real false start, caught locally before shipping**: a
+  `forward_pre_hook` on `multihead_attn.out_proj` (the first attempt) never fires, because
+  PyTorch's internal `multi_head_attention_forward` calls `F.linear(attn_output, out_proj.weight,
+  out_proj.bias)` directly, not `out_proj(...)` as a module call — confirmed with a real
+  `nn.MultiheadAttention` locally (hook literally never invoked). The shipped implementation
+  instead hooks `multihead_attn` itself with a `forward_hook(..., with_kwargs=True)` that
+  re-invokes the same call with `average_attn_weights=False` (guarded against infinite recursion)
+  to get genuine per-head attention weights, recombines them with a manually-split V-projection,
+  zeroes the targeted head(s), and re-applies `out_proj` — verified locally against a real
+  `nn.MultiheadAttention` to reproduce the unablated output **bit-for-bit exactly** when ablating
+  zero heads (`torch.equal`, not just `allclose`), and to visibly change the output when a real
+  head is ablated. `validate_head_ablation_noop` re-runs this same check on the real model, inline
+  in the notebook, before any row 24 result is trusted. The one remaining unverified assumption is
+  the attribute name itself (`layer.multihead_attn`, DETR-style decoder-layer naming) — if wrong,
+  `attach()` raises `AttributeError` immediately (loud failure), not a silently wrong answer.
 
 **Hook prerequisite resolved:** rows 1, 3, 4 need **no `forward_hook`** — verified directly
 against the installed `voxtell` v0.1.0 source. `predictor.predict_sliding_window_return_logits(

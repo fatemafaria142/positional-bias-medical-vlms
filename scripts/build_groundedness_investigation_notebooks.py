@@ -1519,6 +1519,21 @@ OASIS_ORGAN_WHITELIST_BATCH3 = [
     "hippocampus", "ventral DC", "amygdala", "pallidum",
 ]
 
+# One OASIS subject (Faria's data only), restricted to the 9 largest-mask bilateral organ cores
+# (by mean GT voxel count across subjects, rotation 0; decoded from gt_mask_rle_b64 in
+# predictions_voxtell_neurite_oasis_rotation_*.csv -- brain stem excluded, it has no left/right pair):
+# cerebral cortex > cerebral white matter > cerebellum cortex > cerebellum white matter >
+# lateral ventricle > thalamus > putamen > hippocampus > caudate.
+# OASIS_OAS1_0057_MR1 is the largest-mask of Faria's 3 subjects over these 9 cores (1,443,837 vs.
+# 1,408,755 voxels for OASIS_OAS1_0014_MR1; OASIS_OAS1_0363_MR1 has no rotation CSV to verify).
+# Shared with scripts/build_mechanistic_notebooks.py's OASIS_ONE_SUBJECT/OASIS_RICH_CORES, so rows
+# 1-11 (this notebook) and rows 12-21 (the mechanistic notebooks) run on the same subject and organs.
+OASIS_SUBJECTS_ONE = [("faria", "OASIS_OAS1_0057_MR1")]
+OASIS_ORGAN_WHITELIST_ONE_SUBJECT = [
+    "cerebral cortex", "cerebral white matter", "cerebellum cortex", "cerebellum white matter",
+    "lateral ventricle", "thalamus", "putamen", "hippocampus", "caudate",
+]
+
 if __name__ == "__main__":
     build(
         "voxtell-amos-rotation-multiangle-kaggle.ipynb", "amos22_mri", "AMOS22 MRI",
@@ -1542,4 +1557,18 @@ if __name__ == "__main__":
                               "remaining pairs by real ground-truth mask volume (cerebellum white matter, thalamus, "
                               "putamen, caudate, hippocampus, ventral DC, amygdala, pallidum); accumbens, inferior "
                               "lateral ventricle and vessel are excluded as too small to score."),
+    )
+    build(
+        "voxtell-oasis-rotation-multiangle-kaggle.ipynb", "neurite_oasis", "Neurite OASIS (one subject)",
+        OASIS_SUBJECTS_ONE, "voxtell-oasis-groundedness-investigation-onesubject-kaggle.ipynb",
+        organ_whitelist=OASIS_ORGAN_WHITELIST_ONE_SUBJECT, output_suffix="neurite_oasis_onesubject",
+        whitelist_note_text=("Narrowed to **Faria's data only, 1 subject** (OASIS_OAS1_0057_MR1 -- the largest-mask "
+                              "of Faria's 3 subjects over this organ set) and the **9 largest bilateral pairs by "
+                              "mean ground-truth mask volume** (cerebral cortex, cerebral white matter, cerebellum "
+                              "cortex, cerebellum white matter, lateral ventricle, thalamus, putamen, hippocampus, "
+                              "caudate); brain stem is excluded (no left/right pair) and all smaller pairs "
+                              "(amygdala, pallidum, accumbens, ventral DC, inferior lateral ventricle, choroid "
+                              "plexus, vessel) are excluded as too small to score. Rows 12-21 on this same subject "
+                              "and organ set are covered by voxtell-oasis-mechanistic-experiments-kaggle.ipynb, "
+                              "voxtell-oasis-mechanistic-rows13-16-kaggle.ipynb and voxtell-oasis-rows17-21-kaggle.ipynb."),
     )

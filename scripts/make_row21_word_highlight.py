@@ -82,7 +82,7 @@ def label(text, val):
     return f"{text}  ({'0.000' if val == 0 else f'{val:.3g}'})"
 
 
-def render(organ: str, methods: dict, out_path: Path):
+def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASIS"):
     pad, gap = 0.16, 0.09
     scratch = plt.figure(figsize=(22, 5), dpi=200)
     sax = scratch.add_subplot(111)
@@ -117,7 +117,7 @@ def render(organ: str, methods: dict, out_path: Path):
     ax.axis("off")
 
     top = fig_h - 0.12
-    ax.text(fig_w / 2, top, "Neurite-OASIS", fontsize=19, fontweight="bold", color=INK, ha="center", va="top")
+    ax.text(fig_w / 2, top, title, fontsize=19, fontweight="bold", color=INK, ha="center", va="top")
     ax.text(fig_w / 2, top - 0.44, "Which input matters more for the segmentation -- the image, or the words?",
             fontsize=12.5, color=INK2, ha="center", va="top")
     pos, core = organ.split(None, 1)
@@ -159,10 +159,15 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("results_dir", type=Path, help="directory containing row21_joint_shapley_<suffix>.csv")
     ap.add_argument("--suffix", default="neurite_oasis")
+    ap.add_argument("--dataset", default=None,
+                     help="dataset folder name under word_highlight/ (default: inferred from --suffix, "
+                          "e.g. neurite_oasis -> OASIS, amos22_mri -> AMOS)")
     ap.add_argument("--out-dir", type=Path, default=None,
-                     help="default: <repo>/local_plots_mechanistic/rows17_21/word_highlight")
+                     help="default: <repo>/local_plots_mechanistic/rows17_21/word_highlight/<dataset>")
     args = ap.parse_args()
-    out_dir = args.out_dir or (REPO / "local_plots_mechanistic" / "rows17_21" / "word_highlight")
+    dataset_folder = args.dataset or ("OASIS" if "oasis" in args.suffix.lower() else
+                                       "AMOS" if "amos" in args.suffix.lower() else args.suffix)
+    out_dir = args.out_dir or (REPO / "local_plots_mechanistic" / "rows17_21" / "word_highlight" / dataset_folder)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     path = args.results_dir / f"row21_joint_shapley_{args.suffix}.csv"
@@ -171,12 +176,13 @@ def main():
         return
     df = pd.read_csv(path)
 
+    title = {"OASIS": "Neurite-OASIS", "AMOS": "AMOS22 MRI"}.get(dataset_folder, dataset_folder)
     for organ in sorted(df.organ.unique()):
         methods = method_values(df, organ)
         if not methods:
             continue
         out = out_dir / f"row21_{organ.replace(' ', '_')}.png"
-        render(organ, methods, out)
+        render(organ, methods, out, title=title)
         print("wrote", out.relative_to(REPO) if REPO in out.parents else out)
 
 

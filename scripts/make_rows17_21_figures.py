@@ -480,6 +480,81 @@ def figure_row18_paper(subj, core, kl_left, kl_right, out_dir):
     return out, caption
 
 
+def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
+    """Self-contained version: one clean figure with a title, subtitle, legend, axis labels and a
+    one-line definition note -- everything a reader needs is ON the image, no external caption or
+    verbal explanation required. Same clean two-panel layout as figure_row18_paper (not the numbered
+    "1/2/3" story version), but with enough built-in text to stand alone."""
+    left_organ, right_organ = f"left {core}", f"right {core}"
+    img2, _, idx3 = subj.slice_of(left_organ)
+    gt_l = subj.gt_mask(left_organ)[idx3]
+    gt_r = subj.gt_mask(right_organ)[idx3]
+    img2t, gt_lt, gt_rt = img2.T, gt_l.T, gt_r.T
+    union = gt_lt | gt_rt
+    win = bbox_2d(union, 16, union.shape)
+    img2c, gt_lc, gt_rc = crop(img2t, win), crop(gt_lt, win), crop(gt_rt, win)
+
+    dfl = pd.DataFrame(kl_left).sort_values("layer")
+    dfr = pd.DataFrame(kl_right).sort_values("layer")
+    col = "kl_divergence_vs_generic_normalized"
+    mean_gap = float(np.mean(dfl[col].values - dfr[col].values))
+    similar = abs(mean_gap) < 0.15 * max(dfl[col].mean(), dfr[col].mean(), 1e-6)
+    worse_side = "left" if mean_gap > 0 else "right"
+    verdict = (f"No meaningful left/right gap (Δ={abs(mean_gap):.2f}) — attention is side-symmetric for this organ."
+               if similar else
+               f"{worse_side.capitalize()} side matches worse (Δ={abs(mean_gap):.2f} KL) — a possible positional asymmetry.")
+
+    fig = plt.figure(figsize=(9.6, 4.6), dpi=220)
+    fig.patch.set_facecolor("white")
+    fig.text(0.5, 0.965, f"Does VoxTell's attention find the {core} equally well on both sides?",
+              ha="center", fontsize=14.5, fontweight="bold", color=PAPER_INK)
+    fig.text(0.5, 0.925,
+              "Cross-attention vs. ground-truth alignment (KL divergence) at each of the 6 decoder layers, left vs. right",
+              ha="center", fontsize=10.5, color=PAPER_MUTED)
+
+    # --- panel (a): anatomical context --------------------------------------------------------------
+    ax_a = fig.add_axes([0.04, 0.14, 0.27, 0.67])
+    ax_a.imshow(img2c, cmap="gray", origin="lower")
+    ax_a.set_xticks([]); ax_a.set_yticks([])
+    for sp in ax_a.spines.values():
+        sp.set_visible(False)
+    if gt_lc.any():
+        ax_a.contour(gt_lc, levels=[0.5], colors=BLUE, linewidths=1.5)
+    if gt_rc.any():
+        ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.5)
+    ax_a.text(0.03, 0.04, subj.left_label, transform=ax_a.transAxes, color="white", fontsize=9, fontweight="bold")
+    ax_a.text(0.97, 0.04, subj.right_label, transform=ax_a.transAxes, color="white", fontsize=9,
+              fontweight="bold", ha="right")
+    ax_a.set_title("Where the organ actually is", fontsize=10.5, color=PAPER_INK, pad=6)
+    from matplotlib.lines import Line2D
+    handles = [Line2D([0], [0], color=BLUE, lw=2, label=f"Left {core}"),
+               Line2D([0], [0], color=ORANGE, lw=2, label=f"Right {core}")]
+    ax_a.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, -0.04), ncol=1, frameon=False, fontsize=9)
+
+    # --- panel (b): the data, with a full legend --------------------------------------------------
+    ax_b = fig.add_axes([0.42, 0.21, 0.53, 0.60])
+    _paper_axes_style(ax_b)
+    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.8, markersize=5.5, label=f"Left {core}")
+    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.8, markersize=5.5, label=f"Right {core}")
+    ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.5, zorder=0,
+                       label="Left–right gap")
+    ax_b.set_xlabel("Decoder layer  (1 = earliest, 6 = final)", fontsize=10, color=PAPER_INK)
+    ax_b.set_ylabel("KL divergence\n(lower = attention matches\nthe true organ better)", fontsize=10, color=PAPER_INK)
+    ax_b.set_title("How well attention matches the real organ, at each layer", fontsize=10.5, color=PAPER_INK, pad=6)
+    ax_b.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
+    ax_b.set_axisbelow(True)
+    ax_b.legend(frameon=False, fontsize=9, loc="best", handlelength=1.6)
+
+    fig.text(0.5, 0.075, f"Verdict: {verdict}", ha="center", fontsize=11, fontweight="bold",
+              color=(INK if similar else RED))
+    fig.text(0.5, 0.025,
+              f"Subject {subj.subject_id} ({subj.person}) • KL divergence measures how far the model's attention "
+              "is from the organ's true shape; 0 would mean a perfect match.",
+              ha="center", fontsize=8.5, color=PAPER_MUTED)
+
+    return savefig(fig, out_dir / core.replace(" ", "_") / "row18_explainer.png")
+
+
 # --------------------------------------------------------------------------------------------------
 # row 19 -- gradient saliency + Grad-CAM (maps NOT registered: VoxTell's own cropped patch)
 # --------------------------------------------------------------------------------------------------
@@ -714,7 +789,7 @@ def main():
                 right_rows = sub18[sub18.organ == f"right {core}"].to_dict("records")
                 if left_rows and right_rows and f"left {core}" in subj.label_ids and f"right {core}" in subj.label_ids:
                     try:
-                        print("wrote", rel(figure_row18_pair(subj, core, left_rows, right_rows, maps18, out_dir), args.repo))
+                        print("wrote", rel(figure_row18_explainer(subj, core, left_rows, right_rows, out_dir), args.repo))
                         paper_path, caption = figure_row18_paper(subj, core, left_rows, right_rows, out_dir)
                         print("wrote", rel(paper_path, args.repo))
                         captions.append(caption)

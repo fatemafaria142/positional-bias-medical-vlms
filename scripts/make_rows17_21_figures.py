@@ -146,8 +146,8 @@ def panel_image(ax, img2, title, left_label, right_label):
     ax.imshow(img2, cmap="gray", origin="lower")
     ax.set_title(title, fontsize=12, fontweight="bold", color=INK, pad=5)
     clean_axes(ax)
-    ax.text(0.02, 0.5, left_label, transform=ax.transAxes, color="white", fontsize=10, fontweight="bold", va="center")
-    ax.text(0.98, 0.5, right_label, transform=ax.transAxes, color="white", fontsize=10, fontweight="bold", va="center", ha="right")
+    ax.text(0.02, 0.5, left_label, transform=ax.transAxes, color="white", fontsize=10, fontweight="bold", va="center", zorder=6)
+    ax.text(0.98, 0.5, right_label, transform=ax.transAxes, color="white", fontsize=10, fontweight="bold", va="center", ha="right", zorder=6)
 
 
 def overlay(ax, mask_2d, color, alpha=0.5):
@@ -231,72 +231,253 @@ def crop(arr2d, win):
 # row 17 -- voxel-grid occlusion Shapley map (full-volume frame -> exactly registered on the scan)
 # --------------------------------------------------------------------------------------------------
 def figure_row17(subj, organ, shap_rows, voxel_map, out_dir):
+    """One story, top to bottom: (1) where this organ sits in the WHOLE scan, (2) zoomed in on the
+    organ itself -- real picture vs. which parts of it the model needed, (3) the bottom-line answer
+    in a plain sentence, with the block ranking underneath for anyone who wants the detail."""
     img2, gt2, idx3 = subj.slice_of(organ)
     valid = ~np.isnan(voxel_map)
     map_full = resample_model_array(voxel_map, subj.label_path_abs, subj.img_nii, order=1, valid=valid)
     map2 = map_full[idx3]
     win = subj.crop_window(organ, pad=14)
-    img2c, gt2c, map2c = crop(img2.T, win), crop(gt2.T, win), crop(map2.T, win)
-
-    fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.8), dpi=170)
-    fig.patch.set_facecolor(SURFACE)
-    panel_image(axes[0], img2c, "Scan + ground truth", subj.left_label, subj.right_label)
-    overlay(axes[0], gt2c, AQUA)
-    v = np.nanmax(np.abs(map2c)) if np.isfinite(map2c).any() else 1e-6
-    im = heat_panel(axes[1], map2c, "Row 17: voxel-block Shapley credit\n(red = helps the mask, blue = hurts it)",
-                     DIVERGING, vmin=-v, vmax=v)
-    overlay(axes[1], gt2c, AQUA, alpha=0.0)
-    if gt2c.any():
-        axes[1].contour(gt2c, levels=[0.5], colors=INK, linewidths=1.2, linestyles="--")
-    fig.colorbar(im, ax=axes[1], fraction=0.046, pad=0.03, label="Shapley credit (dice)")
-    fig.suptitle(f"{organ} -- which image block matters most to the prediction", fontsize=13.5, fontweight="bold", color=INK, y=1.02)
-    fig.tight_layout()
-    out1 = savefig(fig, out_dir / organ.replace(" ", "_") / "row17_voxel_grid_shapley_map.png")
+    full_img, full_gt = img2.T, gt2.T
+    img2c, gt2c, map2c = crop(full_img, win), crop(full_gt, win), crop(map2.T, win)
+    r0, r1, c0, c1 = win
 
     df = pd.DataFrame(shap_rows).sort_values("shapley_value", ascending=False)
-    fig, ax = plt.subplots(figsize=(6.4, 4), dpi=170)
+    best, worst = df.iloc[0], df.iloc[-1]
+    v_range = np.nanmax(np.abs(map2c)) if np.isfinite(map2c).any() else 1e-6
+    n_helps = int((df.shapley_value >= 0).sum())
+    takeaway = (
+        f'"{organ}": every one of the 8 image blocks around this organ HELPED the model get it right '
+        f"(none hurt it) -- block {int(best.block_id)} mattered most, block {int(worst.block_id)} mattered "
+        f"least. The model is genuinely reading the real scan here, not ignoring it."
+        if n_helps == 8 else
+        f'"{organ}": {n_helps} of 8 image blocks helped, {8 - n_helps} actually hurt the result when kept real '
+        f"(vs. being replaced with noise) -- block {int(best.block_id)} helped most, block {int(worst.block_id)} "
+        f"hurt most."
+    )
+
+    fig = plt.figure(figsize=(10.5, 12), dpi=170)
     fig.patch.set_facecolor(SURFACE)
-    colors = [RED if v >= 0 else BLUE for v in df.shapley_value]  # matches the map's red=helps/blue=hurts legend
-    ax.bar(df.block_id.astype(str), df.shapley_value, color=colors, width=0.62, zorder=3)
-    ax.axhline(0, color=INK2, linewidth=1)
-    style_bars(ax, f"{organ} -- Shapley credit per voxel block", "Shapley credit (f_dice_gt)")
-    ax.set_xlabel("block id", fontsize=10.5, color=INK2)
-    fig.tight_layout()
-    out2 = savefig(fig, out_dir / organ.replace(" ", "_") / "row17_block_shapley_bars.png")
-    return out1, out2
+
+    # --- step 1: whole scan, with a box showing where we're about to zoom in -----------------------
+    fig.text(0.5, 0.975, "ROW 17 -- which part of the picture did the model actually need?", ha="center",
+              fontsize=15, fontweight="bold", color=INK)
+    fig.text(0.5, 0.953, f"organ: {organ}", ha="center", fontsize=11.5, color=MUTED)
+    fig.text(0.5, 0.918, "1. Where is it in the full scan?", ha="center", fontsize=12.5, fontweight="bold", color=INK)
+    ax0 = fig.add_axes([0.32, 0.66, 0.36, 0.22])
+    ax0.imshow(full_img, cmap="gray", origin="lower")
+    clean_axes(ax0)
+    ax0.text(0.02, 0.5, subj.left_label, transform=ax0.transAxes, color="white", fontsize=10, fontweight="bold", va="center", zorder=6)
+    ax0.text(0.98, 0.5, subj.right_label, transform=ax0.transAxes, color="white", fontsize=10, fontweight="bold", va="center", ha="right", zorder=6)
+    overlay(ax0, full_gt, AQUA, alpha=0.45)
+    from matplotlib.patches import Rectangle
+    pad_in = max(1, int(0.015 * (c1 - c0)))
+    ax0.add_patch(Rectangle((c0 + pad_in, r0 + pad_in), c1 - c0 - 2 * pad_in, r1 - r0 - 2 * pad_in,
+                             fill=False, edgecolor=ORANGE, linewidth=2.2, zorder=5))
+
+    # --- step 2: zoomed scan vs. zoomed "what mattered" heatmap ------------------------------------
+    fig.text(0.5, 0.615, "2. Zoomed in: the real picture, and which parts of it the model needed",
+              ha="center", fontsize=12.5, fontweight="bold", color=INK)
+    ax1 = fig.add_axes([0.06, 0.345, 0.40, 0.225])
+    panel_image(ax1, img2c, "The real scan here", subj.left_label, subj.right_label)
+    overlay(ax1, gt2c, AQUA)
+    ax2 = fig.add_axes([0.54, 0.345, 0.40, 0.225])
+    im = heat_panel(ax2, map2c, "Red = helped, blue = hurt", DIVERGING, vmin=-v_range, vmax=v_range)
+    if gt2c.any():
+        ax2.contour(gt2c, levels=[0.5], colors=INK, linewidths=1.2, linestyles="--")
+    fig.colorbar(im, ax=ax2, fraction=0.05, pad=0.04, label="Shapley credit (dice)")
+
+    # --- step 3: the bottom line, in one sentence, plus the detail bar chart -----------------------
+    fig.text(0.5, 0.275, "3. The bottom line", ha="center", fontsize=12.5, fontweight="bold", color=INK)
+    fig.text(0.5, 0.245, "\n".join(_wrap(takeaway, 92)), ha="center", va="top", fontsize=11, color=INK2)
+    ax3 = fig.add_axes([0.12, 0.035, 0.76, 0.12])
+    colors = [RED if v >= 0 else BLUE for v in df.shapley_value]
+    ax3.bar(df.block_id.astype(str), df.shapley_value, color=colors, width=0.62, zorder=3)
+    ax3.axhline(0, color=INK2, linewidth=1)
+    style_bars(ax3, "", "Shapley credit\n(per block)")
+    ax3.set_xlabel("block id (detail, for reference)", fontsize=9.5, color=MUTED)
+
+    out = savefig(fig, out_dir / organ.replace(" ", "_") / "row17_story.png")
+    return (out,)
+
+
+def _wrap(text, width):
+    import textwrap
+    return textwrap.wrap(text, width)
 
 
 # --------------------------------------------------------------------------------------------------
 # row 18 -- per-layer attention / KL divergence (map NOT registered: VoxTell's own cropped grid)
 # --------------------------------------------------------------------------------------------------
-def figure_row18(subj, organ, kl_rows, maps, out_dir):
-    img2, gt2, _ = subj.slice_of(organ)
-    win = subj.crop_window(organ, pad=14)
-    img2c, gt2c = crop(img2.T, win), crop(gt2.T, win)
+def _organ_core_side(organ):
+    parts = organ.split(None, 1)
+    if len(parts) == 2 and parts[0].lower() in ("left", "right"):
+        return parts[1], parts[0].lower()
+    return organ, None
 
-    df = pd.DataFrame(kl_rows).sort_values("layer")
-    fig = plt.figure(figsize=(11.5, 4.6), dpi=170)
+
+def figure_row18_pair(subj, core, kl_left, kl_right, maps, out_dir):
+    """THE positional-bias version of row 18: does the model's internal attention match the organ
+    EQUALLY WELL regardless of which side is asked? A single-organ KL curve (the old version of this
+    figure) cannot answer that -- it has no "other side" to compare against. This one puts left and
+    right side by side everywhere: the two scans, the two KL curves, the two attention patterns, and
+    a bottom line that states the actual side gap in plain language."""
+    left_organ, right_organ = f"left {core}", f"right {core}"
+    img2l, gt2l, _ = subj.slice_of(left_organ)
+    img2r, gt2r, _ = subj.slice_of(right_organ)
+    winl, winr = subj.crop_window(left_organ, pad=14), subj.crop_window(right_organ, pad=14)
+    img2cl, gt2cl = crop(img2l.T, winl), crop(gt2l.T, winl)
+    img2cr, gt2cr = crop(img2r.T, winr), crop(gt2r.T, winr)
+
+    dfl = pd.DataFrame(kl_left).sort_values("layer")
+    dfr = pd.DataFrame(kl_right).sort_values("layer")
+    col = "kl_divergence_vs_generic_normalized"
+    gap = (dfl[col].values - dfr[col].values)
+    mean_gap = float(np.mean(gap))
+    worse_side = "left" if mean_gap > 0 else "right" if mean_gap < 0 else None
+    similar = abs(mean_gap) < 0.15 * max(dfl[col].mean(), dfr[col].mean(), 1e-6)
+    takeaway = (
+        f'"{core}": the model\'s attention matches the LEFT and RIGHT organ about EQUALLY well '
+        f"(average gap {abs(mean_gap):.2f} KL) -- no sign of a side-specific attention bias here."
+        if similar else
+        f'"{core}": the model\'s attention matches the {("RIGHT" if worse_side == "left" else "LEFT")} organ '
+        f"noticeably better than the {worse_side.upper()} one (average gap {abs(mean_gap):.2f} KL) -- "
+        f"a real positional asymmetry for this organ."
+    )
+
+    fig = plt.figure(figsize=(12, 12.5), dpi=170)
     fig.patch.set_facecolor(SURFACE)
-    ax1 = fig.add_axes([0.07, 0.14, 0.4, 0.72])
-    ax1.plot(df.layer, df.kl_divergence, "-o", color=BLUE, label="raw KL(GT || attention)", linewidth=2, markersize=5)
-    ax1.plot(df.layer, df.kl_divergence_vs_generic_normalized, "-o", color=ORANGE,
-              label="KL after dividing out a generic prompt", linewidth=2, markersize=5)
-    style_bars(ax1, f"{organ} -- attention vs. ground truth, by decoder layer", "KL divergence (lower = better match)")
-    ax1.set_xlabel("decoder layer", fontsize=10.5, color=INK2)
-    ax1.legend(frameon=False, fontsize=9.5, loc="best")
+    fig.text(0.5, 0.975, "ROW 18 -- does attention match the organ EQUALLY on both sides?", ha="center",
+              fontsize=15, fontweight="bold", color=INK)
+    fig.text(0.5, 0.953, f"organ pair: {core}  (left vs. right)", ha="center", fontsize=11.5, color=MUTED)
 
-    ax2 = fig.add_axes([0.53, 0.14, 0.2, 0.72])
-    ax3 = fig.add_axes([0.76, 0.14, 0.2, 0.72])
-    panel_image(ax2, img2c, "Scan + GT (reference slice)", subj.left_label, subj.right_label)
-    overlay(ax2, gt2c, AQUA)
-    key = f"{organ}__last_layer"
-    if key in maps:
-        m = maps[key]
-        mid = m.shape[subj.slice_axis if subj.slice_axis < m.ndim else -1] // 2
-        heat_panel(ax3, m[tuple(slice(None) if a != 0 else mid for a in range(m.ndim))] if m.ndim == 3 else m,
-                   "Last-layer attention\n(model's own cropped/downsampled grid,\nnot pixel-registered)", SEQ_BLUE)
-    fig.suptitle(f"{organ}: where does cross-attention land, relative to the true organ?", fontsize=13, fontweight="bold", color=INK, y=1.03)
-    return savefig(fig, out_dir / organ.replace(" ", "_") / "row18_attention_kl.png")
+    fig.text(0.5, 0.918, "1. The two organs, as they actually sit in the scan", ha="center", fontsize=12.5, fontweight="bold", color=INK)
+    ax0 = fig.add_axes([0.10, 0.70, 0.33, 0.195])
+    panel_image(ax0, img2cl, "Left " + core, subj.left_label, subj.right_label)
+    overlay(ax0, gt2cl, AQUA)
+    ax0b = fig.add_axes([0.57, 0.70, 0.33, 0.195])
+    panel_image(ax0b, img2cr, "Right " + core, subj.left_label, subj.right_label)
+    overlay(ax0b, gt2cr, AQUA)
+
+    fig.text(0.5, 0.645, "2. At each processing step, does attention match the LEFT organ as well as the RIGHT one?",
+              ha="center", fontsize=12.5, fontweight="bold", color=INK)
+    ax1 = fig.add_axes([0.10, 0.37, 0.80, 0.21])
+    ax1.plot(dfl.layer, dfl[col], "-o", color=BLUE, label=f"left {core}", linewidth=2.2, markersize=6)
+    ax1.plot(dfr.layer, dfr[col], "-o", color=ORANGE, label=f"right {core}", linewidth=2.2, markersize=6)
+    ax1.fill_between(dfl.layer, dfl[col], dfr[col], color=GRAY_MID, alpha=0.6, zorder=1)
+    style_bars(ax1, "", "KL divergence  (lower = attention matches that organ better)")
+    ax1.set_xlabel("processing step (decoder layer)", fontsize=10.5, color=INK2)
+    ax1.legend(frameon=False, fontsize=9.5, loc="upper right")
+
+    key_l, key_r = f"{left_organ}__last_layer", f"{right_organ}__last_layer"
+    if key_l in maps and key_r in maps:
+        fig.text(0.5, 0.320, "3. What each side's attention pattern actually looks like", ha="center",
+                  fontsize=12.5, fontweight="bold", color=INK)
+        ax2 = fig.add_axes([0.20, 0.145, 0.22, 0.125])
+        ax3 = fig.add_axes([0.58, 0.145, 0.22, 0.125])
+        for ax, key, label in [(ax2, key_l, f"left {core}"), (ax3, key_r, f"right {core}")]:
+            m = np.asarray(maps[key])
+            proj = m.max(axis=0) if m.ndim == 3 else m
+            heat_panel(ax, proj, label, SEQ_BLUE)
+        fig.text(0.5, 0.148, "(the model's own internal grid -- shown for pattern only, not lined up pixel-for-pixel with the scans above)",
+                  ha="center", fontsize=8.5, color=MUTED)
+        bottom_y = 0.095
+    else:
+        bottom_y = 0.26
+
+    fig.text(0.5, bottom_y, "The bottom line", ha="center", fontsize=12.5, fontweight="bold", color=INK)
+    fig.text(0.5, bottom_y - 0.03, "\n".join(_wrap(takeaway, 100)), ha="center", va="top", fontsize=11, color=INK2)
+
+    return savefig(fig, out_dir / core.replace(" ", "_") / "row18_left_vs_right_story.png")
+
+
+PAPER_INK = "#000000"
+PAPER_MUTED = "#555555"
+PAPER_GRID = "#dddddd"
+
+
+def _paper_axes_style(ax):
+    ax.set_facecolor("white")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_color(PAPER_INK)
+    ax.spines["bottom"].set_color(PAPER_INK)
+    ax.spines["left"].set_linewidth(0.8)
+    ax.spines["bottom"].set_linewidth(0.8)
+    ax.tick_params(colors=PAPER_INK, labelsize=9, width=0.8)
+
+
+def _panel_label(ax, letter):
+    ax.text(-0.06, 1.08, letter, transform=ax.transAxes, fontsize=13, fontweight="bold", color=PAPER_INK, va="top")
+
+
+def figure_row18_paper(subj, core, kl_left, kl_right, out_dir):
+    """Publication-ready version of the row-18 left-vs-right comparison: white background, minimal
+    spines, lettered panels (a/b), no explanatory prose baked into the image -- that belongs in the
+    external figure caption (returned as a string alongside the saved PNG, so it can be pasted
+    straight into a paper). Two panels: (a) both organs' true location on one anatomical slice, for
+    spatial context; (b) the actual data -- per-layer attention-GT match quality, left vs. right."""
+    left_organ, right_organ = f"left {core}", f"right {core}"
+    img2, _, idx3 = subj.slice_of(left_organ)
+    gt_l = subj.gt_mask(left_organ)[idx3]
+    gt_r = subj.gt_mask(right_organ)[idx3]
+    img2t, gt_lt, gt_rt = img2.T, gt_l.T, gt_r.T
+    union = gt_lt | gt_rt
+    win = bbox_2d(union, 16, union.shape)
+    img2c, gt_lc, gt_rc = crop(img2t, win), crop(gt_lt, win), crop(gt_rt, win)
+
+    dfl = pd.DataFrame(kl_left).sort_values("layer")
+    dfr = pd.DataFrame(kl_right).sort_values("layer")
+    col = "kl_divergence_vs_generic_normalized"
+
+    fig = plt.figure(figsize=(8.0, 3.4), dpi=300)
+    fig.patch.set_facecolor("white")
+
+    # --- panel (a): anatomical context, both organs on one slice -----------------------------------
+    ax_a = fig.add_axes([0.04, 0.10, 0.30, 0.80])
+    ax_a.imshow(img2c, cmap="gray", origin="lower")
+    ax_a.set_xticks([]); ax_a.set_yticks([])
+    for sp in ax_a.spines.values():
+        sp.set_visible(False)
+    if gt_lc.any():
+        ax_a.contour(gt_lc, levels=[0.5], colors=BLUE, linewidths=1.3)
+    if gt_rc.any():
+        ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.3)
+    ax_a.text(0.03, 0.04, subj.left_label, transform=ax_a.transAxes, color="white", fontsize=8, fontweight="bold")
+    ax_a.text(0.97, 0.04, subj.right_label, transform=ax_a.transAxes, color="white", fontsize=8,
+              fontweight="bold", ha="right")
+    from matplotlib.lines import Line2D
+    ax_a.legend(handles=[Line2D([0], [0], color=BLUE, lw=1.5, label=f"left {core}"),
+                          Line2D([0], [0], color=ORANGE, lw=1.5, label=f"right {core}")],
+                loc="upper center", bbox_to_anchor=(0.5, -0.02), ncol=1, frameon=False, fontsize=8)
+    _panel_label(ax_a, "a")
+
+    # --- panel (b): the actual data -----------------------------------------------------------------
+    ax_b = fig.add_axes([0.46, 0.17, 0.50, 0.73])
+    _paper_axes_style(ax_b)
+    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.4, markersize=4, label="Left")
+    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.4, markersize=4, label="Right")
+    ax_b.set_xlabel("Decoder layer", fontsize=9.5, color=PAPER_INK)
+    ax_b.set_ylabel("KL divergence\n(attention vs. ground truth)", fontsize=9.5, color=PAPER_INK)
+    ax_b.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
+    ax_b.set_axisbelow(True)
+    ax_b.legend(frameon=False, fontsize=9, loc="best", handlelength=1.6)
+    _panel_label(ax_b, "b")
+
+    out = savefig(fig, out_dir / core.replace(" ", "_") / "row18_paper.png")
+
+    mean_gap = float(np.mean(dfl[col].values - dfr[col].values))
+    caption = (
+        f'Figure. Cross-attention alignment with ground truth for left vs. right {core}, by decoder '
+        f'layer. (a) Ground-truth location of the left (blue) and right (orange) {core} on a single '
+        f'representative slice. (b) KL divergence between the ground-truth mask and the cross-attention '
+        f'density at each decoder layer, after normalizing out a generic, non-spatial prompt\'s attention '
+        f'(lower = better alignment). Mean left-right gap: {abs(mean_gap):.2f} KL '
+        f'({"left" if mean_gap > 0 else "right"} worse). '
+        f'Subject: {subj.subject_id} ({subj.person}).'
+    )
+    return out, caption
 
 
 # --------------------------------------------------------------------------------------------------
@@ -521,6 +702,30 @@ def main():
         maps19 = _load_npz(_find_npz(args.results_dir, 19, "row19_saliency_maps", subject_id))
         maps20 = _load_npz(_find_npz(args.results_dir, 20, "row20_fused_maps", subject_id))
 
+        # row 18 is a LEFT vs RIGHT comparison, so it's handled once per organ PAIR, not per organ
+        # (the old per-organ version couldn't say anything about positional bias -- no "other side"
+        # to compare against).
+        if not row18.empty:
+            sub18 = row18[row18.subject_id == subject_id]
+            cores = sorted({_organ_core_side(o)[0] for o in sub18.organ.unique() if _organ_core_side(o)[1]})
+            captions = []
+            for core in cores:
+                left_rows = sub18[sub18.organ == f"left {core}"].to_dict("records")
+                right_rows = sub18[sub18.organ == f"right {core}"].to_dict("records")
+                if left_rows and right_rows and f"left {core}" in subj.label_ids and f"right {core}" in subj.label_ids:
+                    try:
+                        print("wrote", rel(figure_row18_pair(subj, core, left_rows, right_rows, maps18, out_dir), args.repo))
+                        paper_path, caption = figure_row18_paper(subj, core, left_rows, right_rows, out_dir)
+                        print("wrote", rel(paper_path, args.repo))
+                        captions.append(caption)
+                    except Exception as e:
+                        print(f"[error] {subject_id}/row18/{core}: {e}")
+            if captions:
+                cap_path = out_dir / "row18_paper_captions.txt"
+                cap_path.parent.mkdir(parents=True, exist_ok=True)
+                cap_path.write_text("\n\n".join(captions), encoding="utf-8")
+                print("wrote", rel(cap_path, args.repo))
+
         for organ in sub0.index:
             if organ not in subj.label_ids:
                 print(f"[skip] {subject_id}/{organ}: not in local manifest, can't locate ground truth")
@@ -531,10 +736,6 @@ def main():
                     if r:
                         for p in figure_row17(subj, organ, r, maps17[organ], out_dir):
                             print("wrote", rel(p, args.repo))
-                if not row18.empty:
-                    r = row18[(row18.subject_id == subject_id) & (row18.organ == organ)].to_dict("records")
-                    if r:
-                        print("wrote", rel(figure_row18(subj, organ, r, maps18, out_dir), args.repo))
                 if not row19.empty:
                     r = row19[(row19.subject_id == subject_id) & (row19.organ == organ)]
                     if len(r):

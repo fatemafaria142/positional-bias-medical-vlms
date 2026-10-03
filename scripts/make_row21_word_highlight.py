@@ -108,7 +108,7 @@ def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASI
     content = max(sum(w) + gap * (len(w) - 1) for w in widths.values())
     fig_w = max(9.5, left + label_col + content + right)
     row_pitch, chip_h = 0.66, 0.4
-    fig_h = 1.65 + row_pitch * len(rows) + 1.05
+    fig_h = 1.25 + row_pitch * len(rows) + 0.75
     fig = plt.figure(figsize=(fig_w, fig_h), dpi=200)
     fig.patch.set_facecolor("#fcfcfb")
     ax = fig.add_axes([0, 0, 1, 1])
@@ -117,14 +117,13 @@ def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASI
     ax.axis("off")
 
     top = fig_h - 0.12
-    ax.text(fig_w / 2, top, title, fontsize=19, fontweight="bold", color=INK, ha="center", va="top")
-    ax.text(fig_w / 2, top - 0.44, "Which input matters more for the segmentation -- the image, or the words?",
-            fontsize=12.5, color=INK2, ha="center", va="top")
+    ax.text(fig_w / 2, top, "Which input matters more for the segmentation -- the image, or the words?",
+            fontsize=13.5, fontweight="bold", color=INK, ha="center", va="top")
     pos, core = organ.split(None, 1)
-    ax.text(fig_w / 2, top - 0.84, f"“Segment the {pos} {core} in this image.”", fontsize=13, style="italic",
+    ax.text(fig_w / 2, top - 0.40, f"“Segment the {pos} {core} in this image.”", fontsize=13, style="italic",
             color=INK, ha="center", va="top")
 
-    row_top = top - 1.45
+    row_top = top - 1.00
     for i, (m, toks) in enumerate(rows.items()):
         cy = row_top - row_pitch * i - row_pitch / 2
         ax.text(left, cy, m, fontsize=FS, fontweight="bold", color=INK, ha="left", va="center")
@@ -152,9 +151,7 @@ def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASI
         lx += 0.56 + 0.088 * len(txt) + 0.4
 
     import textwrap
-    note = ("Each number is Shapley credit, in Dice-score units — the fair-share decomposition of how much "
-            "that role contributed to the final Dice score, averaged over all 8 image/organ-word/position-word "
-            "combinations. It is NOT the raw Dice score of any one combination.")
+    note = "Numbers = Shapley credit (Dice-score units), not a raw Dice score."
     chars_per_line = max(40, int((fig_w - left - right) / 0.062))
     note_y = ly - 0.34
     for line in textwrap.wrap(note, chars_per_line):

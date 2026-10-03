@@ -108,7 +108,7 @@ def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASI
     content = max(sum(w) + gap * (len(w) - 1) for w in widths.values())
     fig_w = max(9.5, left + label_col + content + right)
     row_pitch, chip_h = 0.66, 0.4
-    fig_h = 1.65 + row_pitch * len(rows) + 0.75
+    fig_h = 1.65 + row_pitch * len(rows) + 1.05
     fig = plt.figure(figsize=(fig_w, fig_h), dpi=200)
     fig.patch.set_facecolor("#fcfcfb")
     ax = fig.add_axes([0, 0, 1, 1])
@@ -150,6 +150,16 @@ def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASI
                                              linewidth=0, facecolor=face))
         ax.text(lx + 0.56, ly, txt, fontsize=10.5, color=INK2, ha="left", va="center")
         lx += 0.56 + 0.088 * len(txt) + 0.4
+
+    import textwrap
+    note = ("Each number is Shapley credit, in Dice-score units — the fair-share decomposition of how much "
+            "that role contributed to the final Dice score, averaged over all 8 image/organ-word/position-word "
+            "combinations. It is NOT the raw Dice score of any one combination.")
+    chars_per_line = max(40, int((fig_w - left - right) / 0.062))
+    note_y = ly - 0.34
+    for line in textwrap.wrap(note, chars_per_line):
+        ax.text(left, note_y, line, fontsize=9.3, color=INK2, ha="left", va="top", style="italic")
+        note_y -= 0.22
 
     fig.savefig(out_path, facecolor=fig.get_facecolor(), bbox_inches="tight", pad_inches=0.15)
     plt.close(fig)

@@ -151,7 +151,7 @@ def render(organ: str, methods: dict, out_path: Path, title: str = "Neurite-OASI
         lx += 0.56 + 0.088 * len(txt) + 0.4
 
     import textwrap
-    note = "Numbers = Shapley credit (Dice-score units), not a raw Dice score."
+    note = "Numbers = Shapley credit (Dice-score units)."
     chars_per_line = max(40, int((fig_w - left - right) / 0.062))
     note_y = ly - 0.34
     for line in textwrap.wrap(note, chars_per_line):

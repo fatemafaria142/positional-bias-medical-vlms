@@ -259,7 +259,17 @@ def gradient_saliency(model, patch, row=0, memory=None, pos=None, prompts_embed=
     MUST be called OUTSIDE any `torch.inference_mode()`/`torch.no_grad()` context -- tensors
     created under `inference_mode` are permanently non-differentiable even once you leave it
     (this is why `run_outputs` is `@torch.inference_mode()` and cannot be reused here; call
-    `encode`/`decode` directly instead, as this function does).
+    `encode`/`decode` directly instead, as this function does). The taint also applies to the
+    MODEL'S OWN WEIGHTS, not just inputs: if `model`'s parameters were ever created/touched
+    while some earlier code ran under `inference_mode` (e.g. inside predictor construction, a
+    detail of `voxtell`'s own loading path, not this file), `model.parameters()` can themselves
+    be inference tensors -- `conv3d` then raises "Inference tensors cannot be saved for backward"
+    on the very first encoder layer, regardless of whether the input patch is clean, because
+    autograd needs the weight (not just the input) to compute the input's own gradient. Cloning
+    each tainted parameter once, in place, outside any inference_mode context (below), permanently
+    de-taints the model for every future call -- confirmed locally against a real `nn.Conv3d`
+    with weights deliberately tainted the same way (forward+backward fails before this fix,
+    succeeds after it, with the clone changing nothing numerically).
 
     patch: (1, C, X, Y, Z), will be cloned and marked requires_grad. prompts_embed: (M, D) text
     embeddings for every prompt sharing this patch (only `row`'s logits are backpropagated, but
@@ -270,6 +280,9 @@ def gradient_saliency(model, patch, row=0, memory=None, pos=None, prompts_embed=
              i.e. the channel-mean gradient of the same logits w.r.t. the bottleneck token grid).
     """
     assert torch.is_grad_enabled(), 'gradient_saliency needs grad enabled -- do not call inside inference_mode/no_grad'
+    for p in model.parameters():  # one-time de-taint; cheap no-op on every call after the first
+        if p.is_inference():
+            p.data = p.data.clone()
     patch = patch.clone().detach().requires_grad_(True)
     skips, mem = encode(model, patch)
     # keep the bottleneck activation's own grad (for Grad-CAM) by not detaching it

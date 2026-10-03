@@ -535,13 +535,14 @@ def _rounded_card(fig, rect, facecolor="white", edgecolor="#e4e6ec", lw=1.0, sha
 
 def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     """Self-contained, designed version: declarative title, Left/Right/Gap legend only (the organ
-    is already named once in the title), a compact statistics card instead of a prose "Verdict:"
-    sentence, and rounded card panels on a soft page background instead of a flat white chart.
-    Left and right each get their OWN small line chart (not one shared overlay) since they are
-    two different organs with their own per-layer KL curves; a third mini chart plots the
-    layer-by-layer gap (Left - Right) directly instead of relying on a shaded fill. No subject/
+    is already named once in the title), a bottom legend-style row for the summary statistics
+    instead of a card, and rounded card panels on a soft page background instead of a flat white
+    chart. Left and right each get their OWN small line chart (not one shared overlay) since they
+    are two different organs with their own per-layer KL curves; a third mini chart plots the
+    layer-by-layer gap (Left - Right) directly instead of relying on a shaded fill. The anatomy
+    image and the three charts sit at the same gap from each other all the way across. No subject/
     file identifier is printed on the figure, and no floating per-point value labels clutter the
-    lines -- the exact numbers live in the stats card."""
+    lines -- the exact numbers live in the bottom stats legend."""
     left_organ, right_organ = f"left {core}", f"right {core}"
     img2, _, idx3 = subj.slice_of(left_organ)
     gt_l = subj.gt_mask(left_organ)[idx3]
@@ -576,10 +577,11 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=3,
                frameon=False, fontsize=9.5)
 
-    CARD_Y, CARD_H = 0.12, 0.60
+    CARD_Y, CARD_H = 0.15, 0.57
+    GAP_X = 0.025
 
     # --- panel (a): anatomical context, on its own card ---------------------------------------------
-    card_a = (0.022, CARD_Y, 0.155, CARD_H)
+    card_a = (0.02, CARD_Y, 0.16, CARD_H)
     _rounded_card(fig, card_a, pad_in=0.012)
     ax_a = fig.add_axes([card_a[0] + 0.012, card_a[1] + 0.03, card_a[2] - 0.024, card_a[3] - 0.05])
     ax_a.imshow(img2c, cmap="gray", origin="lower")
@@ -598,8 +600,10 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     y_hi = max(dfl[col_actual].max(), dfr[col_actual].max())
     y_pad = (y_hi - y_lo) * 0.18 or 0.05
 
+    CHART_W = 0.2417
+
     def _mini_chart(x0, layer, actual_vals, color):
-        card = (x0, CARD_Y, 0.178, CARD_H)
+        card = (x0, CARD_Y, CHART_W, CARD_H)
         _rounded_card(fig, card, pad_in=0.012)
         ax = fig.add_axes([card[0] + 0.040, card[1] + 0.10, card[2] - 0.075, card[3] - 0.19])
         _paper_axes_style(ax)
@@ -612,35 +616,29 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
         ax.set_xticks(list(layer))
         return ax
 
-    ax_left = _mini_chart(0.205, dfl.layer, dfl[col_actual], BLUE)
+    left_x0 = card_a[0] + card_a[2] + GAP_X
+    ax_left = _mini_chart(left_x0, dfl.layer, dfl[col_actual], BLUE)
     ax_left.set_ylim(y_lo - y_pad, y_hi + y_pad)
     ax_left.set_ylabel("KL divergence\n(lower = better match)", fontsize=8.6, color=PAPER_INK)
 
-    ax_right = _mini_chart(0.408, dfr.layer, dfr[col_actual], ORANGE)
+    right_x0 = left_x0 + CHART_W + GAP_X
+    ax_right = _mini_chart(right_x0, dfr.layer, dfr[col_actual], ORANGE)
     ax_right.set_ylim(y_lo - y_pad, y_hi + y_pad)
 
-    ax_gap = _mini_chart(0.611, dfl.layer, gap_actual_by_layer, GAP_C)
+    gap_x0 = right_x0 + CHART_W + GAP_X
+    ax_gap = _mini_chart(gap_x0, dfl.layer, gap_actual_by_layer, GAP_C)
     ax_gap.axhline(0, color=PAPER_GRID, linewidth=1.0, zorder=1)
     g_pad = (max(abs(gap_actual_by_layer.min()), abs(gap_actual_by_layer.max())) * 0.3) or 0.02
     ax_gap.set_ylim(gap_actual_by_layer.min() - g_pad, gap_actual_by_layer.max() + g_pad)
 
-    # --- panel (c): compact statistics card, not a prose sentence ------------------------------------
-    card_c = (0.828, CARD_Y, 0.15, CARD_H)
-    _rounded_card(fig, card_c, pad_in=0.012)
-    ax_c = fig.add_axes([card_c[0] + 0.013, card_c[1] + 0.02, card_c[2] - 0.026, card_c[3] - 0.04])
-    ax_c.axis("off")
-    stat_rows = [
-        ("Mean KL — Left", f"{mean_l:.3f}", BLUE),
-        ("Mean KL — Right", f"{mean_r:.3f}", ORANGE),
-        ("Mean gap (L−R)", f"{mean_gap:+.3f}", GAP_C),
+    # --- bottom summary stats, as a legend row (colored swatch + text), not a card ------------------
+    stat_handles = [
+        Line2D([], [], color=BLUE, lw=0, marker="s", markersize=9, label=f"Mean KL — Left: {mean_l:.3f}"),
+        Line2D([], [], color=ORANGE, lw=0, marker="s", markersize=9, label=f"Mean KL — Right: {mean_r:.3f}"),
+        Line2D([], [], color=GAP_C, lw=0, marker="s", markersize=9, label=f"Mean gap (L−R): {mean_gap:+.3f}"),
     ]
-    y0 = 0.90
-    for i, (label, value, color) in enumerate(stat_rows):
-        ax_c.text(0.0, y0, label, fontsize=8.6, color=PAPER_MUTED, transform=ax_c.transAxes, va="top")
-        ax_c.text(0.0, y0 - 0.14, value, fontsize=13, fontweight="bold", color=color, transform=ax_c.transAxes, va="top")
-        y0 -= 0.33
-        if i < len(stat_rows) - 1:
-            ax_c.plot([0, 1], [y0 + 0.09, y0 + 0.09], color="#edeef2", linewidth=1, transform=ax_c.transAxes)
+    fig.legend(handles=stat_handles, loc="lower center", bbox_to_anchor=(0.5, 0.025), ncol=3,
+               frameon=False, fontsize=9.5, handletextpad=0.5, columnspacing=1.8)
 
     return savefig(fig, out_dir / core.replace(" ", "_") / "row18_explainer.png")
 

@@ -2,7 +2,7 @@
 
 ---
 
-## 1. Detection with Rotation
+## 1. 2D Localization Under Rotation
 
 Goal: rotate the input image and measure how well 2D localization models still find the prompted left or right structure, and whether they land on the opposite side.
 
@@ -82,7 +82,7 @@ Reported per model, per dataset, per prompt (left, right) and per angle.
 
 ---
 
-## 2. Segmentation with Rotation
+## 2. 3D Segmentation Under Rotation
 
 Goal: measure how segmentation quality degrades under rotation, and how often the predicted mask lands on the opposite-side (wrong-side) organ instead of the prompted one.
 
@@ -186,7 +186,7 @@ Empty predictions score Dice 0 and are excluded from HD95 and centroid shift; re
 
 ---
 
-## 3. Image-Text Contribution (Word Attribution)
+## 3. Image vs. Word Attribution
 
 Goal: quantify how much the image and each prompt word contribute to the prediction, and whether anatomical terms dominate positional words such as "left" and "right".
 
@@ -237,7 +237,7 @@ Reported per dataset and per prompt (left, right).
 
 ---
 
-## 4. Internal Embedding Shift (Left/Right Embedding Swap)
+## 4. Left/Right Embedding Swap
 
 Goal: test whether the model's output follows the prompt embedding by injecting the embedding of one side into the run of the other and seeing what changes.
 
@@ -304,7 +304,7 @@ Reported per dataset, for Swap A and Swap B separately.
 
 ---
 
-## 5. Layer-wise Attention Grounding (KL Divergence, Left vs. Right)
+## 5. Attention Grounding Across Layers (KL Divergence)
 
 Goal: find which decoder layer's cross-attention is best grounded on the correct anatomical location, and whether that grounding is systematically worse for one side than the other.
 
@@ -336,7 +336,7 @@ Reported per organ, per layer, for left and right separately, plus the left-righ
 
 ---
 
-## 6. Uncertainty Quantification
+## 6. Uncertainty Under Rotation
 
 Goal: estimate the model's predictive uncertainty under rotation, and test whether it rises with rotation and predicts failure.
 
@@ -372,7 +372,7 @@ Goal: estimate the model's predictive uncertainty under rotation, and test wheth
 
 ---
 
-## 7. Prompt Sensitivity (VoxTell Only)
+## 7. Prompt Wording Sensitivity
 
 Goal: test whether VoxTell's left/right behavior depends on the structure's name (by rephrasing prompts as location descriptions) or on real visual evidence (by prompting for absent structures).
 
@@ -419,5 +419,3 @@ For every row below, run the negative prompt on its image, **plus** the matched 
 | Neurite-OASIS (brain) | `"Segment the left kidney in this image."` | Kidney is not in a brain scan | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. hippocampus), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
 | TotalSegmentatorV2 | `"Segment the left hippocampus in this image."` | Restricted to TotalSegmentatorV2 scans whose field of view excludes the head, confirmed from each scan's metadata | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. lung), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
 | HanSeg-CT (head and neck) | `"Segment the left kidney in this image."` | Kidney is not in a head-and-neck scan | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. parotid gland), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
-
-**Not included in this round:** a wrong-side variant, where the negative prompt names the correct organ but the side that's actually missing (rather than an organ from the wrong anatomy entirely). Left for a follow-up study.

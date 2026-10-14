@@ -1,8 +1,4 @@
-# Study Plan: Rotation Robustness & Interpretability of Medical Vision-Language Models
-
-Branch: `faria/voxtell3d-rotation-medical-segmentation`
-
-Items marked **TBD** are open decisions to resolve before running experiments.
+# Study Plan: Rotation Robustness and Positional Bias in Medical Vision-Language Models
 
 ---
 
@@ -10,14 +6,20 @@ Items marked **TBD** are open decisions to resolve before running experiments.
 
 Goal: rotate the input image and measure how well 2D localization models still find the prompted left or right structure, and whether they land on the opposite side.
 
+**Research questions:**
+- Does rotation make the model's box/point land on the opposite-side structure more than chance, rather than just becoming less accurate on the correct side (wrong-side rate vs. IoU drop)?
+- Is the direction of the bias (which side is favored) consistent across models and angles, which would show a systematic positional bias rather than random noise?
+
 ### Overview
 
-- **Models (9):** Grounding DINO, OWLv2, Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, Molmo2-8B, North-Micro-Vision-Instruct, Florence-2.
-- **Datasets (2):** AMOS22-MRI and Neurite-OASIS, one 2D slice per subject.
-- **Prompts (2):** left and right.
-- **Rotation angles (7):** 0°, 30°, 60°, 90°, 120°, 150°, 180°.
-- **Metrics:** mean IoU, wrong-side rate, mean normalized distance, detect rate, and the drop vs. 0°.
-- **Exceptions:** Molmo2-8B returns points only, so it has no IoU. North-Micro-Vision-Instruct gets IoU only if it returns a box (to check).
+| Setting | Value |
+|---|---|
+| Models (9) | Grounding DINO, OWLv2, Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, Molmo2-8B, North-Micro-Vision-Instruct, Florence-2 |
+| Datasets (2) | AMOS22-MRI and Neurite-OASIS, one 2D slice per subject |
+| Prompts (2) | left and right |
+| Rotation angles (7) | 0°, 30°, 60°, 90°, 120°, 150°, 180° |
+| Metrics | mean IoU, wrong-side rate, mean normalized distance, detect rate, and the drop vs. 0° |
+| Exceptions | Molmo2-8B returns points only, so it has no IoU. North-Micro-Vision-Instruct gets IoU only if it returns a box |
 
 ### 1.1 Experiment design
 
@@ -27,49 +29,54 @@ Goal: rotate the input image and measure how well 2D localization models still f
 | Models | **9** 2D localization models (listed in the overview) |
 | Datasets | **2**: AMOS22-MRI and Neurite-OASIS (same as the VoxTell segmentation runs) |
 | Input | One 2D slice per subject, extracted from the volume *(proposed: slice with the largest mask of the target pair)* |
-| Structures | Bilateral pairs only. AMOS22-MRI: **TBD** *(proposed: kidney, adrenal gland)*. Neurite-OASIS: **TBD** *(proposed: hippocampus, lateral ventricle)* |
-| Subjects | **TBD** per dataset |
+| Structures | All bilateral pairs |
+| Subjects | As many as possible, per dataset |
 | Prompts | **2**: left, right, per dataset and structure (see 1.2) |
 | Rotation angles | **7**: 0°, 30°, 60°, 90°, 120°, 150°, 180° |
-| Rotation method | In-plane rotation of the 2D slice around its center. Image size kept fixed, with fill = background value. TBD whether 90° multiples are also run without interpolation |
+| Rotation method | In-plane rotation of the 2D slice around its center. Image size kept fixed, with fill = background value. 90° multiples are also run without interpolation, as a control against interpolation artifacts at off-axis angles |
 | Ground truth | Box (and centroid) computed from the ground-truth mask in the same slice, rotated by the same angle |
 
 ### 1.2 Prompts (by dataset)
 
-Each structure is prompted twice, once with **left** and once with **right**. Use the rows for the dataset being run. Structures are *(proposed)*, final list **TBD**.
+Each structure is prompted twice, once with **left** and once with **right**. Use the rows for the dataset being run. All bilateral pairs are included.
+
+Two templates are used: the **original template** and one **paraphrase template** (same meaning, different wording), to run a paraphrase-robustness check alongside the main left/right comparison.
+
+**Original template**
 
 | Dataset | Structure | Left prompt | Right prompt |
 |---|---|---|---|
 | AMOS22-MRI | Kidney | `"Locate the left kidney in this image."` | `"Locate the right kidney in this image."` |
 | AMOS22-MRI | Adrenal gland | `"Locate the left adrenal gland in this image."` | `"Locate the right adrenal gland in this image."` |
 | Neurite-OASIS | Hippocampus | `"Locate the left hippocampus in this image."` | `"Locate the right hippocampus in this image."` |
-| Neurite-OASIS | Lateral ventricle | `"Locate the left lateral ventricle in this image."` | `"Locate the right lateral ventricle in this image."` |
+| Neurite-OASIS | Thalamus | `"Locate the left thalamus in this image."` | `"Locate the right thalamus in this image."` |
+| Neurite-OASIS | Ventricle | `"Locate the left ventricle in this image."` | `"Locate the right ventricle in this image."` |
+| Neurite-OASIS | Cerebral hemisphere | `"Locate the left cerebral hemisphere in this image."` | `"Locate the right cerebral hemisphere in this image."` |
 
-Prompt form by model *(proposed, confirm each model's API)*:
-- **Grounding DINO, OWLv2** (open-vocabulary detectors): pass only the phrase, e.g. `"left kidney"`.
-- **Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, North-Micro-Vision-Instruct, Florence-2:** pass the instruction form above (`"Locate the left kidney in this image."`), adapted to each model's grounding format.
-- **Molmo2-8B:** same instruction, but the answer is a point, not a box.
+**Paraphrase template** (same meaning, reworded, for the paraphrase-robustness check)
 
-The same prompt is used at every rotation angle. Only the image rotates.
+| Dataset | Structure | Left prompt (paraphrase) | Right prompt (paraphrase) |
+|---|---|---|---|
+| AMOS22-MRI | Kidney | `"Find the kidney that is on the left."` | `"Find the kidney that is on the right."` |
+| AMOS22-MRI | Adrenal gland | `"Find the adrenal gland that is on the left."` | `"Find the adrenal gland that is on the right."` |
+| Neurite-OASIS | Hippocampus | `"Find the hippocampus that is on the left."` | `"Find the hippocampus that is on the right."` |
+| Neurite-OASIS | Thalamus | `"Find the thalamus that is on the left."` | `"Find the thalamus that is on the right."` |
+| Neurite-OASIS | Ventricle | `"Find the ventricle that is on the left."` | `"Find the ventricle that is on the right."` |
+| Neurite-OASIS | Cerebral hemisphere | `"Find the cerebral hemisphere that is on the left."` | `"Find the cerebral hemisphere that is on the right."` |
 
-### 1.3 Procedure
-1. Extract one 2D slice per subject, and compute the ground-truth box and centroid from the mask.
-2. For each angle, rotate the slice and the ground-truth box/centroid together.
-3. For each model and each prompt (left, right), run inference and store the predicted box or point.
-4. Compute the metrics (see overview) in the rotated frame, and the wrong-side rate against the true side of the structure.
-5. Aggregate over subjects and report the drop vs. 0°.
+Both templates are run at every rotation angle. Only the image rotates.
 
 ### 1.4 Task and metrics
 
 **Task:** for each 2D slice rotated by angle θ and each prompt (left or right), the model returns a box (or a point for Molmo2-8B) for the prompted structure. The output is compared with the ground-truth box and centroid of that structure in the same rotated slice.
 
-| Metric | Definition | Applies to |
-|---|---|---|
-| IoU | Area of overlap between predicted box and ground-truth box, divided by the area of their union. Averaged over samples | 8 box models (not Molmo2-8B) |
-| Wrong-side rate | Share of predictions whose center is closer to the centroid of the **opposite-side** structure than to the centroid of the prompted structure | All 9 |
-| Mean normalized distance | Distance between predicted center (or point) and ground-truth centroid, divided by the image diagonal | All 9 |
-| Detect rate | Share of calls that return a usable box or point | All 9 |
-| Drop vs. 0° | Metric at 0° minus the same metric at angle θ | All metrics |
+| Metric | Definition | Applies to | Why it is used |
+|---|---|---|---|
+| IoU | Area of overlap between predicted box and ground-truth box, divided by the area of their union. Averaged over samples | 8 box models (not Molmo2-8B) | Standard localization-accuracy score; tracks how precisely the box matches the target as rotation increases |
+| Wrong-side rate | Share of predictions whose center is closer to the centroid of the **opposite-side** structure than to the centroid of the prompted structure | All 9 | Directly tests the core question: whether rotation makes the model point at the mirror-image (wrong-side) structure instead of the prompted one |
+| Mean normalized distance | Distance between predicted center (or point) and ground-truth centroid, divided by the image diagonal | All 9 | A continuous, scale-independent measure of positional error that also works for point-only models (Molmo2-8B), where IoU can't be computed |
+| Detect rate | Share of calls that return a usable box or point | All 9 | Separates "wrong answer" from "no answer"; a model that stops returning predictions under rotation is a different failure mode than one that mislocalizes |
+| Drop vs. 0° | Metric at 0° minus the same metric at angle θ | All metrics | Isolates the effect of rotation itself from each model's baseline accuracy, so results are comparable across models with very different starting performance |
 
 Reported per model, per dataset, per prompt (left, right) and per angle.
 
@@ -77,60 +84,103 @@ Reported per model, per dataset, per prompt (left, right) and per angle.
 
 ## 2. Segmentation with Rotation
 
+Goal: measure how segmentation quality degrades under rotation, and how often the predicted mask lands on the opposite-side (wrong-side) organ instead of the prompted one.
+
 Only **in-domain datasets** are used for each model.
+
+**Research questions:**
+- Does rotation cause the predicted mask to overlap the opposite-side organ's ground truth more than the prompted organ's (a laterality flip), rather than just a lower-quality mask on the correct side?
+- Is the wrong-side rate asymmetric by rotation direction (e.g., more left→right flips than right→left), which would point to a directional bias rather than symmetric noise?
 
 ### 2.1 Datasets per model
 
-**VoxTell** (5 datasets, CT and MRI)
+**VoxTell**
 
-| # | Dataset | Domain | Modality | Dim. | Paired structures | Example prompt |
-|---|---|---|---|---|---|---|
-| 1 | AMOS22-MRI | Abdomen | MRI (abdominal; sequence: **TBD**) | 3D | Kidneys, adrenal glands | `"Segment the left kidney in this image."` |
-| 2 | Neurite-OASIS | Brain | MRI (T1-weighted structural) | 3D | Hippocampus, thalamus, ventricles, cerebral hemispheres | `"Segment the left hippocampus in this image."` |
-| 3 | KiTS23 | Abdomen (kidney) | CT (contrast-enhanced) | 3D | Left/right kidney | `"Segment the right kidney in this image."` |
-| 4 | TotalSegmentatorV2 | Whole body (thorax, abdomen, bones) | CT | 3D | Lungs, kidneys, adrenal glands, ribs (structures: **TBD**) | `"Segment the left lung in this image."` |
-| 5 | HanSeg-CT | Head and neck | CT | 3D | Parotid and submandibular glands (confirm labels) | `"Segment the left parotid gland in this image."` |
+| # | Dataset | Domain | Modality | Dim. | Paired structures |
+|---|---|---|---|---|---|
+| 1 | AMOS22-MRI | Abdomen | MRI (abdominal, T2-weighted) | 3D | Kidneys, adrenal glands |
+| 2 | Neurite-OASIS | Brain | MRI (T1-weighted structural) | 3D | Hippocampus, thalamus, ventricles, cerebral hemispheres |
+| 3 | KiTS23 | Abdomen (kidney) | CT (contrast-enhanced) | 3D | Left/right kidney |
+| 4 | TotalSegmentatorV2 | Whole body (thorax, abdomen, bones) | CT | 3D | All bilateral pairs: lungs, kidneys, adrenal glands, ribs |
+| 5 | HanSeg-CT | Head and neck | CT | 3D | Parotid and submandibular glands |
 
-**Text3DSAM** (2 in-domain datasets, CT and MRI)
+**Text3DSAM**
 
-| # | Dataset | Domain | Modality | Dim. | Paired structures | Example prompt |
-|---|---|---|---|---|---|---|
-| 1 | CT_HaN-Seg | Head and neck | CT | 3D | Parotid gland | `"Segment the left parotid gland in this image."` |
-| 2 | MR_TotalSeg | Whole body (musculoskeletal, abdomen) | MRI (sequence: **TBD**) | 3D | Gluteus maximus (also kidneys) | `"Segment the left gluteus maximus in this image."` |
+| # | Dataset | Domain | Modality | Dim. | Paired structures |
+|---|---|---|---|---|---|
+| 1 | CT_HaN-Seg | Head and neck | CT | 3D | Parotid gland |
+| 2 | MR_TotalSeg | Whole body (musculoskeletal, abdomen) | MRI (T1-weighted) | 3D | Gluteus maximus (also kidneys) |
 
-**Medical-SAM3** (2 in-domain datasets, radiography and ultrasound)
+**Medical-SAM3**
 
-| # | Dataset | Domain | Modality | Dim. | Paired structures | Example prompt |
-|---|---|---|---|---|---|---|
-| 1 | Chest ImaGenome (built on MIMIC-CXR) | Chest (thorax) | Radiography (chest X-ray) | 2D | Left lung, right lung | `"Segment the left lung in this image."` |
-| 2 | TRUSTED (renal ultrasound, paired with CT) | Abdomen (kidney) | Ultrasound (3D transabdominal) | 3D | Left kidney, right kidney (48 patients, 96 kidneys) | `"Segment the left kidney in this image."` |
+| # | Dataset | Domain | Modality | Dim. | Paired structures |
+|---|---|---|---|---|---|
+| 1 | Chest ImaGenome (built on MIMIC-CXR) | Chest (thorax) | Radiography (chest X-ray) | 2D | Left lung, right lung |
+| 2 | TRUSTED (renal ultrasound, paired with CT) | Abdomen (kidney) | Ultrasound (3D transabdominal) | 3D | Left kidney, right kidney (48 patients, 96 kidneys) |
 
-### 2.2 Experiment settings
+### 2.2 Prompts (by dataset)
 
-| Question | Answer |
+Each structure is prompted twice, once with **left** and once with **right**. Two templates are used, the same paraphrase-robustness check used for the detection prompts.
+
+#### 2.2.1 Original template
+
+| Dataset | Structure | Left prompt | Right prompt |
+|---|---|---|---|
+| AMOS22-MRI | Kidney | `"Segment the left kidney in this image."` | `"Segment the right kidney in this image."` |
+| Neurite-OASIS | Hippocampus | `"Segment the left hippocampus in this image."` | `"Segment the right hippocampus in this image."` |
+| KiTS23 | Kidney | `"Segment the left kidney in this image."` | `"Segment the right kidney in this image."` |
+| TotalSegmentatorV2 | Lung | `"Segment the left lung in this image."` | `"Segment the right lung in this image."` |
+| HanSeg-CT | Parotid gland | `"Segment the left parotid gland in this image."` | `"Segment the right parotid gland in this image."` |
+| CT_HaN-Seg | Parotid gland | `"Segment the left parotid gland in this image."` | `"Segment the right parotid gland in this image."` |
+| MR_TotalSeg | Gluteus maximus | `"Segment the left gluteus maximus in this image."` | `"Segment the right gluteus maximus in this image."` |
+| Chest ImaGenome | Lung | `"Segment the left lung in this image."` | `"Segment the right lung in this image."` |
+| TRUSTED | Kidney | `"Segment the left kidney in this image."` | `"Segment the right kidney in this image."` |
+
+#### 2.2.2 Paraphrase template
+
+Same meaning, reworded, for the paraphrase-robustness check.
+
+| Dataset | Structure | Left prompt (paraphrase) | Right prompt (paraphrase) |
+|---|---|---|---|
+| AMOS22-MRI | Kidney | `"Find the kidney that is on the left."` | `"Find the kidney that is on the right."` |
+| Neurite-OASIS | Hippocampus | `"Find the hippocampus that is on the left."` | `"Find the hippocampus that is on the right."` |
+| KiTS23 | Kidney | `"Find the kidney that is on the left."` | `"Find the kidney that is on the right."` |
+| TotalSegmentatorV2 | Lung | `"Find the lung that is on the left."` | `"Find the lung that is on the right."` |
+| HanSeg-CT | Parotid gland | `"Find the parotid gland that is on the left."` | `"Find the parotid gland that is on the right."` |
+| CT_HaN-Seg | Parotid gland | `"Find the parotid gland that is on the left."` | `"Find the parotid gland that is on the right."` |
+| MR_TotalSeg | Gluteus maximus | `"Find the gluteus maximus that is on the left."` | `"Find the gluteus maximus that is on the right."` |
+| Chest ImaGenome | Lung | `"Find the lung that is on the left."` | `"Find the lung that is on the right."` |
+| TRUSTED | Kidney | `"Find the kidney that is on the left."` | `"Find the kidney that is on the right."` |
+
+Both templates are run at every rotation angle, for every bilateral pair listed in 2.1. Only the image rotates.
+
+### 2.3 Experiment settings
+
+| Setting | Value |
 |---|---|
 | How many models? | 3 |
 | How many datasets? | 9 in total (5 + 2 + 2), model-specific |
 | Which metrics? | Dice, IoU, HD95, wrong-side rate, centroid shift |
-| How many prompts tested? | 2 (left, right) |
+| How many prompts tested? | 4 (left and right, each with the original and paraphrase template) |
 | Rotation angles | 0°, 30°, 60°, 90°, 120°, 150°, 180° |
 
 Notes:
 - Chest X-ray is 2D, so its rotation is in-plane. The other datasets are 3D volumes.
 - Report each metric per rotation angle and as the drop relative to 0°.
+- Report the original and paraphrase templates separately, and their difference, to isolate wording effects from the left/right effect.
 
-### 2.3 Task and metrics
+### 2.4 Task and metrics
 
 **Task:** for each volume (or 2D image for Chest X-ray) rotated by angle θ and each prompt (left or right), the model segments the prompted structure. The predicted mask is compared with the ground-truth mask of that structure.
 
-| Metric | Definition |
-|---|---|
-| Dice | 2 x overlap of predicted and ground-truth mask, divided by the sum of their sizes |
-| IoU | Overlap of predicted and ground-truth mask, divided by their union |
-| HD95 | 95th-percentile Hausdorff distance between predicted and ground-truth mask boundaries (smaller is better) |
-| Wrong-side rate | Share of predictions that overlap the **opposite-side** structure's ground truth more than the prompted structure's ground truth |
-| Centroid shift | Distance between predicted centroid and ground-truth centroid, normalized by the volume diagonal |
-| Drop vs. 0° | Metric at 0° minus the same metric at angle θ |
+| Metric | Definition | Why it is used |
+|---|---|---|
+| Dice | 2 x overlap of predicted and ground-truth mask, divided by the sum of their sizes | Standard segmentation-quality score; gives a single number to track overall mask accuracy as rotation increases |
+| IoU | Overlap of predicted and ground-truth mask, divided by their union | Stricter overlap measure than Dice (penalizes false positives/negatives more symmetrically); cross-checks that the Dice trend isn't an artifact of the metric's formula |
+| HD95 | 95th-percentile Hausdorff distance between predicted and ground-truth mask boundaries (smaller is better) | Captures boundary/localization error that Dice and IoU can hide, e.g. a mask that is well-overlapped but with a badly placed edge, which matters when checking whether rotation shifts the mask spatially rather than just shrinking it |
+| Wrong-side rate | Share of predictions that overlap the **opposite-side** structure's ground truth more than the prompted structure's ground truth | Directly tests the paper's core claim: whether rotation causes the model to segment the mirror-image (wrong-side) structure instead of the prompted one |
+| Centroid shift | Distance between predicted centroid and ground-truth centroid, normalized by the volume diagonal | Gives a continuous, scale-independent measure of positional drift, so a side-flip can be detected even before it is severe enough to change the wrong-side rate |
+| Drop vs. 0° | Metric at 0° minus the same metric at angle θ | Isolates the effect of rotation itself from each model's/dataset's baseline performance, making results comparable across models and datasets with very different starting Dice/IoU levels |
 
 Empty predictions score Dice 0 and are excluded from HD95 and centroid shift; report how many were empty. Reported per model, per dataset, per prompt and per angle.
 
@@ -138,45 +188,50 @@ Empty predictions score Dice 0 and are excluded from HD95 and centroid shift; re
 
 ## 3. Image-Text Contribution (Word Attribution)
 
-- **Scope:** Segmentation model only, **0° rotation only**, bilateral images.
-- **Models:** **VoxTell only** (1 model).
-- **Datasets:** VoxTell's 5 datasets from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT).
-- **Prompts:** **2** (left, right), the same template as Section 2, e.g. `"Segment the left kidney in this image."`.
-- **Goal:** Quantify how much the image and each prompt word contribute to the prediction, and whether anatomical terms dominate positional words such as "left" and "right".
-- **Methods:** Shapley values and Integrated Gradients, run on the same images and prompts so results are comparable.
+Goal: quantify how much the image and each prompt word contribute to the prediction, and whether anatomical terms dominate positional words such as "left" and "right".
 
-### 3.1 Shapley values
-- Players are the image and each prompt word. Absent words are masked or replaced with a neutral token. An absent image is replaced with a baseline image.
-- **Image:** contribution of the image (or image regions/patches) to the output.
-- **Text:** contribution of each word.
+**Research questions:**
+- Does the organ word's attribution dwarf the side word's ("left"/"right") attribution, which would mean the model's apparent positional behavior is driven by the image/default prior rather than by actually reading the position word?
+- When the side word is removed, does the model keep producing a confident but spatially arbitrary mask (rather than becoming uncertain), showing the side word has little causal effect even where it carries some attribution?
 
-### 3.2 Integrated Gradients (IG)
-- Attributes the output to input features by integrating gradients from a baseline to the actual input.
-- **Image:** attribution across pixels or patches (baseline: black or blank image).
-- **Text:** attribution across tokens, taken on the token embeddings (baseline: empty or padding prompt).
-- **Use:** compare the **total attribution magnitude** of the image inputs and the word inputs (modality share).
-- **Best for:** gradient-based modality attribution.
+### Overview
 
-### Output score being explained
-**Mean mask probability inside the ground-truth region.** For each image and prompt, take the model's predicted probability map and average it over the voxels (or pixels) where the ground-truth mask of the prompted structure is 1. This single number is the score that both Shapley and Integrated Gradients explain.
+| Setting | Value |
+|---|---|
+| Scope | Segmentation model only, **0° rotation only**, bilateral images |
+| Models | **VoxTell only** (1 model) |
+| Datasets | VoxTell's 5 segmentation datasets (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
+| Prompts | **2** (left, right), each used in 3 variants: <ul><li>**Original:** `"Segment the left kidney in this image."`</li><li>**Organ-only (side word removed):** `"Segment the kidney in this image."`</li><li>**Paraphrase:** `"Find the kidney that is on the left."`</li></ul> |
+| Methods | 6 Captum attribution methods: Integrated Gradients, Layer Integrated Gradients, Occlusion, Feature Ablation, GradientSHAP, and Shapley Value Sampling, run on the same images and prompts so results are comparable |
 
-- It is differentiable, so Integrated Gradients can use it.
-- It can be recomputed after removing a word or the image, so Shapley can use it.
-- It drops when the model moves the mask to the wrong side, which is what the left/right question needs.
-- Dice is not used as the explained score. It is used only to measure the deletion test.
+### Attribution methods compared
+
+| Method | How it works | Image attribution | Text attribution | Output score explained | Expected result |
+|---|---|---|---|---|---|
+| **Integrated Gradients** | Attributes the prediction score to input features by integrating gradients along a straight path from a baseline to the actual input (Captum `IntegratedGradients`). | Yes, attribution across pixels or patches (baseline: black or blank image) | Yes, via embeddings; attribution across tokens taken on the token embeddings (baseline: empty or padding prompt) | <ul><li>Mean predicted mask probability inside the ground-truth region.</li><li>Usable here because it is a plain differentiable average, so a gradient path can be integrated through it.</li></ul> | <ul><li>The gradient path should show a visible rise at the side word's tokens if the model is sensitive to it.</li><li>A flat gradient profile at the side word next to a sharp spike at the organ word would mean the model's local sensitivity doesn't actually track position.</li></ul> |
+| **Layer Integrated Gradients** | Same integration as above, but attributes at a chosen intermediate layer instead of the raw input (Captum `LayerIntegratedGradients`), e.g. the token-embedding layer or a fusion layer. | Yes, applied at an intermediate image-encoder layer | Yes, via embeddings; applied directly at the token-embedding layer | <ul><li>Same mean mask probability score, read from that layer onward.</li></ul> | <ul><li>Localizes *where* the side word's influence appears or disappears: strong attribution at the embedding layer that washes out by a later fusion layer would mean the side signal is lost before it reaches the output.</li></ul> |
+| **Occlusion** | Perturbation-based: masks a region of the image or a word directly and measures the resulting change in the prediction, with no gradients needed (Captum `Occlusion`). | Yes, slides an occlusion window over the image | Yes, with suitable input wrappers; occludes (masks) one word at a time | <ul><li>Score drop when a region or word is occluded, relative to the unoccluded score.</li></ul> | <ul><li>Occluding the side word alone should cause a measurable score drop if the model is using it.</li><li>No drop would mean the model ignores the side word regardless of what the gradient-based methods show.</li></ul> |
+| **Feature Ablation** | Generalizes occlusion to arbitrary feature groups: each group is replaced by a baseline value and the output difference is recorded (Captum `FeatureAblation`). | Yes, with suitable input wrappers; ablates image regions/patches as groups | Yes, with suitable input wrappers; ablates a whole word as one group | <ul><li>Score drop when a feature group is ablated, relative to the full-input score.</li></ul> | <ul><li>Ablating the side-word group should produce a drop comparable to Shapley Value Sampling's per-word figure.</li><li>A large disagreement with Shapley flags a word-word interaction effect that simple ablation misses but Shapley accounts for.</li></ul> |
+| **GradientSHAP** | Approximates Shapley values using gradients: adds noise to interpolate between random baselines and the input, then averages the resulting gradients (Captum `GradientShap`). | Yes, via differentiable baselines over image pixels | Yes, via differentiable embeddings | <ul><li>Same mean mask probability score.</li></ul> | <ul><li>Should broadly agree with Shapley Value Sampling's organ-vs-side ranking, since it approximates the same quantity by a different route.</li><li>Disagreement flags that GradientSHAP's baseline-sampling assumptions don't hold well for this model/task.</li></ul> |
+| **Shapley Value Sampling** | Monte Carlo approximation of exact Shapley values: samples random coalitions instead of enumerating every combination (Captum `ShapleyValueSampling`). | Yes, with feature grouping; the image is treated as one group (or a few coarse regions) | Yes, with feature grouping; each word is one group/player | <ul><li>Same mean mask probability score, recomputed per sampled coalition.</li></ul> | <ul><li>If the model genuinely reads position, the side word ("left"/"right") should carry a clearly non-zero value, not just the organ word.</li><li>A side-word value near zero would mean the output is effectively decided before the position word is even considered.</li></ul> |
+
+Notes:
+- This mean-probability score is the common output being attributed by all 6 methods.
+- Dice is a separate metric, used only for the deletion test below.
+- The score also drops when the model moves the mask to the wrong side, the exact failure mode this plan is checking for.
 
 ### Task and metrics
 
-**Task:** at 0° rotation, for each image and prompt (left or right), assign an attribution to the image and to each prompt word, using both Shapley and Integrated Gradients, for the explained score above.
+**Task:** at 0° rotation, for each image and prompt (left or right), assign an attribution to the image and to each prompt word, using all 6 Captum methods, for the explained score above.
 
-| Metric | Definition |
-|---|---|
-| Modality share | Total absolute attribution of the image divided by the total of the image and all words, for each method |
-| Per-word attribution | Attribution of each word (organ word, side word), averaged across images |
-| Organ-vs-side ratio | Attribution of the organ word divided by attribution of the side word ("left" or "right") |
-| Method agreement | Spearman rank correlation of the word attributions between Shapley and IG |
-| Deletion test | Dice drop after removing the highest-attributed word (and, separately, the highest-attributed image regions), compared with a random removal |
-| Left/right check | Whether the side word carries attribution, and whether the attributed image region falls on the matching side (share of image attribution inside the ground-truth region) |
+| Metric | Definition | Why it is used |
+|---|---|---|
+| Modality share | Total absolute attribution of the image divided by the total of the image and all words, for each method | Answers the headline question directly: does the model lean on the image or on the prompt text to produce its answer |
+| Per-word attribution | Attribution of each word (organ word, side word), averaged across images | Breaks the text side down further, so "the prompt matters" can be refined into which specific word is doing the work |
+| Organ-vs-side ratio | Attribution of the organ word divided by attribution of the side word ("left" or "right") | A single number for the paper's core concern: whether the model is driven far more by *what* the structure is than by *which side* it's on |
+| Method agreement | Spearman rank correlation of the word attributions across all 6 methods (pairwise and overall) | Checks that the word-importance ranking isn't an artifact of one particular attribution method, before trusting the organ-vs-side ratio |
+| Deletion test | Dice drop after removing the highest-attributed word (and, separately, the highest-attributed image regions), compared with a random removal | A causal check: confirms the attributed word/region actually matters to the output, rather than just correlating with it |
+| Left/right check | Whether the side word carries attribution, and whether the attributed image region falls on the matching side (share of image attribution inside the ground-truth region) | Ties the text-side and image-side attributions together on the one question that matters for positional bias: is "left"/"right" grounded in the correct side of the image |
 
 Reported per dataset and per prompt (left, right).
 
@@ -184,11 +239,20 @@ Reported per dataset and per prompt (left, right).
 
 ## 4. Internal Embedding Shift (Left/Right Embedding Swap)
 
-- **Scope:** Segmentation model only, **0° rotation only**, bilateral images.
-- **Models:** **VoxTell only** (1 model).
-- **Datasets:** VoxTell's 5 datasets from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT).
-- **Prompt(s) used:** **left** and **right** prompts (paired, same image). Bilateral prompt: **TBD** whether to include.
-- **Goal:** Test whether the model's output follows the prompt embedding. Inject the embedding of one side into the run of the other and see what changes.
+Goal: test whether the model's output follows the prompt embedding by injecting the embedding of one side into the run of the other and seeing what changes.
+
+**Research questions:**
+- If the "right" embedding is injected into a "left" run, does the output mask move to follow the injected side, proving the model's side decision is causally carried by the text embedding rather than by the image or a fixed prior?
+- At which fusion layer does this causal effect first appear, pinpointing exactly where in the model the left/right decision (and any bias in it) is made?
+
+### Overview
+
+| Setting | Value |
+|---|---|
+| Scope | Segmentation model only, **0° rotation only**, bilateral images |
+| Models | **VoxTell only** (1 model) |
+| Datasets | VoxTell's 5 segmentation datasets (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
+| Prompt(s) used | **left** and **right** prompts (paired, same image). No bilateral/"both" prompt, matching the left/right-only template used throughout this plan |
 
 ### Method (activation patching)
 1. Run the image with the **left** prompt and cache the internal embeddings (prompt/text embedding, or fused features at chosen layers).
@@ -203,6 +267,8 @@ Reported per dataset and per prompt (left, right).
 | Clean right | right | right | (reference) | (reference) |
 | Swap A | left | **right** | segments the right side | segments the left side |
 | Swap B | right | **left** | segments the left side | segments the right side |
+
+### Injection details
 
 - **Where to inject:** at the **text-image fusion**, which in VoxTell is the transformer decoder, where the text query cross-attends to the image features.
   - **Input stays the same:** the prompt text is not changed. For Swap A the prompt is still "left"; for Swap B it is still "right".
@@ -219,13 +285,13 @@ Reported per dataset and per prompt (left, right).
 
 **Task:** at 0° rotation, run the swap test (Swap A and Swap B) with the replacement made at fusion layer 1, 2 or 3 in separate runs, and check whether the predicted mask follows the injected side or the prompt side.
 
-| Metric | Definition |
-|---|---|
-| Dice vs. embedding-side ground truth | Dice between the swapped output and the ground-truth mask of the side whose embedding was injected |
-| Dice vs. prompt-side ground truth | Dice between the swapped output and the ground-truth mask of the side named in the prompt |
-| Swap success rate | Share of cases where the Dice vs. the embedding-side ground truth is higher than the Dice vs. the prompt-side ground truth |
-| Centroid shift | Distance the predicted centroid moves from the clean run toward the other side, normalized by the volume diagonal |
-| Per-layer swap success | Swap success rate for injection at layer 1, layer 2 and layer 3, shown as a curve |
+| Metric | Definition | Why it is used |
+|---|---|---|
+| Dice vs. embedding-side ground truth | Dice between the swapped output and the ground-truth mask of the side whose embedding was injected | Tests the "follows the embedding" hypothesis directly: if the mask matches this ground truth, the output tracked the injected signal, not the original prompt |
+| Dice vs. prompt-side ground truth | Dice between the swapped output and the ground-truth mask of the side named in the prompt | The mirror-image comparison; high Dice here instead means the model ignored the injected embedding and stuck with the text/image it was given |
+| Swap success rate | Share of cases where the Dice vs. the embedding-side ground truth is higher than the Dice vs. the prompt-side ground truth | Collapses the two Dice scores above into one pass/fail number per case, so results can be aggregated and compared across datasets |
+| Centroid shift | Distance the predicted centroid moves from the clean run toward the other side, normalized by the volume diagonal | Captures partial or graded swaps that the binary success-rate metric would miss, e.g. a mask that shifts toward the other side without fully flipping |
+| Per-layer swap success | Swap success rate for injection at layer 1, layer 2 and layer 3, shown as a curve | Localizes *where* in the fusion process the side decision is made, not just *whether* it can be flipped at all |
 
 Reported per dataset, for Swap A and Swap B separately.
 
@@ -238,40 +304,52 @@ Reported per dataset, for Swap A and Swap B separately.
 
 ---
 
-## 5. Layer-wise Embedding Divergence Under Rotation
+## 5. Layer-wise Attention Grounding (KL Divergence, Left vs. Right)
 
-| Question | Answer |
+Goal: find which decoder layer's cross-attention is best grounded on the correct anatomical location, and whether that grounding is systematically worse for one side than the other.
+
+**Research questions:**
+- Is there a persistent Left-KL − Right-KL gap across decoder layers, showing the model's attention is better grounded for one side than the other even though both sides are the same type of structure?
+- At which layer is attention best grounded overall (lowest KL), and does the left/right gap shrink, grow, or stay flat as the signal passes through layers?
+
+| Setting | Value |
 |---|---|
 | Models | **VoxTell only** (1 model) |
-| How many datasets? | VoxTell's 5 datasets from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
-| Rotation angles | 0° as the reference vs. each of 30°, 60°, 90°, 120°, 150°, 180° |
-| Prompt(s) used | 2 (left, right), fixed across angles |
-| Layers probed | Encoder stages, text projection, transformer decoder (fusion) layers, decoder stages (see `model_layer_summary.md`) |
+| How many datasets? | VoxTell's 5 segmentation datasets (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
+| Prompt(s) used | 2 (left, right), paired on the same image |
+| Layers probed | Every decoder layer's text-to-image cross-attention |
 
-- **Goal:** Find which layer or component first breaks when the image is rotated (encoder, fusion, or decoder).
-- **Setup:** Run the same image at 0° and at each rotation with the same prompt. Extract activations at each layer using forward hooks.
-- **Alignment:** Rotate the feature maps back by the inverse angle (or compare pooled embeddings) so spatial positions correspond. Verify the round trip before trusting results.
-- **Metrics:**
-  - Cosine distance between 0° and rotated embeddings, per layer.
-  - Linear CKA between 0° and rotated embeddings, per layer (computed across a batch of images).
-- **Outputs:**
-  - Plot of divergence vs. layer depth, one curve per angle.
-  - Identify the first layer where divergence jumps, and compare it with the drop in Dice/IoU from Section 2.
-- **Controls:**
-  - Compare 90° multiples (no interpolation) against off-axis angles such as 45°.
-  - Include a no-rotation repeat (same image twice) as the noise floor.
-- **Open points:** Decide whether to compare token-level or pooled embeddings, and how many images are needed for stable CKA.
+### Method
+- For each organ, run the model once with its **left** prompt and once with its **right** prompt on the same image, and capture the decoder's cross-attention density at every layer.
+- Normalize the ground-truth mask and each layer's attention density into probability distributions over voxels, then compute `KL(ground-truth mask ‖ attention density)` per layer, per side.
+- Repeat with one generic, non-spatial prompt per subject ("Segment the anatomy in this image.") and divide its attention map out before computing KL, isolating prompt-specific grounding from wherever the model looks by default.
+- Take the per-layer gap (Left KL − Right KL) as the positional-bias signal: a consistently positive or negative gap means attention aligns with one side's true anatomy systematically better than the other's.
+
+| Metric | Definition | Why it is used |
+|---|---|---|
+| KL divergence (raw) | `KL(ground-truth mask ‖ attention density)`, per layer, per side | Base measure of how well the attention at that layer matches where the organ actually is |
+| KL divergence (generic-normalized) | Same, but the attention is divided by a generic non-spatial prompt's attention first | Isolates prompt-specific grounding from the model's default gaze, so the result isn't just "the model looks at the center of the image" |
+| Left-right KL gap | Left KL minus Right KL, per layer | The direct positional-bias signal: a persistent sign across layers means one side is mechanistically worse-grounded, not just noisier |
+| Best-grounded layer | Layer with the lowest KL, per organ and side | Identifies where in the network attention is most accurate, a candidate layer to target with the embedding-swap intervention |
+
+Reported per organ, per layer, for left and right separately, plus the left-right gap curve across layers.
 
 ---
 
 ## 6. Uncertainty Quantification
 
-| Question | Answer |
+Goal: estimate the model's predictive uncertainty under rotation, and test whether it rises with rotation and predicts failure.
+
+**Research questions:**
+- Does the model's uncertainty rise specifically when rotation produces a wrong-side (positional) error, or does it stay low even when confidently on the wrong side? Can uncertainty actually catch positional bias, or does the model fail silently?
+- Is calibration (Expected Calibration Error, ECE) worse at the rotation angles that produce more wrong-side errors, linking miscalibration directly to the positional-bias failure mode rather than to generic accuracy loss?
+
+| Setting | Value |
 |---|---|
-| Models | **TBD** |
-| How many datasets? | **TBD** |
-| Rotation angles | **TBD** (same as Sections 1 and 2) |
-| Prompt(s) used | **TBD** |
+| Models | **VoxTell only** (1 model); MC dropout requires VoxTell to have dropout layers, checked first |
+| How many datasets? | **2**: AMOS22-MRI, Neurite-OASIS |
+| Rotation angles | **7**: 0°, 30°, 60°, 90°, 120°, 150°, 180° (same angles used for the detection and segmentation tasks) |
+| Prompt(s) used | **2** (left, right) |
 
 ### 6.1 Methods
 - **Primary: test-time augmentation (TTA) variance.** Run the model on several rotated views, rotate the outputs back, and measure disagreement.
@@ -280,26 +358,35 @@ Reported per dataset, for Swap A and Swap B separately.
   - Use a fixed TTA set that does not depend on the true rotation, to avoid leaking the answer.
 - **Secondary: MC dropout** (10-20 passes per angle). Dropout is kept active at inference, and uncertainty is the variance or entropy across passes. Compare its results with TTA at every angle.
   - Check first that each model has dropout layers. If one does not, note it as a limitation for that model.
-- **Only these two methods are used.** Both are reported side by side in 5.2.
+- **Only these two methods are used.** Both are reported side by side in "What to report" below.
 - **Caveat:** TTA variance measures rotation sensitivity. A model that is wrong at every angle can look confident, which is why MC dropout is used alongside it.
 
 ### 6.2 What to report
-1. **Uncertainty vs. rotation angle:** mean uncertainty at each angle (does it rise with rotation?).
-2. **Failure detection:** does high uncertainty predict low Dice or a missed detection? Report AUROC and risk-coverage curves, for TTA and MC dropout separately.
-3. **Calibration:** expected calibration error and reliability diagrams, 0° vs. rotated angles.
-4. **Link to Section 5:** compare uncertainty with layer-wise embedding divergence.
+
+| # | Item | What to report |
+|---|---|---|
+| 1 | Uncertainty vs. rotation angle | Mean uncertainty at each angle (does it rise with rotation?) |
+| 2 | Failure detection | Does high uncertainty predict low Dice or a missed detection? Report AUROC and risk-coverage curves, for TTA and MC dropout separately |
+| 3 | Calibration | Expected calibration error and reliability diagrams, 0° vs. rotated angles |
+| 4 | Link to attention grounding | Compare uncertainty with the layer-wise KL-divergence attention-grounding results |
 
 ---
 
 ## 7. Prompt Sensitivity (VoxTell Only)
 
-| Question | Answer |
+Goal: test whether VoxTell's left/right behavior depends on the structure's name (by rephrasing prompts as location descriptions) or on real visual evidence (by prompting for absent structures).
+
+**Research questions:**
+- When the structure is described by location instead of name, does accuracy or side-choice change, revealing whether "left"/"right" understanding is actually tied to the structure's name rather than to genuine spatial-language comprehension?
+- When prompted with a side word for a structure that is absent, does the model hallucinate a mask preferentially on one particular side, revealing a positional prior that acts independently of real visual evidence?
+
+| Setting | Value |
 |---|---|
 | How many models? | **VoxTell only** (1 model) |
-| How many datasets? | VoxTell's 5 datasets from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
+| How many datasets? | VoxTell's 5 segmentation datasets (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
 | Rotation | 0° only *(proposed)* |
-| Metrics | **TBD** (Dice, IoU, HD95 for positive prompts; false-positive rate for negative prompts) |
-| How many targets (organs/lesions)? | **TBD** |
+| Metrics | Dice, IoU, HD95 for positive prompts; false-positive rate for negative prompts |
+| How many targets (organs/lesions)? | All bilateral pairs across these 5 segmentation datasets |
 | How many prompt types? | 2 (location wording, negative prompts) + canonical reference |
 
 ### 7.1 Anatomical-location wording
@@ -308,17 +395,15 @@ Reported per dataset, for Swap A and Swap B separately.
 
 **Question:** can VoxTell find the structure from location words alone?
 
-| Dataset | Normal prompt (reference) | Location-wording prompt *(proposed)* |
-|---|---|---|
-| AMOS22-MRI, KiTS23 (kidney) | `"Segment the left kidney in this image."` | `"Segment the organ on the left side of the back of the abdomen."` |
-| AMOS22-MRI (adrenal gland) | `"Segment the left adrenal gland in this image."` | `"Segment the small gland above the left kidney."` |
-| Neurite-OASIS (hippocampus) | `"Segment the left hippocampus in this image."` | `"Segment the structure in the left medial temporal lobe."` |
-| TotalSegmentatorV2 (lung) | `"Segment the left lung in this image."` | `"Segment the air-filled organ in the left side of the chest."` |
-| HanSeg-CT (parotid gland) | `"Segment the left parotid gland in this image."` | `"Segment the salivary gland in front of the left ear."` |
+For every row below, run **both** prompts (normal and location-wording) on the same image, for both left and right, and compare.
 
-- **New prompts:** 1 per structure and side (left and right).
-- **Metrics:** Dice and IoU for the location prompt, and the drop relative to the normal prompt. Also the wrong-side rate.
-- **How to read it:** a small drop means the model understands the location words. A large drop means it relies on the structure's name.
+| Dataset | Normal prompt (reference) | Location-wording prompt *(proposed)* | Metrics used | Expected result |
+|---|---|---|---|---|
+| AMOS22-MRI, KiTS23 (kidney) | `"Segment the left kidney in this image."` | `"Segment the organ on the left side of the back of the abdomen."` | <ul><li>Dice on the location prompt</li><li>IoU on the location prompt</li><li>Drop vs. the normal prompt</li><li>Wrong-side rate</li></ul> | Small drop: model understands the location words. Large drop: model was really relying on the word "kidney" |
+| AMOS22-MRI (adrenal gland) | `"Segment the left adrenal gland in this image."` | `"Segment the small gland above the left kidney."` | <ul><li>Dice on the location prompt</li><li>IoU on the location prompt</li><li>Drop vs. the normal prompt</li><li>Wrong-side rate</li></ul> | Small drop: model understands the location words. Large drop: model was really relying on the word "adrenal gland" |
+| Neurite-OASIS (hippocampus) | `"Segment the left hippocampus in this image."` | `"Segment the structure in the left medial temporal lobe."` | <ul><li>Dice on the location prompt</li><li>IoU on the location prompt</li><li>Drop vs. the normal prompt</li><li>Wrong-side rate</li></ul> | Small drop: model understands the location words. Large drop: model was really relying on the word "hippocampus" |
+| TotalSegmentatorV2 (lung) | `"Segment the left lung in this image."` | `"Segment the air-filled organ in the left side of the chest."` | <ul><li>Dice on the location prompt</li><li>IoU on the location prompt</li><li>Drop vs. the normal prompt</li><li>Wrong-side rate</li></ul> | Small drop: model understands the location words. Large drop: model was really relying on the word "lung" |
+| HanSeg-CT (parotid gland) | `"Segment the left parotid gland in this image."` | `"Segment the salivary gland in front of the left ear."` | <ul><li>Dice on the location prompt</li><li>IoU on the location prompt</li><li>Drop vs. the normal prompt</li><li>Wrong-side rate</li></ul> | Small drop: model understands the location words. Large drop: model was really relying on the word "parotid gland" |
 
 ### 7.2 Negative prompts (target absent)
 
@@ -326,47 +411,13 @@ Reported per dataset, for Swap A and Swap B separately.
 
 **Question:** does VoxTell return an empty mask (correct), or does it invent a mask (hallucination)?
 
-| Dataset | Negative prompt *(proposed)* | Why the target is absent |
-|---|---|---|
-| AMOS22-MRI, KiTS23 (abdomen) | `"Segment the left hippocampus in this image."` | Hippocampus is in the brain, not in an abdominal scan |
-| Neurite-OASIS (brain) | `"Segment the left kidney in this image."` | Kidney is not in a brain scan |
-| TotalSegmentatorV2 | `"Segment the left hippocampus in this image."` | Only valid for scans that exclude the head (**TBD**: check) |
-| HanSeg-CT (head and neck) | `"Segment the left kidney in this image."` | Kidney is not in a head-and-neck scan |
+For every row below, run the negative prompt on its image, **plus** the matched positive prompt (the organ that actually is present, as a control), on the same dataset.
 
-- **New prompts:** 1 per image.
-- **Metrics:**
-  - False-positive rate: share of negative prompts that return a non-empty mask.
-  - Predicted mask size on negatives.
-  - Model confidence on negatives.
-- **Control:** run the matched positive prompt on the same dataset, so the false-positive rate can be read against the true-positive rate.
-- **How to read it:** a low false-positive rate means the model correctly says "not here". A high rate means it hallucinates masks.
-- **Open:** whether to also use a wrong-side variant, which is a negative where only the other side is missing (**TBD**).
+| Dataset | Negative prompt *(proposed)* | Why the target is absent | Metrics used | Expected result |
+|---|---|---|---|---|
+| AMOS22-MRI, KiTS23 (abdomen) | `"Segment the left hippocampus in this image."` | Hippocampus is in the brain, not in an abdominal scan | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. kidney), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
+| Neurite-OASIS (brain) | `"Segment the left kidney in this image."` | Kidney is not in a brain scan | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. hippocampus), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
+| TotalSegmentatorV2 | `"Segment the left hippocampus in this image."` | Restricted to TotalSegmentatorV2 scans whose field of view excludes the head, confirmed from each scan's metadata | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. lung), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
+| HanSeg-CT (head and neck) | `"Segment the left kidney in this image."` | Kidney is not in a head-and-neck scan | <ul><li>False-positive rate</li><li>Predicted mask size on negatives</li><li>Model confidence on negatives</li><li>True-positive rate from the matched positive prompt (e.g. parotid gland), as the reference to read the false-positive rate against</li></ul> | Low false-positive rate: model correctly returns nothing. High rate: model hallucinates a mask for an organ that isn't there |
 
-### 7.3 Notes
-- Keep the images and ground-truth masks fixed; change only the prompt text.
-- Use the same prompt set on all 5 datasets so results are comparable.
-- Report which prompt types cause the largest drops.
-
----
-
-## Summary of Experiments
-
-Scope: all experiments use **bilateral structures** (paired left/right).
-
-**Prompt types (2 base):** **left** and **right**, using the repo's template, e.g. `"Segment the left kidney in this image."` / `"Segment the right kidney in this image."`. Each structure is prompted with both. (Earlier drafts also proposed a "bilateral/both" prompt; it is dropped to match the repo's left/right template.)
-
-**Rotation angles (Experiments 1, 2, 5, 6):** 0°, 30°, 60°, 90°, 120°, 150°, 180° (7 angles, as in the existing VoxTell rotation sweep).
-
-**Source of values:** models, datasets, angles and prompt wording come from the repo (`positional-bias-benchmark-plan.md`, `experiment_support_table.md`, the rotation prediction CSVs). Items marked *(proposed)* are my suggestions for you to confirm.
-
-| # | Experiment | What it does | Models | Datasets | Metrics | Prompts |
-|---|---|---|---|---|---|---|
-| 1 | Detection with rotation | Rotates the input image and measures how box/point localization falls with angle, and whether it lands on the opposite side. | 9 2D localization models: Grounding DINO, OWLv2, Kosmos-2, Qwen2.5-VL-3B, InternVL2.5, LocateAnything-3B, Molmo2-8B, North-Micro-Vision-Instruct, Florence-2 (not yet run) | Same as the VoxTell segmentation runs: AMOS22-MRI and Neurite-OASIS (2). The 2D models get one 2D slice per subject, and the ground-truth box is taken from the mask in that slice | Mean IoU (not Molmo2, point-only), wrong-side rate, mean normalized distance, detect rate; drop vs. 0° | 2 (left, right) x 7 angles |
-| 2 | Segmentation with rotation | Rotates the input volume and measures how segmentation quality falls with angle, and how often the mask lands on the opposite-side organ. | 3: VoxTell, Text3DSAM, Medical-SAM3 | In-domain only. VoxTell: AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT (5). Text3DSAM: CT_HaN-Seg, MR_TotalSeg (2). Medical-SAM3: Chest ImaGenome, TRUSTED (2) | Dice, IoU, HD95, wrong-side (opposite-organ) rate, centroid shift; drop vs. 0° | 2 (left, right) x 7 angles |
-| 3 | Image-text contribution / word attribution | At 0° only, measures how much the image and each prompt word contribute to the prediction, and whether anatomical words dominate positional words (left/right). Two methods on the same inputs: **Shapley** and **Integrated Gradients**. | 1: VoxTell only | VoxTell's 5 from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) | Image-vs-text share, per-word attribution (anatomical vs. positional), Spearman rank correlation between the 2 methods, deletion-test Dice drop | 2 (left, right), e.g. `"Segment the left kidney in this image."` |
-| 4 | Internal embedding shift (left/right swap) | At 0° only, injects the right embedding into the left-prompt run and the left embedding into the right-prompt run, then checks whether the output follows the embedding or the prompt/image. | 1: VoxTell only | VoxTell's 5 from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) | Swap success rate, Dice/IoU vs. embedding-side and prompt-side ground truth, centroid shift, per-layer swap success; no-op and random-embedding controls | 2 (left, right) |
-| 5 | Layer-wise embedding divergence | Compares embeddings at 0° and rotated angles layer by layer to find where the model breaks (encoder, fusion, decoder). | 1: VoxTell only (layers listed in `model_layer_summary.md`: encoder stages, text projection, transformer decoder, decoder stages) | VoxTell's 5 from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) | Cosine distance and CKA per layer; noise floor from a same-image repeat; compared with the Dice drop from Experiment 2 | **2 (left, right)**, fixed across all angles; 6 non-zero angles vs. the 0° reference |
-| 6 | Uncertainty quantification | Estimates uncertainty with TTA variance (primary) and MC dropout (secondary) and checks whether it rises with rotation and flags failures. | 1: VoxTell *(proposed; MC dropout needs dropout layers, check first)* | AMOS22-MRI, Neurite-OASIS | Uncertainty vs. angle, AUROC (failure detection), risk-coverage, ECE | 2 (left, right) x 7 angles |
-| 7 | Prompt sensitivity (VoxTell only) | Tests two prompt types: anatomical-location wording of the same target, and negative prompts (target absent) to test for hallucinated masks. | 1: VoxTell only | VoxTell's 5 from Section 2.1 (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) | Dice/IoU drop vs. canonical (location wording); false-positive rate, predicted mask size and confidence on negatives | 2 types: **location wording** (1 new prompt per structure, e.g. `"organ in the right upper quadrant"`) + **negative prompts** (1 per image, an organ from the other anatomy, e.g. `"Segment the spleen in this image."` on brain MRI). Canonical left/right is the reference |
-
-Still to confirm: number of subjects per dataset, which structures (e.g., kidney, adrenal gland, hippocampus), and the *(proposed)* items above.
+**Not included in this round:** a wrong-side variant, where the negative prompt names the correct organ but the side that's actually missing (rather than an organ from the wrong anatomy entirely). Left for a follow-up study.

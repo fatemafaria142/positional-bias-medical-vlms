@@ -352,21 +352,22 @@ Goal: estimate the model's predictive uncertainty under rotation, and test wheth
 | Prompt(s) used | **2** (left, right) |
 
 ### 6.1 Methods
-- **Primary: test-time augmentation (TTA) variance.** Run the model on several rotated views, rotate the outputs back, and measure disagreement.
-  - Segmentation: per-pixel variance or entropy of the averaged probability map.
-  - Detection: spread of box positions and variance of scores.
-  - Use a fixed TTA set that does not depend on the true rotation, to avoid leaking the answer.
-- **Secondary: MC dropout** (10-20 passes per angle). Dropout is kept active at inference, and uncertainty is the variance or entropy across passes. Compare its results with TTA at every angle.
-  - Check first that each model has dropout layers. If one does not, note it as a limitation for that model.
-- **Only these two methods are used.** Both are reported side by side in "What to report" below.
-- **Caveat:** TTA variance measures rotation sensitivity. A model that is wrong at every angle can look confident, which is why MC dropout is used alongside it.
+Only these three methods are used, and all are reported side by side in 6.2.
+
+| Method | What it does | How to compute it | Why it is used | Caveat |
+|---|---|---|---|---|
+| **TTA variance (primary)** | Runs the model on several rotated views of the same image, rotates each output back to the original frame, and measures how much the predictions disagree | <ul><li>Segmentation: per-pixel variance or entropy of the averaged probability map</li><li>Detection: spread of box positions and variance of scores</li><li>Use a fixed TTA set that does not depend on the true rotation, to avoid leaking the answer</li></ul> | Directly measures rotation sensitivity: if the answer changes a lot across views of the same input, that disagreement signals uncertainty | Only catches inconsistency. A model that is confidently wrong at every angle (e.g. always picks the mirror-image organ) agrees with itself, giving low variance even though it is always wrong |
+| **MC dropout (secondary)** | Runs the model 10-20 times per angle on the same input with dropout kept active at inference, and measures how much the repeated predictions disagree | <ul><li>Variance or entropy across the 10-20 passes</li><li>Compare with TTA at every angle</li><li>Check first that the model has dropout layers; if not, note it as a limitation for that model</li></ul> | Catches what TTA misses: uncertainty from the model's own internal randomness rather than from varying the input, so it can flag a confidently-wrong-every-time model | Needs dropout layers active at inference; not every model in this plan may support it |
+| **Multi-view side agreement (third; left/right wrong-side rate only)** | Runs K views of the same case, takes the mask-centroid side (left or right of the midline) from each view, and measures how much the views disagree about the side | <ul><li>Prompt paraphrases: "left kidney", "kidney on the patient's left", "L kidney"</li><li>Mirror flip: flip the volume left-right, swap the prompt to the opposite side, un-flip the output</li><li>Small rotations (e.g. ±10°)</li><li>Use a fixed view set that does not depend on the true rotation or true side</li><li>Score: let `p` be the fraction of views that vote "left"; uncertainty = binary entropy of `p`, or `1 - \|2p - 1\|`</li><li>The ground-truth side is never used to compute it</li></ul> | A model that truly understands laterality should give the same side under paraphrased prompts and a mirror flip; disagreement means it is guessing the side. Scored against the per-case `wrong_side` outcome | Same blind spot as TTA: a model consistently wrong across all views gets a low score. Applies to the wrong-side-rate task only |
+
+MC dropout is run alongside TTA so that a model which is wrong at every rotation angle but looks internally consistent is not mistaken for a well-calibrated, low-uncertainty model. Multi-view side agreement adds a laterality-specific signal on top of these two.
 
 ### 6.2 What to report
 
-| # | Item | What to report |
+| No. | Item | What to report |
 |---|---|---|
 | 1 | Uncertainty vs. rotation angle | Mean uncertainty at each angle (does it rise with rotation?) |
-| 2 | Failure detection | Does high uncertainty predict low Dice or a missed detection? Report AUROC and risk-coverage curves, for TTA and MC dropout separately |
+| 2 | Failure detection | <ul><li>Does high uncertainty predict low Dice, a missed detection, or a wrong-side prediction?</li><li>AUROC and risk-coverage curves for TTA, MC dropout and multi-view side agreement separately</li><li>Multi-view is scored against `wrong_side`</li></ul> |
 | 3 | Calibration | Expected calibration error and reliability diagrams, 0° vs. rotated angles |
 | 4 | Link to attention grounding | Compare uncertainty with the layer-wise KL-divergence attention-grounding results |
 

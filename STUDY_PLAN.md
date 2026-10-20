@@ -42,7 +42,7 @@ Each structure is prompted twice, once with **left** and once with **right**. Us
 
 Two templates are used: the **original template** and one **paraphrase template** (same meaning, different wording), to run a paraphrase-robustness check alongside the main left/right comparison.
 
-**Original template**
+#### 1.2.1 Original template
 
 | Dataset | Structure | Left prompt | Right prompt |
 |---|---|---|---|
@@ -53,7 +53,9 @@ Two templates are used: the **original template** and one **paraphrase template*
 | Neurite-OASIS | Ventricle | `"Locate the left ventricle in this image."` | `"Locate the right ventricle in this image."` |
 | Neurite-OASIS | Cerebral hemisphere | `"Locate the left cerebral hemisphere in this image."` | `"Locate the right cerebral hemisphere in this image."` |
 
-**Paraphrase template** (same meaning, reworded, for the paraphrase-robustness check)
+#### 1.2.2 Paraphrase template
+
+Same meaning, reworded, for the paraphrase-robustness check.
 
 | Dataset | Structure | Left prompt (paraphrase) | Right prompt (paraphrase) |
 |---|---|---|---|
@@ -66,7 +68,7 @@ Two templates are used: the **original template** and one **paraphrase template*
 
 Both templates are run at every rotation angle. Only the image rotates.
 
-### 1.4 Task and metrics
+### 1.3 Task and metrics
 
 **Task:** for each 2D slice rotated by angle θ and each prompt (left or right), the model returns a box (or a point for Molmo2-8B) for the prompted structure. The output is compared with the ground-truth box and centroid of that structure in the same rotated slice.
 
@@ -201,7 +203,7 @@ Goal: quantify how much the image and each prompt word contribute to the predict
 | Scope | Segmentation model only, **0° rotation only**, bilateral images |
 | Models | **VoxTell only** (1 model) |
 | Datasets | VoxTell's 5 segmentation datasets (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
-| Prompts | **2** (left, right), each used in 3 variants: <ul><li>**Original:** `"Segment the left kidney in this image."`</li><li>**Organ-only (side word removed):** `"Segment the kidney in this image."`</li><li>**Paraphrase:** `"Find the kidney that is on the left."`</li></ul> |
+| Prompts | **2** (left, right), each used in 4 variants: <ul><li>**Original:** `"Segment the left kidney in this image."` / `"Segment the right kidney in this image."`</li><li>**Without organ (side word kept, organ name removed):** `"Segment the left structure in this image."` / `"Segment the right structure in this image."`</li><li>**Without position (organ kept, side word removed):** `"Segment the kidney in this image."` (same prompt for both the left and right case, since the side word is gone)</li><li>**Paraphrase:** `"Find the kidney that is on the left."` / `"Find the kidney that is on the right."`</li></ul> |
 | Methods | 6 Captum attribution methods: Integrated Gradients, Layer Integrated Gradients, Occlusion, Feature Ablation, GradientSHAP, and Shapley Value Sampling, run on the same images and prompts so results are comparable |
 
 ### Attribution methods compared
@@ -237,13 +239,13 @@ Reported per dataset and per prompt (left, right).
 
 ---
 
-## 4. Left/Right Embedding Swap
+## 4. Activation Patching: Swapping Layer Updates from the Opposite-Side Request
 
-Goal: test whether the model's output follows the prompt embedding by injecting the embedding of one side into the run of the other and seeing what changes.
+Goal: test, layer by layer, whether replacing what a single decoder layer adds to the query with what that same layer would have added for the opposite-side request moves the predicted mask to the other organ, to find exactly which layer (or layers) carry the left/right decision.
 
 **Research questions:**
-- If the "right" embedding is injected into a "left" run, does the output mask move to follow the injected side, proving the model's side decision is causally carried by the text embedding rather than by the image or a fixed prior?
-- At which fusion layer does this causal effect first appear, pinpointing exactly where in the model the left/right decision (and any bias in it) is made?
+- If one decoder layer's own update is replaced with the update it would have produced for the opposite-side request (e.g. "right kidney" instead of "left kidney"), does the mask move to the other organ, proving that layer carries left/right information?
+- Is the left/right decision concentrated in a single layer, or spread across several of VoxTell's 6 decoder layers?
 
 ### Overview
 
@@ -253,54 +255,51 @@ Goal: test whether the model's output follows the prompt embedding by injecting 
 | Models | **VoxTell only** (1 model) |
 | Datasets | VoxTell's 5 segmentation datasets (AMOS22-MRI, Neurite-OASIS, KiTS23, TotalSegmentatorV2, HanSeg-CT) |
 | Prompt(s) used | **left** and **right** prompts (paired, same image). No bilateral/"both" prompt, matching the left/right-only template used throughout this plan |
+| Layers probed | All **6** layers of VoxTell's transformer decoder (`transformer_decoder.layers.0` through `.5`) |
 
-### Method (activation patching)
-1. Run the image with the **left** prompt and cache the internal embeddings (prompt/text embedding, or fused features at chosen layers).
-2. Run the same image with the **right** prompt and cache its embeddings.
-3. **Swap:** re-run the **left** prompt but inject the **right** embedding. Then re-run the **right** prompt but inject the **left** embedding.
-4. Compare the output with the clean left and right runs.
+### Why this method, and not just accuracy or word removal
+
+- **Accuracy alone cannot show where the side is decided.** A correct mask says the model got the side right, but not which part of the model is responsible.
+- **Word removal (the word-attribution experiment above) shows that the side word matters, not where.** It changes the input, and the effect could come from anywhere in the model.
+- **Swapping layer updates tests each layer directly.** If borrowing one layer's update from the opposite-side request moves the mask, that layer carries the left/right information.
+- **Running it across all 6 layers separately shows whether the decision is concentrated in one layer, or spread out across several.**
+
+### Method (activation patching on layer updates)
+1. Run the image once with the **left** prompt (e.g. "left kidney") and once with the **right** prompt (e.g. "right kidney"). At each of the 6 decoder layers, cache what that layer adds to the query, that is, its own update, separately for the left run and the right run. The prompt text, its text embedding, and the image are not changed.
+2. For each layer *k* (1 to 6), in a separate run: re-run the **left** prompt, but at layer *k* only, replace that layer's own update with the update it computed for the **right** prompt on the same image. The other 5 layers keep running normally on the left prompt's own updates.
+3. Do the mirror run: re-run the **right** prompt, but at layer *k* only, replace that layer's update with the one computed for the **left** prompt.
+4. Compare each patched run's output mask against the clean left and clean right runs, to see whether patching that one layer moved the mask to the other organ.
 
 ### Conditions
-| Run | Prompt text | Injected embedding | If output follows the embedding | If output follows the text/image |
-|---|---|---|---|---|
-| Clean left | left | left | (reference) | (reference) |
-| Clean right | right | right | (reference) | (reference) |
-| Swap A | left | **right** | segments the right side | segments the left side |
-| Swap B | right | **left** | segments the left side | segments the right side |
+| Run | Prompt text | Layer patched | Update injected at that layer | If output follows the patched update | If output follows the text/image |
+|---|---|---|---|---|---|
+| Clean left | left | none | (reference) | (reference) | (reference) |
+| Clean right | right | none | (reference) | (reference) | (reference) |
+| Patch A (layer *k*) | left | layer *k* | **right**-prompt update at layer *k* | segments the right side | segments the left side |
+| Patch B (layer *k*) | right | layer *k* | **left**-prompt update at layer *k* | segments the left side | segments the right side |
 
-### Injection details
-
-- **Where to inject:** at the **text-image fusion**, which in VoxTell is the transformer decoder, where the text query cross-attends to the image features.
-  - **Input stays the same:** the prompt text is not changed. For Swap A the prompt is still "left"; for Swap B it is still "right".
-  - **Modify the embedding:** inside the model, replace the embedding of the side word ("left") with the embedding of the other side word ("right"), and the reverse for Swap B.
-  - **Layer by layer, separate runs:**
-    1. Run 1: make the replacement at **fusion layer 1**, then let the model continue normally.
-    2. Run 2: make the replacement at **fusion layer 2** only.
-    3. Run 3: make the replacement at **fusion layer 3** only.
-  - Each run has one injection layer. The layers are not combined.
-  - Compare the three runs to see which layer's replacement moves the mask to the other side.
-  - The swap is not applied at the image encoder or after fusion.
+Patch A and Patch B are each run once per layer (*k* = 1 to 6), one layer at a time; layers are never patched in combination.
 
 ### Task and metrics
 
-**Task:** at 0° rotation, run the swap test (Swap A and Swap B) with the replacement made at fusion layer 1, 2 or 3 in separate runs, and check whether the predicted mask follows the injected side or the prompt side.
+**Task:** at 0° rotation, for each of the 6 decoder layers separately, run Patch A and Patch B with that layer's update replaced by the opposite-side request's update, and check whether the predicted mask follows the patched-in side or the original prompt side.
 
 | Metric | Definition | Why it is used |
 |---|---|---|
-| Dice vs. embedding-side ground truth | Dice between the swapped output and the ground-truth mask of the side whose embedding was injected | Tests the "follows the embedding" hypothesis directly: if the mask matches this ground truth, the output tracked the injected signal, not the original prompt |
-| Dice vs. prompt-side ground truth | Dice between the swapped output and the ground-truth mask of the side named in the prompt | The mirror-image comparison; high Dice here instead means the model ignored the injected embedding and stuck with the text/image it was given |
-| Swap success rate | Share of cases where the Dice vs. the embedding-side ground truth is higher than the Dice vs. the prompt-side ground truth | Collapses the two Dice scores above into one pass/fail number per case, so results can be aggregated and compared across datasets |
-| Centroid shift | Distance the predicted centroid moves from the clean run toward the other side, normalized by the volume diagonal | Captures partial or graded swaps that the binary success-rate metric would miss, e.g. a mask that shifts toward the other side without fully flipping |
-| Per-layer swap success | Swap success rate for injection at layer 1, layer 2 and layer 3, shown as a curve | Localizes *where* in the fusion process the side decision is made, not just *whether* it can be flipped at all |
+| Dice vs. patched-side ground truth | Dice between the patched output and the ground-truth mask of the side whose update was injected | Tests the "follows the patched layer" hypothesis directly: if the mask matches this ground truth, that layer's update is what carried the side decision |
+| Dice vs. prompt-side ground truth | Dice between the patched output and the ground-truth mask of the side named in the prompt | The mirror-image comparison; high Dice here instead means that layer's update, on its own, didn't carry the side decision |
+| Patch success rate | Share of cases where the Dice vs. the patched-side ground truth is higher than the Dice vs. the prompt-side ground truth | Collapses the two Dice scores above into one pass/fail number per case, so results can be aggregated and compared across datasets |
+| Centroid shift | Distance the predicted centroid moves from the clean run toward the other side, normalized by the volume diagonal | Captures partial or graded shifts that the binary success-rate metric would miss, e.g. a mask that shifts toward the other side without fully flipping |
+| Per-layer patch success | Patch success rate at each of the 6 layers, shown as a curve | Shows directly whether the left/right decision is concentrated in one layer or spread across several |
 
-Reported per dataset, for Swap A and Swap B separately.
+Reported per dataset, for Patch A and Patch B separately, across all 6 layers.
 
 ### Controls
-- Inject an embedding from the **same** side (no-op) as a noise floor.
-- Inject a random or unrelated-organ embedding to separate "follows the embedding" from "breaks the output".
-- Cross-check on the same images with the real left/right prompts.
+- Patch a layer with its own update from the **same** side (no-op) as a noise floor.
+- Patch with the update from a random or unrelated-organ request, to separate "follows the patched layer" from "breaks the output".
+- Cross-check on the same images with the real, unpatched left/right prompts.
 
-- **Open points:** Which embedding is swapped (text only, or fused image-text), and whether to patch the whole tensor or only selected tokens.
+- **Open points:** Each decoder layer does cross-attention then feed-forward; whether "that layer's update" means patching the combined output of both sub-steps, or the cross-attention sub-step alone, needs to be fixed before running this.
 
 ---
 

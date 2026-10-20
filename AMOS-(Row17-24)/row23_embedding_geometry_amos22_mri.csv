@@ -1,0 +1,7 @@
+dataset,person,subject_id,kind,organ_a,organ_b,cosine_similarity,mean_cosine_similarity,coherence_ratio,n_organs
+amos22_mri,nipu,amos_0508,pair,adrenal gland,kidney,0.9619,,,
+amos22_mri,nipu,amos_0508,summary,,,,0.9619,0.9904,2
+amos22_mri,faria,amos_0530,pair,adrenal gland,kidney,0.9619,,,
+amos22_mri,faria,amos_0530,summary,,,,0.9619,0.9904,2
+amos22_mri,hridoy,amos_0555,pair,adrenal gland,kidney,0.9619,,,
+amos22_mri,hridoy,amos_0555,summary,,,,0.9619,0.9904,2

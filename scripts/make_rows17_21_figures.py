@@ -193,6 +193,13 @@ def heat_panel(ax, arr_2d, title, cmap, vmin=None, vmax=None, center_zero=False)
     return im
 
 
+def fname_suffix(subj) -> str:
+    """"" for a single-subject results_dir (keeps existing short filenames, e.g. OASIS's), or
+    "_<subject_id>" once this results_dir has more than one subject (e.g. AMOS's 3), so each
+    subject gets its own file instead of overwriting the previous subject's at the same path."""
+    return f"_{subj.subject_id}" if subj.multi_subject else ""
+
+
 def savefig(fig, out_path: Path):
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, facecolor=fig.get_facecolor(), bbox_inches="tight", pad_inches=0.15)
@@ -217,8 +224,13 @@ def style_bars(ax, title, ylabel):
 # per-subject context: raw image, GT masks, label ids, slice axis -- loaded once, reused by all rows
 # --------------------------------------------------------------------------------------------------
 class Subject:
-    def __init__(self, repo, person, dataset, subject_id, image_path, label_path):
+    def __init__(self, repo, person, dataset, subject_id, image_path, label_path, multi_subject=False):
         self.repo, self.person, self.dataset, self.subject_id = repo, person, dataset, subject_id
+        # True when this results_dir has more than one subject -- lets output filenames stay the
+        # short, un-suffixed form single-subject runs (e.g. the OASIS set) already use on disk, while
+        # a multi-subject run (e.g. AMOS's 3 subjects) gets each subject its own file instead of the
+        # later ones silently overwriting the earlier ones at the same path.
+        self.multi_subject = multi_subject
         base = repo / person / "samples" / dataset
         self.img_nii = nib.load(str(base / image_path))
         self.image = self.img_nii.get_fdata().astype(np.float32)
@@ -333,7 +345,7 @@ def figure_row17(subj, organ, shap_rows, voxel_map, out_dir):
     style_bars(ax3, "", "Shapley credit\n(per block)")
     ax3.set_xlabel("block id (detail, for reference)", fontsize=9.5, color=MUTED)
 
-    out = savefig(fig, out_dir / organ.replace(" ", "_") / "row17_story.png")
+    out = savefig(fig, out_dir / organ.replace(" ", "_") / f"row17_story{fname_suffix(subj)}.png")
     return (out,)
 
 
@@ -424,7 +436,7 @@ def figure_row18_pair(subj, core, kl_left, kl_right, maps, out_dir):
     fig.text(0.5, bottom_y, "The bottom line", ha="center", fontsize=12.5, fontweight="bold", color=INK)
     fig.text(0.5, bottom_y - 0.03, "\n".join(_wrap(takeaway, 100)), ha="center", va="top", fontsize=11, color=INK2)
 
-    return savefig(fig, out_dir / core.replace(" ", "_") / "row18_left_vs_right_story.png")
+    return savefig(fig, out_dir / core.replace(" ", "_") / f"row18_left_vs_right_story{fname_suffix(subj)}.png")
 
 
 PAPER_INK = "#000000"
@@ -488,28 +500,32 @@ def figure_row18_paper(subj, core, kl_left, kl_right, out_dir):
                 loc="upper center", bbox_to_anchor=(0.5, -0.02), ncol=1, frameon=False, fontsize=8)
     _panel_label(ax_a, "a")
 
-    # --- panel (b): the actual data -----------------------------------------------------------------
+    # --- panel (b): the actual data -- Left/Right on one axis, shaded gap between them so the ------
+    # mismatch is a visual band, not a third derived panel --------------------------------------------
+    GAP_C = "#7a5c3e"
+    mean_gap = float(np.mean(dfl[col].values - dfr[col].values))
     ax_b = fig.add_axes([0.46, 0.17, 0.50, 0.73])
     _paper_axes_style(ax_b)
-    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.4, markersize=4, label="Left")
-    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.4, markersize=4, label="Right")
+    ax_b.fill_between(dfl.layer, dfl[col], dfr[col], color=GAP_C, alpha=0.18, zorder=1,
+                       label=f"Gap (mean {abs(mean_gap):.2f}, {'L' if mean_gap > 0 else 'R'} worse)")
+    ax_b.plot(dfl.layer, dfl[col], "-o", color=BLUE, linewidth=1.4, markersize=4, label="Left", zorder=3)
+    ax_b.plot(dfr.layer, dfr[col], "-o", color=ORANGE, linewidth=1.4, markersize=4, label="Right", zorder=3)
     ax_b.set_xlabel("Decoder layer", fontsize=9.5, color=PAPER_INK)
     ax_b.set_ylabel("KL divergence\n(attention vs. ground truth)", fontsize=9.5, color=PAPER_INK)
     ax_b.yaxis.grid(True, color=PAPER_GRID, linewidth=0.6, zorder=0)
     ax_b.set_axisbelow(True)
-    ax_b.legend(frameon=False, fontsize=9, loc="best", handlelength=1.6)
+    ax_b.legend(frameon=False, fontsize=8.6, loc="best", handlelength=1.6)
     _panel_label(ax_b, "b")
 
-    out = savefig(fig, out_dir / core.replace(" ", "_") / "row18_paper.png")
+    out = savefig(fig, out_dir / core.replace(" ", "_") / f"row18_paper{fname_suffix(subj)}.png")
 
-    mean_gap = float(np.mean(dfl[col].values - dfr[col].values))
     caption = (
         f'Figure. Cross-attention alignment with ground truth for left vs. right {core}, by decoder '
         f'layer. (a) Ground-truth location of the left (blue) and right (orange) {core} on a single '
         f'representative slice. (b) KL divergence between the ground-truth mask and the cross-attention '
         f'density at each decoder layer, after normalizing out a generic, non-spatial prompt\'s attention '
-        f'(lower = better alignment). Mean left-right gap: {abs(mean_gap):.2f} KL '
-        f'({"left" if mean_gap > 0 else "right"} worse). '
+        f'(lower = better alignment); shaded band marks the left-right gap. Mean left-right gap: '
+        f'{abs(mean_gap):.2f} KL ({"left" if mean_gap > 0 else "right"} worse). '
         f'Subject: {subj.subject_id} ({subj.person}).'
     )
     return out, caption
@@ -537,12 +553,12 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     """Self-contained, designed version: declarative title, Left/Right/Gap legend only (the organ
     is already named once in the title), a bottom legend-style row for the summary statistics
     instead of a card, and rounded card panels on a soft page background instead of a flat white
-    chart. Left and right each get their OWN small line chart (not one shared overlay) since they
-    are two different organs with their own per-layer KL curves; a third mini chart plots the
-    layer-by-layer gap (Left - Right) directly instead of relying on a shaded fill. The anatomy
-    image and the three charts sit at the same gap from each other all the way across. No subject/
-    file identifier is printed on the figure, and no floating per-point value labels clutter the
-    lines -- the exact numbers live in the bottom stats legend."""
+    chart. Left and Right share ONE combined chart (same axes), with the layer-by-layer gap
+    (Left - Right) shown directly as a shaded band between the two lines -- no separate third
+    "Gap" panel, so the mismatch reads as one visual band instead of three things to cross-reference.
+    The anatomy image and the combined chart sit at the same gap from each other. No subject/file
+    identifier is printed on the figure, and no floating per-point value labels clutter the lines --
+    the exact numbers live in the bottom stats legend."""
     left_organ, right_organ = f"left {core}", f"right {core}"
     img2, _, idx3 = subj.slice_of(left_organ)
     gt_l = subj.gt_mask(left_organ)[idx3]
@@ -557,27 +573,26 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     col_actual = "kl_divergence"
     mean_l, mean_r = float(dfl[col_actual].mean()), float(dfr[col_actual].mean())
     mean_gap = mean_l - mean_r
-    gap_actual_by_layer = dfl[col_actual].values - dfr[col_actual].values
 
     GAP_C = "#7a5c3e"  # darker, warm neutral -- reads clearly against the light page/card background
 
     PAGE_BG = "#f4f5f8"
-    fig = plt.figure(figsize=(13.0, 4.9), dpi=220)
+    fig = plt.figure(figsize=(13.0, 5.5), dpi=220)
     fig.patch.set_facecolor(PAGE_BG)
-    fig.text(0.5, 0.955, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
+    fig.text(0.5, 0.960, f"Attention–Ground-Truth Alignment by Decoder Layer: {core.title()} (Left vs. Right)",
               ha="center", fontsize=13.5, fontweight="bold", color=PAPER_INK)
-    fig.text(0.5, 0.905,
+    fig.text(0.5, 0.915,
               "KL divergence between cross-attention density and the ground-truth mask",
               ha="center", fontsize=9.5, color=PAPER_MUTED)
 
     from matplotlib.lines import Line2D
     handles = [Line2D([0], [0], color=BLUE, lw=2.6, label="Left", solid_capstyle="round"),
                Line2D([0], [0], color=ORANGE, lw=2.6, label="Right", solid_capstyle="round"),
-               Line2D([0], [0], color=GAP_C, lw=2.6, label="Gap", solid_capstyle="round")]
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.862), ncol=3,
-               frameon=False, fontsize=9.5)
+               Line2D([0], [0], color=GAP_C, lw=2.6, alpha=0.35, solid_capstyle="round", label="Gap")]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.877), ncol=3,
+               frameon=False, fontsize=9.5, handlelength=2.0, handleheight=1.0)
 
-    CARD_Y, CARD_H = 0.15, 0.57
+    CARD_Y, CARD_H = 0.243, 0.508
     GAP_X = 0.025
 
     # --- panel (a): anatomical context, on its own card ---------------------------------------------
@@ -593,43 +608,33 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
     if gt_rc.any():
         ax_a.contour(gt_rc, levels=[0.5], colors=ORANGE, linewidths=1.8)
 
-    # --- panels (b1)/(b2)/(b3): Left, Right, and Gap each as their own small chart of the actual,
-    # real measured KL divergence -- no normalized/baseline variant, no repeated "Left"/"Right"
-    # panel headers (the top legend and the line color already say which is which).
+    # --- panel (b): Left and Right on ONE shared chart, real measured KL divergence -- the gap is
+    # shown as a shaded band between the two lines instead of a separate third panel.
     y_lo = min(dfl[col_actual].min(), dfr[col_actual].min())
     y_hi = max(dfl[col_actual].max(), dfr[col_actual].max())
     y_pad = (y_hi - y_lo) * 0.18 or 0.05
 
-    CHART_W = 0.2417
+    CHART_W = CARD_W_TOTAL = 3 * 0.2417 + 2 * GAP_X  # same total footprint the three mini-charts used
 
-    def _mini_chart(x0, layer, actual_vals, color):
-        card = (x0, CARD_Y, CHART_W, CARD_H)
-        _rounded_card(fig, card, pad_in=0.012)
-        ax = fig.add_axes([card[0] + 0.040, card[1] + 0.10, card[2] - 0.075, card[3] - 0.19])
-        _paper_axes_style(ax)
-        ax.plot(layer, actual_vals, "-", color=color, linewidth=2.4, zorder=3, solid_capstyle="round")
-        ax.scatter(layer, actual_vals, s=42, color=color, edgecolor="white", linewidth=1.2, zorder=4)
-        ax.set_xlabel("Decoder layer", fontsize=9.5, color=PAPER_INK)
-        ax.yaxis.grid(True, color="#e9eaef", linewidth=0.7, zorder=0)
-        ax.set_axisbelow(True)
-        ax.set_facecolor("white")
-        ax.set_xticks(list(layer))
-        return ax
-
-    left_x0 = card_a[0] + card_a[2] + GAP_X
-    ax_left = _mini_chart(left_x0, dfl.layer, dfl[col_actual], BLUE)
-    ax_left.set_ylim(y_lo - y_pad, y_hi + y_pad)
-    ax_left.set_ylabel("KL divergence\n(lower = better match)", fontsize=8.6, color=PAPER_INK)
-
-    right_x0 = left_x0 + CHART_W + GAP_X
-    ax_right = _mini_chart(right_x0, dfr.layer, dfr[col_actual], ORANGE)
-    ax_right.set_ylim(y_lo - y_pad, y_hi + y_pad)
-
-    gap_x0 = right_x0 + CHART_W + GAP_X
-    ax_gap = _mini_chart(gap_x0, dfl.layer, gap_actual_by_layer, GAP_C)
-    ax_gap.axhline(0, color=PAPER_GRID, linewidth=1.0, zorder=1)
-    g_pad = (max(abs(gap_actual_by_layer.min()), abs(gap_actual_by_layer.max())) * 0.3) or 0.02
-    ax_gap.set_ylim(gap_actual_by_layer.min() - g_pad, gap_actual_by_layer.max() + g_pad)
+    chart_x0 = card_a[0] + card_a[2] + GAP_X
+    card_b = (chart_x0, CARD_Y, CHART_W, CARD_H)
+    _rounded_card(fig, card_b, pad_in=0.012)
+    ax_b = fig.add_axes([card_b[0] + 0.045, card_b[1] + 0.10, card_b[2] - 0.075, card_b[3] - 0.19])
+    _paper_axes_style(ax_b)
+    ax_b.fill_between(dfl.layer, dfl[col_actual], dfr[col_actual], color=GAP_C, alpha=0.18, zorder=2,
+                       label=f"Gap (mean {abs(mean_gap):.2f}, {'Left' if mean_gap > 0 else 'Right'} worse)")
+    ax_b.plot(dfl.layer, dfl[col_actual], "-", color=BLUE, linewidth=2.4, zorder=3, solid_capstyle="round")
+    ax_b.scatter(dfl.layer, dfl[col_actual], s=42, color=BLUE, edgecolor="white", linewidth=1.2, zorder=4)
+    ax_b.plot(dfr.layer, dfr[col_actual], "-", color=ORANGE, linewidth=2.4, zorder=3, solid_capstyle="round")
+    ax_b.scatter(dfr.layer, dfr[col_actual], s=42, color=ORANGE, edgecolor="white", linewidth=1.2, zorder=4)
+    ax_b.set_xlabel("Decoder layer", fontsize=9.5, color=PAPER_INK)
+    ax_b.set_ylabel("KL divergence\n(lower = better match)", fontsize=8.6, color=PAPER_INK)
+    ax_b.yaxis.grid(True, color="#e9eaef", linewidth=0.7, zorder=0)
+    ax_b.set_axisbelow(True)
+    ax_b.set_facecolor("white")
+    ax_b.set_xticks(list(dfl.layer))
+    ax_b.set_ylim(y_lo - y_pad, y_hi + y_pad)
+    ax_b.legend(frameon=False, fontsize=8.6, loc="best", handlelength=1.6)
 
     # --- bottom summary stats, as a legend row (colored swatch + text), not a card ------------------
     stat_handles = [
@@ -637,10 +642,18 @@ def figure_row18_explainer(subj, core, kl_left, kl_right, out_dir):
         Line2D([], [], color=ORANGE, lw=0, marker="s", markersize=9, label=f"Mean KL — Right: {mean_r:.3f}"),
         Line2D([], [], color=GAP_C, lw=0, marker="s", markersize=9, label=f"Mean gap (L−R): {mean_gap:+.3f}"),
     ]
-    fig.legend(handles=stat_handles, loc="lower center", bbox_to_anchor=(0.5, 0.025), ncol=3,
+    fig.legend(handles=stat_handles, loc="lower center", bbox_to_anchor=(0.5, 0.115), ncol=3,
                frameon=False, fontsize=9.5, handletextpad=0.5, columnspacing=1.8)
 
-    return savefig(fig, out_dir / core.replace(" ", "_") / "row18_explainer.png")
+    # --- how-to-read-this-chart footer, so the figure is self-contained for a paper -----------------
+    fig.text(0.5, 0.062,
+              "Low KL → attention concentrated where the ground-truth structure actually is → good alignment.",
+              ha="center", fontsize=8.6, style="italic", color=PAPER_MUTED)
+    fig.text(0.5, 0.025,
+              "High KL → attention scattered away from the true anatomical region → poor alignment.",
+              ha="center", fontsize=8.6, style="italic", color=PAPER_MUTED)
+
+    return savefig(fig, out_dir / core.replace(" ", "_") / f"row18_explainer{fname_suffix(subj)}.png")
 
 
 def figure_row18_attention_overlay(subj, core, maps, out_dir):
@@ -711,7 +724,7 @@ def figure_row18_attention_overlay(subj, core, maps, out_dir):
               "red dashed outline = true organ location. Overlap = attention genuinely finds the organ.",
               ha="center", fontsize=8.3, color=PAPER_MUTED)
 
-    return savefig(fig, out_dir / core.replace(" ", "_") / "row18_attention_overlay.png")
+    return savefig(fig, out_dir / core.replace(" ", "_") / f"row18_attention_overlay{fname_suffix(subj)}.png")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -745,7 +758,7 @@ def figure_row19(subj, organ, row, maps, out_dir):
             heat_panel(ax, m[idx], title, SEQ_BLUE)
     fig.suptitle(f"{organ}: gradient-based saliency (cheap counterpart to row 17's exact map)",
                  fontsize=13, fontweight="bold", color=INK, y=1.03)
-    return savefig(fig, out_dir / organ.replace(" ", "_") / "row19_gradient_saliency.png")
+    return savefig(fig, out_dir / organ.replace(" ", "_") / f"row19_gradient_saliency{fname_suffix(subj)}.png")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -778,7 +791,7 @@ def figure_row20(subj, organ, rows, maps, out_dir):
             ax.axis("off")
     fig.suptitle(f"{organ}: does the fused image+text feature map move with the prompt?",
                  fontsize=13, fontweight="bold", color=INK, y=1.03)
-    return savefig(fig, out_dir / organ.replace(" ", "_") / "row20_fused_activation_overlap.png")
+    return savefig(fig, out_dir / organ.replace(" ", "_") / f"row20_fused_activation_overlap{fname_suffix(subj)}.png")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -788,7 +801,7 @@ ROLE_LABEL = {"image": "image", "organ_word": "organ word", "position_word": "po
 ROLE_COLOR = {"image": BLUE, "organ_word": ORANGE, "position_word": AQUA}
 
 
-def figure_row21(organ, rows, out_dir):
+def figure_row21(organ, rows, out_dir, subj):
     df = pd.DataFrame(rows)
     roles = ["image", "organ_word", "position_word"]
     metrics = ["f_dice_gt", "f_dice_self"]
@@ -809,7 +822,7 @@ def figure_row21(organ, rows, out_dir):
                "Dice-score contribution\n(Shapley credit, in Dice units)")
     ax.legend(frameon=False, fontsize=9.5, loc="best")
     fig.tight_layout()
-    return savefig(fig, out_dir / organ.replace(" ", "_") / "row21_joint_image_word_shapley.png")
+    return savefig(fig, out_dir / organ.replace(" ", "_") / f"row21_joint_image_word_shapley{fname_suffix(subj)}.png")
 
 
 _ROLE_SET_ORDER = ["none", "image", "organ_word", "position_word", "image+organ_word",
@@ -826,7 +839,7 @@ _ROLE_SET_LABEL = {
 }
 
 
-def figure_row21_coalition_dice(organ, coalition_rows, out_dir):
+def figure_row21_coalition_dice(organ, coalition_rows, out_dir, subj):
     """The literal version of "which matters more, by Dice score": one bar per one of the 8
     image/organ-word/position-word present-or-absent combinations, showing the ACTUAL Dice score
     VoxTell achieves with exactly that information available -- no Shapley math, no derived credit,
@@ -887,7 +900,7 @@ def figure_row21_coalition_dice(organ, coalition_rows, out_dir):
               "(blank prompt + noised image, i.e. the model's uninformed baseline).",
               ha="center", fontsize=8.3, color=PAPER_MUTED)
 
-    return savefig(fig, out_dir / organ.replace(" ", "_") / "row21_coalition_dice.png")
+    return savefig(fig, out_dir / organ.replace(" ", "_") / f"row21_coalition_dice{fname_suffix(subj)}.png")
 
 
 def figure_row21_summary(all_rows, out_dir):
@@ -1040,11 +1053,13 @@ def main():
     row21_coal = read_csv(args.results_dir, "row21_coalition_dice", args.suffix)
 
     all_row21_rows = []
+    all_row18_captions = []
+    multi_subject = row0["subject_id"].nunique() > 1
     for (person, subject_id), sub0 in row0.groupby(["person", "subject_id"]):
         sub0 = sub0.set_index("organ")
         first = sub0.iloc[0]
         subj = Subject(args.repo, person, first["dataset"] if "dataset" in sub0.columns else args.suffix,
-                        subject_id, first["image_path"], first["label_path"])
+                        subject_id, first["image_path"], first["label_path"], multi_subject=multi_subject)
         maps17 = _load_npz(_find_npz(args.results_dir, 17, "row17_shapley_maps", subject_id))
         maps18 = _load_npz(_find_npz(args.results_dir, 18, "row18_attention_maps", subject_id))
         maps19 = _load_npz(_find_npz(args.results_dir, 19, "row19_saliency_maps", subject_id))
@@ -1071,11 +1086,7 @@ def main():
                             print("wrote", rel(overlay_path, args.repo))
                     except Exception as e:
                         print(f"[error] {subject_id}/row18/{core}: {e}")
-            if captions:
-                cap_path = out_dir / "row18_paper_captions.txt"
-                cap_path.parent.mkdir(parents=True, exist_ok=True)
-                cap_path.write_text("\n\n".join(captions), encoding="utf-8")
-                print("wrote", rel(cap_path, args.repo))
+            all_row18_captions += captions
 
         for organ in sub0.index:
             if organ not in subj.label_ids:
@@ -1099,13 +1110,19 @@ def main():
                     r = row21[(row21.subject_id == subject_id) & (row21.organ == organ)].to_dict("records")
                     if r:
                         all_row21_rows += r
-                        print("wrote", rel(figure_row21(organ, r, out_dir), args.repo))
+                        print("wrote", rel(figure_row21(organ, r, out_dir, subj), args.repo))
                 if not row21_coal.empty:
                     rc = row21_coal[(row21_coal.subject_id == subject_id) & (row21_coal.organ == organ)].to_dict("records")
                     if rc:
-                        print("wrote", rel(figure_row21_coalition_dice(organ, rc, out_dir), args.repo))
+                        print("wrote", rel(figure_row21_coalition_dice(organ, rc, out_dir, subj), args.repo))
             except Exception as e:
                 print(f"[error] {subject_id}/{organ}: {e}")
+
+    if all_row18_captions:
+        cap_path = out_dir / "row18_paper_captions.txt"
+        cap_path.parent.mkdir(parents=True, exist_ok=True)
+        cap_path.write_text("\n\n".join(all_row18_captions), encoding="utf-8")
+        print("wrote", rel(cap_path, args.repo))
 
     if all_row21_rows:
         print("wrote", rel(figure_row21_summary(all_row21_rows, out_dir), args.repo))

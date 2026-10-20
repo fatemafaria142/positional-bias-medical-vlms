@@ -1,0 +1,25 @@
+dataset,person,subject_id,organ,block_id,block_bbox,shapley_value
+amos22_mri,nipu,amos_0508,right kidney,0,91:137x0:24x142:176,0.070397
+amos22_mri,nipu,amos_0508,right kidney,1,91:137x0:24x176:209,0.256645
+amos22_mri,nipu,amos_0508,right kidney,2,91:137x24:48x142:176,0.003187
+amos22_mri,nipu,amos_0508,right kidney,3,91:137x24:48x176:209,0.057874
+amos22_mri,nipu,amos_0508,right kidney,4,137:183x0:24x142:176,0.180108
+amos22_mri,nipu,amos_0508,right kidney,5,137:183x0:24x176:209,0.321912
+amos22_mri,nipu,amos_0508,right kidney,6,137:183x24:48x142:176,0.019105
+amos22_mri,nipu,amos_0508,right kidney,7,137:183x24:48x176:209,0.024573
+amos22_mri,faria,amos_0530,right kidney,0,0:26x74:107x188:226,0.075942
+amos22_mri,faria,amos_0530,right kidney,1,0:26x74:107x226:265,0.109847
+amos22_mri,faria,amos_0530,right kidney,2,0:26x107:140x188:226,0.127318
+amos22_mri,faria,amos_0530,right kidney,3,0:26x107:140x226:265,0.223659
+amos22_mri,faria,amos_0530,right kidney,4,26:51x74:107x188:226,0.189163
+amos22_mri,faria,amos_0530,right kidney,5,26:51x74:107x226:265,0.095502
+amos22_mri,faria,amos_0530,right kidney,6,26:51x107:140x188:226,0.10238
+amos22_mri,faria,amos_0530,right kidney,7,26:51x107:140x226:265,0.03059
+amos22_mri,hridoy,amos_0555,right kidney,0,0:24x74:108x164:198,0.102353
+amos22_mri,hridoy,amos_0555,right kidney,1,0:24x74:108x198:231,0.158776
+amos22_mri,hridoy,amos_0555,right kidney,2,0:24x108:141x164:198,0.204283
+amos22_mri,hridoy,amos_0555,right kidney,3,0:24x108:141x198:231,0.111358
+amos22_mri,hridoy,amos_0555,right kidney,4,24:49x74:108x164:198,0.215879
+amos22_mri,hridoy,amos_0555,right kidney,5,24:49x74:108x198:231,0.120625
+amos22_mri,hridoy,amos_0555,right kidney,6,24:49x108:141x164:198,0.026674
+amos22_mri,hridoy,amos_0555,right kidney,7,24:49x108:141x198:231,0.031051

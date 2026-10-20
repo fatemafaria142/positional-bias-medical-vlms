@@ -1,0 +1,9 @@
+dataset,person,subject_id,organ,block_id,block_bbox,shapley_value
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,0,33:106x15:110x3:48,0.110942
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,1,33:106x15:110x48:92,0.016762
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,2,33:106x110:204x3:48,0.049485
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,3,33:106x110:204x48:92,0.117944
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,4,106:178x15:110x3:48,0.109685
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,106:178x15:110x48:92,0.181347
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,6,106:178x110:204x3:48,0.080067
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,7,106:178x110:204x48:92,0.221268

@@ -1,0 +1,19 @@
+dataset,person,subject_id,organ,role,metric,shapley_value
+amos22_mri,nipu,amos_0508,right kidney,image,f_dice_gt,0.414317
+amos22_mri,nipu,amos_0508,right kidney,image,f_dice_self,0.440683
+amos22_mri,nipu,amos_0508,right kidney,organ_word,f_dice_gt,0.414317
+amos22_mri,nipu,amos_0508,right kidney,organ_word,f_dice_self,0.440683
+amos22_mri,nipu,amos_0508,right kidney,position_word,f_dice_gt,0.105167
+amos22_mri,nipu,amos_0508,right kidney,position_word,f_dice_self,0.118633
+amos22_mri,faria,amos_0530,right kidney,image,f_dice_gt,0.4236
+amos22_mri,faria,amos_0530,right kidney,image,f_dice_self,0.443017
+amos22_mri,faria,amos_0530,right kidney,organ_word,f_dice_gt,0.4236
+amos22_mri,faria,amos_0530,right kidney,organ_word,f_dice_self,0.443017
+amos22_mri,faria,amos_0530,right kidney,position_word,f_dice_gt,0.1072
+amos22_mri,faria,amos_0530,right kidney,position_word,f_dice_self,0.113967
+amos22_mri,hridoy,amos_0555,right kidney,image,f_dice_gt,0.431317
+amos22_mri,hridoy,amos_0555,right kidney,image,f_dice_self,0.44245
+amos22_mri,hridoy,amos_0555,right kidney,organ_word,f_dice_gt,0.431317
+amos22_mri,hridoy,amos_0555,right kidney,organ_word,f_dice_self,0.44245
+amos22_mri,hridoy,amos_0555,right kidney,position_word,f_dice_gt,0.108367
+amos22_mri,hridoy,amos_0555,right kidney,position_word,f_dice_self,0.1151

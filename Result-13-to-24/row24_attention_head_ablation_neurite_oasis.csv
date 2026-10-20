@@ -1,0 +1,145 @@
+dataset,person,subject_id,organ,layer,head,n_heads,dice_vs_gt,dice_vs_baseline,call
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,0,8,0.8848,0.9963,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,1,8,0.8863,0.9983,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,2,8,0.8884,0.9986,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,3,8,0.8849,0.9967,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,4,8,0.8881,0.9986,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,5,8,0.8771,0.985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,6,8,0.8864,0.9973,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,5,7,8,0.8874,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,0,8,0.0033,0.95,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,1,8,0.003,0.9516,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,2,8,0.0035,0.9845,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,3,8,0.0035,0.9921,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,4,8,0.0036,0.9762,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,5,8,0.0022,0.8146,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,6,8,0.0035,0.9876,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,5,7,8,0.0039,0.9495,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,0,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,1,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,2,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,3,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,4,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,5,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,6,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,5,7,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,0,8,0.8715,0.9977,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,1,8,0.8724,0.9932,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,2,8,0.8719,0.9989,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,3,8,0.871,0.9975,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,4,8,0.8722,0.9977,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,5,8,0.873,0.9913,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,6,8,0.8713,0.9981,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,5,7,8,0.8717,0.9983,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,0,8,0.8631,0.9974,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,1,8,0.8643,0.9962,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,2,8,0.862,0.9989,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,3,8,0.8614,0.9988,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,4,8,0.8618,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,5,8,0.8556,0.9874,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,6,8,0.8616,0.9986,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,5,7,8,0.8625,0.9972,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,0,8,0.8154,0.9966,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,1,8,0.8412,0.9638,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,2,8,0.8147,0.9978,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,3,8,0.8121,0.9986,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,4,8,0.8154,0.9969,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,5,8,0.7977,0.9807,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,6,8,0.8181,0.9944,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,5,7,8,0.8172,0.9946,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,0,8,0.8356,0.9979,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,1,8,0.8559,0.9686,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,2,8,0.8369,0.9992,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,3,8,0.8367,0.9997,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,4,8,0.8379,0.998,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,5,8,0.8329,0.9899,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,6,8,0.8369,0.9984,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,5,7,8,0.8376,0.9984,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,0,8,0.8439,0.9946,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,1,8,0.8443,0.9849,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,2,8,0.8424,0.9979,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,3,8,0.8404,0.999,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,4,8,0.8403,0.9984,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,5,8,0.8446,0.993,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,6,8,0.84,0.9979,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,5,7,8,0.8471,0.991,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,0,8,0.7867,0.9982,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,1,8,0.7905,0.9801,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,2,8,0.7873,0.997,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,3,8,0.7861,0.999,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,4,8,0.7866,0.9983,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,5,8,0.7881,0.9896,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,6,8,0.7858,0.9993,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,5,7,8,0.7899,0.9945,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,0,8,0.9128,0.9978,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,1,8,0.9133,0.999,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,2,8,0.9143,0.9988,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,3,8,0.913,0.9984,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,4,8,0.9139,0.9988,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,5,8,0.9055,0.9837,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,6,8,0.913,0.9977,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,5,7,8,0.9138,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,0,8,0.0103,0.9699,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,1,8,0.0096,0.9879,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,2,8,0.0102,0.9787,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,3,8,0.0096,0.9871,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,4,8,0.0097,0.9906,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,5,8,0.0064,0.781,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,6,8,0.0096,0.9863,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,5,7,8,0.0105,0.9652,neither
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,0,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,1,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,2,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,3,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,4,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,5,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,6,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,5,7,8,0.0,1.0,empty
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,0,8,0.8564,0.9981,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,1,8,0.8577,0.9878,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,2,8,0.8567,0.9988,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,3,8,0.8547,0.9982,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,4,8,0.8564,0.9979,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,5,8,0.8544,0.981,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,6,8,0.8554,0.998,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,5,7,8,0.8559,0.9981,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,0,8,0.782,0.9984,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,1,8,0.8021,0.9691,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,2,8,0.7832,0.998,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,3,8,0.7821,0.9986,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,4,8,0.7823,0.9983,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,5,8,0.7685,0.9824,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,6,8,0.7808,0.9976,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,5,7,8,0.784,0.9955,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,0,8,0.8339,0.9965,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,1,8,0.861,0.9569,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,2,8,0.8332,0.9984,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,3,8,0.8347,0.9975,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,4,8,0.8354,0.9972,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,5,8,0.7965,0.9605,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,6,8,0.8354,0.9974,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,5,7,8,0.8403,0.9914,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,0,8,0.8925,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,1,8,0.9018,0.9772,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,2,8,0.8912,0.9988,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,3,8,0.8919,0.9991,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,4,8,0.8919,0.9987,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,5,8,0.8921,0.9912,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,6,8,0.8918,0.9986,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,5,7,8,0.8923,0.9966,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,0,8,0.8776,0.999,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,1,8,0.8754,0.9862,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,2,8,0.877,0.999,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,3,8,0.8775,0.9994,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,4,8,0.8777,0.999,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,5,8,0.8791,0.9922,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,6,8,0.8776,0.9992,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,5,7,8,0.8778,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,0,8,0.827,0.9983,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,1,8,0.826,0.9753,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,2,8,0.827,0.9988,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,3,8,0.8273,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,4,8,0.8274,0.9989,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,5,8,0.8218,0.9893,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,6,8,0.827,0.9985,a
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,5,7,8,0.8276,0.9956,a

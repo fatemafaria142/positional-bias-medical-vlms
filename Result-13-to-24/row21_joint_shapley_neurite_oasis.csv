@@ -1,0 +1,109 @@
+dataset,person,subject_id,organ,role,metric,shapley_value
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,image,f_dice_gt,0.389783
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,image,f_dice_self,0.4289
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,organ_word,f_dice_gt,0.396833
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,organ_word,f_dice_self,0.4385
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,position_word,f_dice_gt,0.100883
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,position_word,f_dice_self,0.1326
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,image,f_dice_gt,0.001167
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,image,f_dice_self,0.333333
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,organ_word,f_dice_gt,0.001167
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,organ_word,f_dice_self,0.333333
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,position_word,f_dice_gt,0.001167
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,position_word,f_dice_self,0.333333
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,image,f_dice_gt,0.000317
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,image,f_dice_self,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,organ_word,f_dice_gt,0.000317
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,organ_word,f_dice_self,-0.5
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,position_word,f_dice_gt,-0.000633
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,position_word,f_dice_self,0.5
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,image,f_dice_gt,0.33535
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,image,f_dice_self,0.344467
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,organ_word,f_dice_gt,0.3885
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,organ_word,f_dice_self,0.451067
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,position_word,f_dice_gt,0.14775
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,position_word,f_dice_self,0.204467
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,image,f_dice_gt,0.1173
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,image,f_dice_self,0.169967
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,organ_word,f_dice_gt,0.4904
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,organ_word,f_dice_self,0.538467
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,position_word,f_dice_gt,0.2544
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,position_word,f_dice_self,0.291567
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,image,f_dice_gt,0.291883
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,image,f_dice_self,0.35855
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,organ_word,f_dice_gt,0.307933
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,organ_word,f_dice_self,0.3806
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,position_word,f_dice_gt,0.213383
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,position_word,f_dice_self,0.26085
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,image,f_dice_gt,0.177567
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,image,f_dice_self,0.215733
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,organ_word,f_dice_gt,0.479417
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,organ_word,f_dice_self,0.558283
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,position_word,f_dice_gt,0.179417
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,position_word,f_dice_self,0.225983
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,image,f_dice_gt,0.133183
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,image,f_dice_self,0.181733
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,organ_word,f_dice_gt,0.596733
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,organ_word,f_dice_self,0.670133
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,position_word,f_dice_gt,0.110783
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,position_word,f_dice_self,0.148133
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,image,f_dice_gt,0.01775
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,image,f_dice_self,0.0473
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,organ_word,f_dice_gt,0.6601
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,organ_word,f_dice_self,0.7625
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,position_word,f_dice_gt,0.10815
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,position_word,f_dice_self,0.1902
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,image,f_dice_gt,0.397617
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,image,f_dice_self,0.428167
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,organ_word,f_dice_gt,0.419967
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,organ_word,f_dice_self,0.450367
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,position_word,f_dice_gt,0.096317
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,position_word,f_dice_self,0.121467
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,image,f_dice_gt,0.002883
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,image,f_dice_self,0.303033
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,organ_word,f_dice_gt,0.003483
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,organ_word,f_dice_self,0.348733
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,position_word,f_dice_gt,0.003433
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,position_word,f_dice_self,0.348233
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,image,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,image,f_dice_self,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,organ_word,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,organ_word,f_dice_self,-0.5
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,position_word,f_dice_gt,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,position_word,f_dice_self,0.5
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,image,f_dice_gt,0.35655
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,image,f_dice_self,0.3706
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,organ_word,f_dice_gt,0.4187
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,organ_word,f_dice_self,0.49715
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,position_word,f_dice_gt,0.08085
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,position_word,f_dice_self,0.13225
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,image,f_dice_gt,0.170367
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,image,f_dice_self,0.247883
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,organ_word,f_dice_gt,0.518917
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,organ_word,f_dice_self,0.579583
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,position_word,f_dice_gt,0.092717
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,position_word,f_dice_self,0.172533
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,image,f_dice_gt,0.173483
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,image,f_dice_self,0.205983
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,organ_word,f_dice_gt,0.468933
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,organ_word,f_dice_self,0.566383
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,position_word,f_dice_gt,0.190583
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,position_word,f_dice_self,0.227633
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,image,f_dice_gt,0.10185
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,image,f_dice_self,0.12255
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,organ_word,f_dice_gt,0.6834
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,organ_word,f_dice_self,0.745
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,position_word,f_dice_gt,0.10645
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,position_word,f_dice_self,0.13245
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,image,f_dice_gt,0.103767
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,image,f_dice_self,0.1344
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,organ_word,f_dice_gt,0.557867
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,organ_word,f_dice_self,0.61465
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,position_word,f_dice_gt,0.215667
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,position_word,f_dice_self,0.25095
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,image,f_dice_gt,0.033633
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,image,f_dice_self,0.0643
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,organ_word,f_dice_gt,0.650783
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,organ_word,f_dice_self,0.75605
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,position_word,f_dice_gt,0.142183
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,position_word,f_dice_self,0.17965

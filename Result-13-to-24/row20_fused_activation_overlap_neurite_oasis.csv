@@ -1,0 +1,55 @@
+dataset,person,subject_id,organ,condition,stage,iou_with_gt
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,matched,3,0.135
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,mismatched_side,3,0.0088
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral white matter,mismatched_organ,3,0.073
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,matched,3,0.0432
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,mismatched_side,3,0.018
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebral cortex,mismatched_organ,3,0.0891
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,matched,3,0.0049
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,mismatched_side,3,0.0013
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left lateral ventricle,mismatched_organ,3,0.0075
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,matched,3,0.0163
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,mismatched_side,3,0.0003
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum white matter,mismatched_organ,3,0.0003
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,matched,3,0.0664
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,mismatched_side,3,0.0002
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left cerebellum cortex,mismatched_organ,3,0.0005
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,matched,3,0.0096
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,mismatched_side,3,0.0002
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left thalamus,mismatched_organ,3,0.001
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,matched,3,0.0094
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,mismatched_side,3,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left caudate,mismatched_organ,3,0.0024
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,matched,3,0.0148
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,mismatched_side,3,0.001
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left putamen,mismatched_organ,3,0.0069
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,matched,3,0.0102
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,mismatched_side,3,0.0
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,left hippocampus,mismatched_organ,3,0.004
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,matched,3,0.1411
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,mismatched_side,3,0.0235
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral white matter,mismatched_organ,3,0.0429
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,matched,3,0.0587
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,mismatched_side,3,0.0148
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebral cortex,mismatched_organ,3,0.0078
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,matched,3,0.0063
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,mismatched_side,3,0.0007
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right lateral ventricle,mismatched_organ,3,0.0074
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,matched,3,0.0223
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,mismatched_side,3,0.0007
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum white matter,mismatched_organ,3,0.0195
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,matched,3,0.0372
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,mismatched_side,3,0.0092
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right cerebellum cortex,mismatched_organ,3,0.0176
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,matched,3,0.0047
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,mismatched_side,3,0.0015
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right thalamus,mismatched_organ,3,0.0161
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,matched,3,0.0081
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,mismatched_side,3,0.0012
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right caudate,mismatched_organ,3,0.0059
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,matched,3,0.011
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,mismatched_side,3,0.002
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right putamen,mismatched_organ,3,0.0025
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,matched,3,0.0089
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,mismatched_side,3,0.0006
+neurite_oasis,faria,OASIS_OAS1_0057_MR1,right hippocampus,mismatched_organ,3,0.0044

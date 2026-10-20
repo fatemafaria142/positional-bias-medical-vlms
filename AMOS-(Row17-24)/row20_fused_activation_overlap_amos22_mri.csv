@@ -1,0 +1,37 @@
+dataset,person,subject_id,organ,condition,stage,iou_with_gt
+amos22_mri,nipu,amos_0508,right kidney,matched,3,0.0049
+amos22_mri,nipu,amos_0508,right kidney,mismatched_side,3,0.0001
+amos22_mri,nipu,amos_0508,right kidney,mismatched_organ,3,0.0037
+amos22_mri,nipu,amos_0508,left kidney,matched,3,0.0042
+amos22_mri,nipu,amos_0508,left kidney,mismatched_side,3,0.0081
+amos22_mri,nipu,amos_0508,left kidney,mismatched_organ,3,0.0131
+amos22_mri,nipu,amos_0508,right adrenal gland,matched,3,0.0
+amos22_mri,nipu,amos_0508,right adrenal gland,mismatched_side,3,0.0
+amos22_mri,nipu,amos_0508,right adrenal gland,mismatched_organ,3,0.0
+amos22_mri,nipu,amos_0508,left adrenal gland,matched,3,0.0
+amos22_mri,nipu,amos_0508,left adrenal gland,mismatched_side,3,0.0
+amos22_mri,nipu,amos_0508,left adrenal gland,mismatched_organ,3,0.0
+amos22_mri,faria,amos_0530,right kidney,matched,3,0.0049
+amos22_mri,faria,amos_0530,right kidney,mismatched_side,3,0.0047
+amos22_mri,faria,amos_0530,right kidney,mismatched_organ,3,0.0033
+amos22_mri,faria,amos_0530,left kidney,matched,3,0.0049
+amos22_mri,faria,amos_0530,left kidney,mismatched_side,3,0.0046
+amos22_mri,faria,amos_0530,left kidney,mismatched_organ,3,0.0033
+amos22_mri,faria,amos_0530,right adrenal gland,matched,3,0.0
+amos22_mri,faria,amos_0530,right adrenal gland,mismatched_side,3,0.0
+amos22_mri,faria,amos_0530,right adrenal gland,mismatched_organ,3,0.0
+amos22_mri,faria,amos_0530,left adrenal gland,matched,3,0.0
+amos22_mri,faria,amos_0530,left adrenal gland,mismatched_side,3,0.0
+amos22_mri,faria,amos_0530,left adrenal gland,mismatched_organ,3,0.0
+amos22_mri,hridoy,amos_0555,right kidney,matched,3,0.007
+amos22_mri,hridoy,amos_0555,right kidney,mismatched_side,3,0.0084
+amos22_mri,hridoy,amos_0555,right kidney,mismatched_organ,3,0.0043
+amos22_mri,hridoy,amos_0555,left kidney,matched,3,0.0054
+amos22_mri,hridoy,amos_0555,left kidney,mismatched_side,3,0.0088
+amos22_mri,hridoy,amos_0555,left kidney,mismatched_organ,3,0.0127
+amos22_mri,hridoy,amos_0555,right adrenal gland,matched,3,0.0
+amos22_mri,hridoy,amos_0555,right adrenal gland,mismatched_side,3,0.0
+amos22_mri,hridoy,amos_0555,right adrenal gland,mismatched_organ,3,0.0
+amos22_mri,hridoy,amos_0555,left adrenal gland,matched,3,0.0
+amos22_mri,hridoy,amos_0555,left adrenal gland,mismatched_side,3,0.0
+amos22_mri,hridoy,amos_0555,left adrenal gland,mismatched_organ,3,0.0

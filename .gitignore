@@ -1,0 +1,9 @@
+data/
+neurite-oasis.v1.0/
+__pycache__/
+*.pyc
+.env
+*.env
+/Text3DSAM/
+/Medical-SAM3/
+external/

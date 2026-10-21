@@ -1,0 +1,6 @@
+*.nii.gz -text -diff
+*.nii -text -diff
+*.png -text -diff
+*.jpg -text -diff
+*.jpeg -text -diff
+*.tif -text -diff

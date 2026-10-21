@@ -90,6 +90,29 @@ def shapley_values(v, roles):
     return phi
 
 
+def shapley_interaction_index(v, roles, i, j):
+    """Exact pairwise Shapley (Grabisch-Roubens) interaction index for players i, j, given the
+    value function v over the full role set `roles` (|roles| = n >= 2). Generalizes the plain
+    2-player "v(both) - v(i alone) - v(j alone) + v(neither)" formula used for row 5/RQ5's
+    interaction term to n > 2 players -- verified to reduce to EXACTLY that formula when n == 2
+    (the n-2=0 "others" case collapses the weighted sum below to a single term with weight 1).
+
+    Positive value: i and j reinforce each other beyond what their individual Shapley
+    contributions already capture (superadditive/complementary). Negative: redundant/
+    substitutable -- knowing one lessens how much the other adds. Near 0: additive, no
+    interaction beyond their separate contributions."""
+    import math
+    n = len(roles)
+    others = [r for r in roles if r not in (i, j)]
+    total = 0.0
+    for bits in itertools.product([True, False], repeat=len(others)):
+        s = frozenset(r for r, b in zip(others, bits) if b)
+        weight = math.factorial(n - len(s) - 2) * math.factorial(len(s)) / math.factorial(n - 1)
+        delta = v[s | {i, j}] - v[s | {i}] - v[s | {j}] + v[s]
+        total += weight * delta
+    return total
+
+
 # ------------------------------------------------------------------------------------------------
 def mirror(organ):
     """'left kidney' <-> 'right kidney'."""
@@ -775,7 +798,15 @@ def run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed
 
     return_masks=True additionally RLE-encodes every coalition's predicted mask (and the GT mask)
     into coalition_rows as 'pred_mask_rle'/'gt_mask_rle' -- no extra forward passes, reusing exactly
-    the masks already computed above. Implies return_coalitions=True."""
+    the masks already computed above. Implies return_coalitions=True.
+
+    `rows` also includes every pairwise Shapley interaction index (`shapley_interaction_index`,
+    `kind='pairwise_interaction'`, `role` formatted as "roleA+roleB") alongside the individual
+    Shapley values (`kind='individual'`) -- free to compute (pure arithmetic on `v_gt`/`v_self`,
+    already fully populated above, no extra forward passes), and tells you whether two roles
+    reinforce each other (positive), are redundant/substitutable (negative), or purely additive
+    (~0) beyond their individual credit. For the 3-role game that's 3 pairs; for the 4-role game
+    (include_other_words=True), 6 pairs."""
     rng = np.random.default_rng(seed)
     gt = label_vol == ids[organ]
     roles = ["image", "organ_word", "position_word"] + (["other_words"] if include_other_words else [])
@@ -791,8 +822,18 @@ def run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed
     phi_gt, phi_self = shapley_values(v_gt, roles), shapley_values(v_self, roles)
     rows = []
     for r in roles:
-        rows.append({"organ": organ, "role": r, "metric": "f_dice_gt", "shapley_value": round(phi_gt[r], 6)})
-        rows.append({"organ": organ, "role": r, "metric": "f_dice_self", "shapley_value": round(phi_self[r], 6)})
+        rows.append({"organ": organ, "role": r, "metric": "f_dice_gt", "shapley_value": round(phi_gt[r], 6),
+                     "kind": "individual"})
+        rows.append({"organ": organ, "role": r, "metric": "f_dice_self", "shapley_value": round(phi_self[r], 6),
+                     "kind": "individual"})
+    for i, j in itertools.combinations(roles, 2):
+        pair_name = "+".join(sorted((i, j)))
+        inter_gt = shapley_interaction_index(v_gt, roles, i, j)
+        inter_self = shapley_interaction_index(v_self, roles, i, j)
+        rows.append({"organ": organ, "role": pair_name, "metric": "f_dice_gt", "shapley_value": round(inter_gt, 6),
+                     "kind": "pairwise_interaction"})
+        rows.append({"organ": organ, "role": pair_name, "metric": "f_dice_self", "shapley_value": round(inter_self, 6),
+                     "kind": "pairwise_interaction"})
     if not return_coalitions and not return_masks:
         return rows
     coalition_rows = []

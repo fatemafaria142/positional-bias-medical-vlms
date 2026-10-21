@@ -389,6 +389,75 @@ A model with no laterality bias would show roughly even left/right resolution ra
 
 ---
 
+## Evaluation Metrics Reference (applies to RQ1–RQ11)
+
+Every metric below is computed from the CSVs described in the RQ sections above and should be reported as mean ± standard deviation across subjects (and, where relevant, broken down per organ, since every CSV carries per-organ granularity).
+
+### Segmentation accuracy metrics (standard)
+
+| Metric | Formula | Quantifies | Source |
+|---|---|---|---|
+| Dice similarity coefficient (DSC) | `2·\|P∩G\| / (\|P\|+\|G\|)` | Overlap between predicted mask P and ground truth G | RQ1, RQ4, RQ5, RQ6, RQ7, RQ10, RQ11 |
+| Intersection over Union (IoU / Jaccard index) | `\|P∩G\| / \|P∪G\|` | Same, stricter penalty than Dice | RQ1 (`iou_named_organ`, `iou_other_side_organ`) |
+| Voxel coverage | `\|P∩G\| / \|G\|` | Fraction of GT covered by the prediction | RQ4 (`cov_left_organ`, `cov_right_organ`) |
+| Predicted volume | `\|P\|` (voxel count) | Mask size — flags empty/over-segmented predictions | RQ1, RQ9, RQ11 (`n_pred_voxels`) |
+
+### Laterality-error metrics (novel to this investigation — define explicitly in the paper)
+
+| Metric | Definition | Source |
+|---|---|---|
+| Laterality classification (`call`) | Categorical: lands on named organ / mirrored organ / both / empty / neither, via thresholded coverage | RQ1, RQ4, RQ7, RQ11 |
+| Laterality-flip rate | Fraction of cases where `call` switches to the opposite side under an intervention | RQ4 (`moved_to_source_side`), RQ7 (per-head flip rate), RQ6 (`moved_to_right_without_right_word`) |
+| Cross-side Dice (`dice_other_side_organ`) | Dice of the prediction against the *wrong* side's GT — a direct, continuous laterality-error score | RQ1 |
+
+### Representation-similarity metrics
+
+| Metric | Formula | Source |
+|---|---|---|
+| Cosine similarity | `a·b / (‖a‖‖b‖)` | RQ1 (fusion channels), RQ2 (text embeddings), RQ6 (diff-vector geometry) |
+| Pearson correlation | standard | RQ1 (`corr_mean`) |
+| Normalized L2 distance | `‖a−b‖ / ‖a‖` | RQ1 (`norm_l2_mean`), RQ3 (`relative_l2_distance`) |
+| Cosine distance | `1 − cosine similarity` | RQ3 (`cosine_distance`) |
+
+### Information-theoretic metric
+
+| Metric | Formula | Source |
+|---|---|---|
+| Kullback–Leibler divergence | `KL(P‖Q) = Σ p·log(p/q)` | RQ3, between left/right cross-attention distributions over image tokens, both directions reported |
+
+### Attribution / explainability metrics
+
+| Metric | Formula | Source |
+|---|---|---|
+| Shapley value (exact, game-theoretic) | `φᵢ = Σ_S [\|S\|!(n−\|S\|−1)!/n!]·(v(S∪{i})−v(S))` | RQ5 (2-player: image, text), RQ9 (8-player: spatial blocks), RQ10 (4-player: image, organ word, position word, other words) |
+| Shapley interaction term | `v(all) − v(each alone) − v(neither)` | RQ5, RQ10 |
+| Saliency enrichment ratio | mean(gradient inside organ) / mean(gradient outside organ) | RQ8 (vanilla gradient and Grad-CAM) |
+
+### Causal-intervention metrics
+
+| Metric | Definition | Source |
+|---|---|---|
+| Activation-patching Dice shift | Dice(patched) − Dice(baseline), per layer | RQ4 |
+| Per-layer information contribution (custom, defined in RQ4b above) | Mean of Dice-gain/Dice-loss across both patching directions, per layer | RQ4b |
+| Full-state-control agreement rate | Fraction of voxels matching the source prompt exactly (sanity check, not a result) | RQ4 |
+| Head-ablation Dice drop | Dice(baseline) − Dice(head ablated) | RQ7 |
+
+### Geometric/coherence metric
+
+| Metric | Definition | Source |
+|---|---|---|
+| Coherence ratio | `‖mean(diff vectors)‖ / mean(‖diff vector‖)` | RQ6 — quantifies whether one shared "left→right" direction exists across organs (1.0 = fully shared, 0.0 = unrelated per-organ) |
+
+### Recommended headline metrics for a Results section
+
+1. **Dice / IoU** (standard segmentation metrics) — from RQ1/RQ4.
+2. **Laterality-flip rate** and **cross-side Dice** (the paper's core novel finding) — from RQ1/RQ4/RQ7/RQ11.
+3. **Shapley values** (RQ5/RQ10) as attribution evidence explaining *why* the flips occur.
+
+Reporting what happens (1), how often (2), and why (3) together is the standard structure for a mechanistic-interpretability results section.
+
+---
+
 ## Organ Coverage (applies to every RQ above)
 
 Every RQ above runs once per bilateral (left/right) organ pair below. Structures with no left/right counterpart (brain midline structures) are out of scope — they carry no laterality signal to test.

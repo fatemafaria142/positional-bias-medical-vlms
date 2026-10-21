@@ -653,6 +653,7 @@ def run_experiment_2_and_3_synonyms_and_layers(
                     and pr.variant_type == "base" and pr.variant_subtype == "canonical_sentence"
                 )
                 base_i = idx_by_prompt[base_pr.prompt_text]
+                m_base_target = masks[base_i]
 
                 # Variants for this (target, side): short_term, 5 clinical synonyms, 3 paraphrases, 1 location_based, 1 contradictory
                 variants = [
@@ -661,6 +662,7 @@ def run_experiment_2_and_3_synonyms_and_layers(
                     and not (pr.variant_type == "lateralized" and pr.variant_subtype == "canonical_sentence")
                 ]
 
+                subject_side_rows: List[Dict[str, Any]] = []
                 for var_pr in variants:
                     v_i = idx_by_prompt[var_pr.prompt_text]
                     m_var = masks[v_i]
@@ -674,7 +676,7 @@ def run_experiment_2_and_3_synonyms_and_layers(
                     pdec_vs_ref = vector_distances(internals["mask_embedding"][v_i], internals["mask_embedding"][ref_i])
                     pdec_vs_base = vector_distances(internals["mask_embedding"][v_i], internals["mask_embedding"][base_i])
 
-                    # 3. Similarity map correlation (at final U-Net fusion stage)
+                    # 3. Similarity map comparison (vs. reference AND vs. base)
                     if internals["fusion_summaries"]:
                         sim_map_metrics = vector_distances(
                             internals["fusion_summaries"][-1][v_i],
@@ -682,14 +684,22 @@ def run_experiment_2_and_3_synonyms_and_layers(
                         )
                         sim_map_corr = sim_map_metrics["pearson_correlation"]
                         sim_map_cos_dist = sim_map_metrics["cosine_distance"]
+                        sim_map_base = vector_distances(
+                            internals["fusion_summaries"][-1][v_i],
+                            internals["fusion_summaries"][-1][base_i],
+                        )
+                        sim_map_corr_base = sim_map_base["pearson_correlation"]
                     else:
                         sim_map_corr = np.nan
                         sim_map_cos_dist = np.nan
+                        sim_map_corr_base = np.nan
 
-                    # 4. Prediction change vs. reference mask
+                    # 4. Prediction change vs. reference mask AND vs. base mask
                     dice_vs_ref = dice_score(m_var, m_ref)
                     pred_change_1_minus_dice = 1.0 - dice_vs_ref
                     iou_vs_ref = iou_score(m_var, m_ref)
+                    dice_vs_base = dice_score(m_var, m_base_target)
+                    pred_change_vs_base = 1.0 - dice_vs_base
                     vol_shift = g_var["n_voxels"] - g_ref["n_voxels"]
                     rel_vol_shift = abs(vol_shift) / max(g_ref["n_voxels"], 1)
                     c_shift_vox, c_shift_norm = centroid_distance(g_var, g_ref, orig_shape)
@@ -716,19 +726,26 @@ def run_experiment_2_and_3_synonyms_and_layers(
                         "qwen3_rel_l2_dist_vs_ref": qwen_vs_ref["relative_l2_distance"],
                         "qwen3_pearson_r_vs_ref": qwen_vs_ref["pearson_correlation"],
                         "qwen3_cosine_dist_vs_base": qwen_vs_base["cosine_distance"],
+                        "qwen3_l2_dist_vs_base": qwen_vs_base["l2_distance"],
+                        "qwen3_pearson_r_vs_base": qwen_vs_base["pearson_correlation"],
                         # Embedding change after Prompt Decoder
                         "prompt_decoder_cosine_dist_vs_ref": pdec_vs_ref["cosine_distance"],
                         "prompt_decoder_l2_dist_vs_ref": pdec_vs_ref["l2_distance"],
                         "prompt_decoder_rel_l2_dist_vs_ref": pdec_vs_ref["relative_l2_distance"],
                         "prompt_decoder_pearson_r_vs_ref": pdec_vs_ref["pearson_correlation"],
                         "prompt_decoder_cosine_dist_vs_base": pdec_vs_base["cosine_distance"],
+                        "prompt_decoder_l2_dist_vs_base": pdec_vs_base["l2_distance"],
+                        "prompt_decoder_pearson_r_vs_base": pdec_vs_base["pearson_correlation"],
                         # Similarity map agreement
                         "similarity_map_pearson_r_vs_ref": sim_map_corr,
                         "similarity_map_cosine_dist_vs_ref": sim_map_cos_dist,
-                        # Prediction change vs Reference prompt
+                        "similarity_map_pearson_r_vs_base": sim_map_corr_base,
+                        # Prediction change vs Reference prompt & Base prompt
                         "dice_vs_ref_prompt": round(dice_vs_ref, 4),
                         "pred_change_1_minus_dice_ref": round(pred_change_1_minus_dice, 4),
                         "iou_vs_ref_prompt": round(iou_vs_ref, 4),
+                        "dice_vs_base_prompt": round(dice_vs_base, 4),
+                        "pred_change_1_minus_dice_base": round(pred_change_vs_base, 4),
                         "n_pred_voxels": g_var["n_voxels"],
                         "n_ref_voxels": g_ref["n_voxels"],
                         "volume_shift_voxels": vol_shift,
@@ -742,11 +759,19 @@ def run_experiment_2_and_3_synonyms_and_layers(
                         "dice_vs_opposite_gt": round(d_opp, 4),
                         "iou_vs_gt": round(i_gt, 4),
                         "wrong_side_error": bool(d_opp > d_gt and d_opp > 0.1),
+                        # Rank columns populated below across synonyms for this (subject, target, side)
+                        "rank_by_qwen3_dist": 0,
+                        "rank_by_prompt_decoder_dist": 0,
+                        "rank_by_pred_change": 0,
                     }
                     if save_rle_in_csv:
                         row2["pred_mask_rle_b64"] = encode_mask_rle(m_var)
-                    subj_exp2_rows.append(row2)
+                    subject_side_rows.append(row2)
                     npz_exp2[f"{var_pr.prompt_id}_mask"] = np.packbits(m_var.ravel())
+                    if internals["fusion_summaries"]:
+                        npz_exp2[f"{var_pr.prompt_id}_sim_map_6cubed"] = (
+                            internals["fusion_summaries"][-1][v_i].numpy().reshape(6, 6, 6).astype(np.float16)
+                        )
 
                     if s_idx < save_nifti_subjects and var_pr.variant_subtype in ("clinical_synonym_1", "paraphrase_1", "anatomical_location_wording"):
                         mgr_exp2.save_nifti(
@@ -776,6 +801,19 @@ def run_experiment_2_and_3_synonyms_and_layers(
                             "pearson_correlation": vd["pearson_correlation"],
                             "cross_attn_cosine_distance": attn_cos_dist,
                         })
+
+                # Populate synonym distance ranks vs. output prediction-change ranks (Section 3 "Other angles to try")
+                q_order = np.argsort([r["qwen3_cosine_dist_vs_ref"] for r in subject_side_rows])
+                p_order = np.argsort([r["prompt_decoder_cosine_dist_vs_ref"] for r in subject_side_rows])
+                o_order = np.argsort([r["pred_change_1_minus_dice_ref"] for r in subject_side_rows])
+                for rk, idx_row in enumerate(q_order, 1):
+                    subject_side_rows[idx_row]["rank_by_qwen3_dist"] = int(rk)
+                for rk, idx_row in enumerate(p_order, 1):
+                    subject_side_rows[idx_row]["rank_by_prompt_decoder_dist"] = int(rk)
+                for rk, idx_row in enumerate(o_order, 1):
+                    subject_side_rows[idx_row]["rank_by_pred_change"] = int(rk)
+
+                subj_exp2_rows.extend(subject_side_rows)
 
             # Experiment III: Record Left vs Right and Base vs Left/Right across all 14 stages
             left_pr = next(
@@ -865,8 +903,9 @@ def run_experiment_2_and_3_synonyms_and_layers(
         metadata={"n_subjects": len(subjects), "structures": structures, "correlations": exp2_corr_rows},
     )
 
-    # Summarize & write Experiment III
+    # Summarize & write Experiment III + generate Layer Localization Plot (Deliverable 4)
     exp3_summary = _summarize_experiment_3(exp3_all_rows)
+    plot_path = _plot_layer_localization(exp3_summary, mgr_exp3.exp_dir / "layer_localization_plot.png")
     exp3_paths = mgr_exp3.write_all_formats(
         metrics_rows=exp3_all_rows,
         summary_rows=exp3_summary,
@@ -877,11 +916,13 @@ def run_experiment_2_and_3_synonyms_and_layers(
                 "Measures feature distance (cosine distance, relative L2, Pearson r, and cross-attention divergence) "
                 "between Left vs. Right prompts and Synonym vs. Reference prompts across all 14 stages of VoxTell: "
                 "Frozen Qwen3 -> `project_text_embed` -> Transformer Decoder Layers 1..6 -> `LayerNorm` -> "
-                "U-Net Multi-Scale Fusion Stages 0..4.",
+                "U-Net Multi-Scale Fusion Stages 0..4.\n\n"
+                f"- **Saved Layer-wise Change Plot:** `{plot_path.name}`",
             ),
         ],
-        metadata={"n_subjects": len(subjects), "structures": structures},
+        metadata={"n_subjects": len(subjects), "structures": structures, "plot_path": str(plot_path)},
     )
+    exp3_paths["layer_plot_png"] = plot_path
 
     return {
         "exp2": {"paths": exp2_paths, "summary": exp2_summary, "correlations": exp2_corr_rows},
@@ -919,6 +960,9 @@ def _summarize_experiment_2(rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, 
             "mean_dice_vs_gt": _m("dice_vs_gt"),
             "mean_dice_drop_vs_ref_gt": _m("dice_drop_vs_ref_gt"),
             "wrong_side_rate": _m("wrong_side_error"),
+            "mean_rank_by_qwen3_dist": _m("rank_by_qwen3_dist"),
+            "mean_rank_by_prompt_decoder_dist": _m("rank_by_prompt_decoder_dist"),
+            "mean_rank_by_pred_change": _m("rank_by_pred_change"),
         })
 
     # Compute correlation between embedding distance and prediction change (1 - Dice_vs_ref)
@@ -982,6 +1026,55 @@ def _summarize_experiment_3(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             "mean_cross_attn_cosine_distance": _m("cross_attn_cosine_distance"),
         })
     return summary
+
+
+def _plot_layer_localization(summary_rows: List[Dict[str, Any]], out_png: Path) -> Path:
+    """
+    Generate Deliverable 4 ('Layer-wise change plot') plotting Cosine Distance and
+    Relative L2 Distance against network stage depth (Stages 0..13) for Left vs. Right,
+    Base vs. Left/Right, and Synonym vs. Reference.
+    """
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+
+        by_comp: Dict[str, List[Dict[str, Any]]] = {}
+        for r in summary_rows:
+            by_comp.setdefault(r["comparison_type"], []).append(r)
+
+        fig, axes = plt.subplots(1, 2, figsize=(14, 5.5), dpi=150)
+        for comp_type, rows in sorted(by_comp.items()):
+            rows_sorted = sorted(rows, key=lambda x: int(x["stage_index"]))
+            xs = [int(x["stage_index"]) for x in rows_sorted]
+            cos_y = [float(x["mean_cosine_distance"]) for x in rows_sorted]
+            l2_y = [float(x["mean_relative_l2_distance"]) for x in rows_sorted]
+            axes[0].plot(xs, cos_y, marker="o", linewidth=2, label=comp_type)
+            axes[1].plot(xs, l2_y, marker="s", linewidth=2, label=comp_type)
+
+        stage_labels = [
+            "0:Qwen3", "1:Proj", "2:DecL1", "3:DecL2", "4:DecL3",
+            "5:DecL4", "6:DecL5", "7:DecL6", "8:Norm",
+            "9:Fus0", "10:Fus1", "11:Fus2", "12:Fus3", "13:Fus4",
+        ]
+        for ax, title, ylabel in [
+            (axes[0], "Layer-wise Cosine Distance vs. Stage Depth", "Mean Cosine Distance (1 - cos)"),
+            (axes[1], "Layer-wise Relative L2 Distance vs. Stage Depth", "Mean Relative L2 Distance"),
+        ]:
+            ax.set_title(title, fontsize=11, fontweight="bold")
+            ax.set_xlabel("VoxTell Network Stage")
+            ax.set_ylabel(ylabel)
+            ax.set_xticks(range(len(stage_labels)))
+            ax.set_xticklabels(stage_labels, rotation=45, ha="right", fontsize=8)
+            ax.grid(True, alpha=0.3)
+            ax.legend(fontsize=8)
+
+        fig.tight_layout()
+        fig.savefig(str(out_png), bbox_inches="tight")
+        plt.close(fig)
+    except Exception as exc:
+        print(f"[warn] Could not render layer_localization_plot.png: {exc}")
+    return out_png
 
 
 # ===========================================================================
@@ -1240,25 +1333,24 @@ def run_experiment_4_mc_dropout_uncertainty(
                 row["mean_mask_rle_b64"] = encode_mask_rle(full_mean_mask)
             subj_rows.append(row)
 
-            # Save compressed ROI uncertainty statistics for canonical + contradictory prompts
-            if pr.variant_subtype in ("canonical_sentence", "conflicting_left_on_right", "lateralized_absent"):
-                npz_maps[f"{pr.prompt_id}_mean_prob_crop"] = maps["mean_prob"]
-                npz_maps[f"{pr.prompt_id}_epistemic_var_crop"] = maps["epistemic_var"]
-                npz_maps[f"{pr.prompt_id}_aleatoric_ent_crop"] = maps["aleatoric_entropy"]
+            # Save compressed ROI uncertainty maps (mean & variance & entropy) for all prompts in this subject
+            npz_maps[f"{pr.prompt_id}_mean_prob_crop"] = maps["mean_prob"]
+            npz_maps[f"{pr.prompt_id}_epistemic_var_crop"] = maps["epistemic_var"]
+            npz_maps[f"{pr.prompt_id}_aleatoric_ent_crop"] = maps["aleatoric_entropy"]
 
-                if s_idx < save_nifti_subjects and pr.target == "hippocampus":
-                    full_var = np.zeros(orig_shape, dtype=np.float32)
-                    full_var[crop_slicer] = maps["epistemic_var"].astype(np.float32)
-                    mgr.save_nifti(
-                        f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_epistemic_var.nii.gz",
-                        full_var,
-                        reference_nifti_path=s_info["image_path"],
-                    )
-                    mgr.save_nifti(
-                        f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_mean_mask.nii.gz",
-                        full_mean_mask,
-                        reference_nifti_path=s_info["image_path"],
-                    )
+            if s_idx < save_nifti_subjects and pr.target == "hippocampus" and pr.variant_subtype in ("canonical_sentence", "conflicting_left_on_right", "lateralized_absent"):
+                full_var = np.zeros(orig_shape, dtype=np.float32)
+                full_var[crop_slicer] = maps["epistemic_var"].astype(np.float32)
+                mgr.save_nifti(
+                    f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_epistemic_var.nii.gz",
+                    full_var,
+                    reference_nifti_path=s_info["image_path"],
+                )
+                mgr.save_nifti(
+                    f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_mean_mask.nii.gz",
+                    full_mean_mask,
+                    reference_nifti_path=s_info["image_path"],
+                )
 
         mgr.save_npz_bundle(
             f"{sid}_exp4_uncertainty_maps.npz",

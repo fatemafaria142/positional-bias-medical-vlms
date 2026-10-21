@@ -631,9 +631,12 @@ def run_sliding_window_custom(
         from nnunetv2.inference.sliding_window_prediction import compute_gaussian
         data_p, revert = pad_nd_image(data, patch_size, "constant", {"value": 0}, True, None)
         slicers = predictor._internal_get_sliding_window_slicers(data_p.shape[1:])
+        # Note: nnunetv2.compute_gaussian uses float16 on non-CPU devices unless computed on CPU first,
+        # and some MPS builds do not support float16 in certain ops. Compute on CPU then cast to float32 on device.
+        g_dev = device if device.type == "cuda" else torch.device("cpu")
         gaussian = compute_gaussian(
-            patch_size, sigma_scale=1.0 / 8.0, value_scaling_factor=10.0, device=device
-        )
+            patch_size, sigma_scale=1.0 / 8.0, value_scaling_factor=10.0, device=g_dev
+        ).float().to(device)
     except ImportError:
         # Standalone fallback when acvl_utils / nnunetv2 are not installed locally
         c, x, y, z = data.shape

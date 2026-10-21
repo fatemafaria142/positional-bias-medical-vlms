@@ -53,14 +53,22 @@ def load_voxtell_predictor_safe(
     from transformers import AutoModel, AutoTokenizer
     from voxtell.inference.predictor import VoxTellPredictor
 
-    dev = torch.device(device if device else ("cuda:0" if torch.cuda.is_available() else "cpu"))
+    if device:
+        dev = torch.device(device)
+    elif torch.cuda.is_available():
+        dev = torch.device("cuda:0")
+    elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        dev = torch.device("mps")
+    else:
+        dev = torch.device("cpu")
+
     predictor = VoxTellPredictor(model_dir=str(model_dir), device=dev)
 
     if fp16_text_backbone:
         if not hasattr(predictor, "_orig_embed_text_prompts"):
             predictor._orig_embed_text_prompts = predictor.embed_text_prompts
 
-        dtype = torch.float16 if dev.type == "cuda" else torch.float32
+        dtype = torch.float16 if dev.type in ("cuda", "mps") else torch.float32
         predictor.text_backbone = AutoModel.from_pretrained(
             "Qwen/Qwen3-Embedding-4B", dtype=dtype
         ).eval()
@@ -72,6 +80,8 @@ def load_voxtell_predictor_safe(
         @torch.inference_mode()
         def _embed_text_prompts_fp16_safe(text_prompts):
             embeddings = predictor._orig_embed_text_prompts(text_prompts)
+            if dev.type == "mps":
+                torch.mps.empty_cache()
             return embeddings.float()
 
         predictor.embed_text_prompts = _embed_text_prompts_fp16_safe

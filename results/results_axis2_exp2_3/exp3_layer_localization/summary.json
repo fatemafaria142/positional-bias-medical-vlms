@@ -1,0 +1,1140 @@
+{
+  "experiment": "exp3_layer_localization",
+  "title": "Axis II \u2014 Experiment III: Layer-wise Localization of Side & Synonym Information",
+  "generated_at_utc": "2026-10-21T12:57:33Z",
+  "metadata": {
+    "n_subjects": 100,
+    "structures": [
+      "hippocampus",
+      "thalamus",
+      "caudate",
+      "putamen",
+      "cerebral white matter",
+      "cerebellum white matter",
+      "cerebellum cortex"
+    ],
+    "plot_path": "/kaggle/working/results/exp3_layer_localization/layer_localization_plot.png"
+  },
+  "summary": [
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.078774,
+      "mean_relative_l2_distance": 0.395162,
+      "mean_pearson_correlation": 0.921244,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.110276,
+      "mean_relative_l2_distance": 0.46718,
+      "mean_pearson_correlation": 0.889688,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.113287,
+      "mean_relative_l2_distance": 0.473,
+      "mean_pearson_correlation": 0.886685,
+      "mean_cross_attn_cosine_distance": 0.011675
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.118143,
+      "mean_relative_l2_distance": 0.48226,
+      "mean_pearson_correlation": 0.881856,
+      "mean_cross_attn_cosine_distance": 0.002859
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.122386,
+      "mean_relative_l2_distance": 0.490857,
+      "mean_pearson_correlation": 0.877654,
+      "mean_cross_attn_cosine_distance": 0.005087
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.119139,
+      "mean_relative_l2_distance": 0.485849,
+      "mean_pearson_correlation": 0.880926,
+      "mean_cross_attn_cosine_distance": 0.011215
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.118466,
+      "mean_relative_l2_distance": 0.484329,
+      "mean_pearson_correlation": 0.881615,
+      "mean_cross_attn_cosine_distance": 0.005782
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.114651,
+      "mean_relative_l2_distance": 0.475861,
+      "mean_pearson_correlation": 0.885437,
+      "mean_cross_attn_cosine_distance": 0.003039
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.114018,
+      "mean_relative_l2_distance": 0.472814,
+      "mean_pearson_correlation": 0.885982,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.231865,
+      "mean_relative_l2_distance": 0.653619,
+      "mean_pearson_correlation": 0.745434,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.051067,
+      "mean_relative_l2_distance": 0.331607,
+      "mean_pearson_correlation": 0.794446,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.012648,
+      "mean_relative_l2_distance": 0.213569,
+      "mean_pearson_correlation": 0.772284,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.14587,
+      "mean_relative_l2_distance": 0.559889,
+      "mean_pearson_correlation": 0.855399,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_left",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.005111,
+      "mean_relative_l2_distance": 0.164035,
+      "mean_pearson_correlation": 0.804915,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.084697,
+      "mean_relative_l2_distance": 0.41064,
+      "mean_pearson_correlation": 0.915384,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.136408,
+      "mean_relative_l2_distance": 0.520686,
+      "mean_pearson_correlation": 0.863613,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.136714,
+      "mean_relative_l2_distance": 0.521426,
+      "mean_pearson_correlation": 0.863268,
+      "mean_cross_attn_cosine_distance": 0.016176
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.138778,
+      "mean_relative_l2_distance": 0.525217,
+      "mean_pearson_correlation": 0.861175,
+      "mean_cross_attn_cosine_distance": 0.00554
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.138691,
+      "mean_relative_l2_distance": 0.52534,
+      "mean_pearson_correlation": 0.861259,
+      "mean_cross_attn_cosine_distance": 0.005992
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.131452,
+      "mean_relative_l2_distance": 0.511676,
+      "mean_pearson_correlation": 0.868511,
+      "mean_cross_attn_cosine_distance": 0.007011
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.129109,
+      "mean_relative_l2_distance": 0.506967,
+      "mean_pearson_correlation": 0.870868,
+      "mean_cross_attn_cosine_distance": 0.010099
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.12368,
+      "mean_relative_l2_distance": 0.496105,
+      "mean_pearson_correlation": 0.87631,
+      "mean_cross_attn_cosine_distance": 0.006812
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.123135,
+      "mean_relative_l2_distance": 0.494054,
+      "mean_pearson_correlation": 0.876865,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.055194,
+      "mean_relative_l2_distance": 0.359055,
+      "mean_pearson_correlation": 0.89927,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.05097,
+      "mean_relative_l2_distance": 0.382078,
+      "mean_pearson_correlation": 0.792831,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.01408,
+      "mean_relative_l2_distance": 0.261305,
+      "mean_pearson_correlation": 0.807634,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.321947,
+      "mean_relative_l2_distance": 0.796233,
+      "mean_pearson_correlation": 0.889279,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "base_vs_right",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.004996,
+      "mean_relative_l2_distance": 0.21484,
+      "mean_pearson_correlation": 0.791331,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.133844,
+      "mean_relative_l2_distance": 0.516616,
+      "mean_pearson_correlation": 0.866152,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.184641,
+      "mean_relative_l2_distance": 0.606324,
+      "mean_pearson_correlation": 0.81534,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.191924,
+      "mean_relative_l2_distance": 0.61787,
+      "mean_pearson_correlation": 0.808081,
+      "mean_cross_attn_cosine_distance": 0.033403
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.197939,
+      "mean_relative_l2_distance": 0.626858,
+      "mean_pearson_correlation": 0.802096,
+      "mean_cross_attn_cosine_distance": 0.011858
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.200904,
+      "mean_relative_l2_distance": 0.631641,
+      "mean_pearson_correlation": 0.799179,
+      "mean_cross_attn_cosine_distance": 0.010048
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.193748,
+      "mean_relative_l2_distance": 0.621241,
+      "mean_pearson_correlation": 0.806374,
+      "mean_cross_attn_cosine_distance": 0.023514
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.190717,
+      "mean_relative_l2_distance": 0.615934,
+      "mean_pearson_correlation": 0.80943,
+      "mean_cross_attn_cosine_distance": 0.019958
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.182078,
+      "mean_relative_l2_distance": 0.60042,
+      "mean_pearson_correlation": 0.818081,
+      "mean_cross_attn_cosine_distance": 0.009019
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.180998,
+      "mean_relative_l2_distance": 0.597954,
+      "mean_pearson_correlation": 0.819002,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.277448,
+      "mean_relative_l2_distance": 0.716812,
+      "mean_pearson_correlation": 0.63517,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.137321,
+      "mean_relative_l2_distance": 0.553441,
+      "mean_pearson_correlation": 0.455989,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.042787,
+      "mean_relative_l2_distance": 0.30583,
+      "mean_pearson_correlation": 0.382066,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.189778,
+      "mean_relative_l2_distance": 0.612868,
+      "mean_pearson_correlation": 0.862001,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "left_vs_right",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 700,
+      "mean_cosine_distance": 0.013177,
+      "mean_relative_l2_distance": 0.20681,
+      "mean_pearson_correlation": 0.396211,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.058216,
+      "mean_relative_l2_distance": 0.340571,
+      "mean_pearson_correlation": 0.941872,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.077134,
+      "mean_relative_l2_distance": 0.393201,
+      "mean_pearson_correlation": 0.922839,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.077228,
+      "mean_relative_l2_distance": 0.39308,
+      "mean_pearson_correlation": 0.922746,
+      "mean_cross_attn_cosine_distance": 0.005927
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.079633,
+      "mean_relative_l2_distance": 0.398355,
+      "mean_pearson_correlation": 0.920344,
+      "mean_cross_attn_cosine_distance": 0.002439
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.081537,
+      "mean_relative_l2_distance": 0.402662,
+      "mean_pearson_correlation": 0.918447,
+      "mean_cross_attn_cosine_distance": 0.003824
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.079287,
+      "mean_relative_l2_distance": 0.396994,
+      "mean_pearson_correlation": 0.920705,
+      "mean_cross_attn_cosine_distance": 0.008099
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.07878,
+      "mean_relative_l2_distance": 0.395323,
+      "mean_pearson_correlation": 0.92122,
+      "mean_cross_attn_cosine_distance": 0.004016
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.075551,
+      "mean_relative_l2_distance": 0.386846,
+      "mean_pearson_correlation": 0.924453,
+      "mean_cross_attn_cosine_distance": 0.003268
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.075158,
+      "mean_relative_l2_distance": 0.384516,
+      "mean_pearson_correlation": 0.924842,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.071224,
+      "mean_relative_l2_distance": 0.357789,
+      "mean_pearson_correlation": 0.916222,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.034191,
+      "mean_relative_l2_distance": 0.296628,
+      "mean_pearson_correlation": 0.90558,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.00388,
+      "mean_relative_l2_distance": 0.143086,
+      "mean_pearson_correlation": 0.941725,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.136372,
+      "mean_relative_l2_distance": 0.498354,
+      "mean_pearson_correlation": 0.967604,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (contradictory)",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.001445,
+      "mean_relative_l2_distance": 0.120683,
+      "mean_pearson_correlation": 0.934254,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.191412,
+      "mean_relative_l2_distance": 0.619251,
+      "mean_pearson_correlation": 0.808613,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.218702,
+      "mean_relative_l2_distance": 0.661012,
+      "mean_pearson_correlation": 0.781271,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.21271,
+      "mean_relative_l2_distance": 0.651942,
+      "mean_pearson_correlation": 0.787276,
+      "mean_cross_attn_cosine_distance": 0.006132
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.214828,
+      "mean_relative_l2_distance": 0.655348,
+      "mean_pearson_correlation": 0.785159,
+      "mean_cross_attn_cosine_distance": 0.003487
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.216836,
+      "mean_relative_l2_distance": 0.659826,
+      "mean_pearson_correlation": 0.783152,
+      "mean_cross_attn_cosine_distance": 0.02256
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.208597,
+      "mean_relative_l2_distance": 0.649,
+      "mean_pearson_correlation": 0.791404,
+      "mean_cross_attn_cosine_distance": 0.024276
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.210194,
+      "mean_relative_l2_distance": 0.651399,
+      "mean_pearson_correlation": 0.789827,
+      "mean_cross_attn_cosine_distance": 0.011844
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.217824,
+      "mean_relative_l2_distance": 0.661841,
+      "mean_pearson_correlation": 0.782213,
+      "mean_cross_attn_cosine_distance": 0.027164
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.216928,
+      "mean_relative_l2_distance": 0.654999,
+      "mean_pearson_correlation": 0.783072,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.100739,
+      "mean_relative_l2_distance": 0.45857,
+      "mean_pearson_correlation": 0.84676,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.029817,
+      "mean_relative_l2_distance": 0.286603,
+      "mean_pearson_correlation": 0.898326,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.00511,
+      "mean_relative_l2_distance": 0.391089,
+      "mean_pearson_correlation": 0.956726,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 1.229904,
+      "mean_relative_l2_distance": 1.533164,
+      "mean_pearson_correlation": 0.807022,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (lateralized)",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.002009,
+      "mean_relative_l2_distance": 0.427254,
+      "mean_pearson_correlation": 0.906214,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.198577,
+      "mean_relative_l2_distance": 0.621075,
+      "mean_pearson_correlation": 0.801435,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.240552,
+      "mean_relative_l2_distance": 0.68838,
+      "mean_pearson_correlation": 0.75939,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.237535,
+      "mean_relative_l2_distance": 0.683746,
+      "mean_pearson_correlation": 0.762445,
+      "mean_cross_attn_cosine_distance": 0.004543
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.24287,
+      "mean_relative_l2_distance": 0.690743,
+      "mean_pearson_correlation": 0.757142,
+      "mean_cross_attn_cosine_distance": 0.00221
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.248912,
+      "mean_relative_l2_distance": 0.697802,
+      "mean_pearson_correlation": 0.751139,
+      "mean_cross_attn_cosine_distance": 0.003496
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.247268,
+      "mean_relative_l2_distance": 0.691411,
+      "mean_pearson_correlation": 0.752818,
+      "mean_cross_attn_cosine_distance": 0.01017
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.249709,
+      "mean_relative_l2_distance": 0.693998,
+      "mean_pearson_correlation": 0.750391,
+      "mean_cross_attn_cosine_distance": 0.027606
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.248698,
+      "mean_relative_l2_distance": 0.693715,
+      "mean_pearson_correlation": 0.751415,
+      "mean_cross_attn_cosine_distance": 0.035062
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.24731,
+      "mean_relative_l2_distance": 0.686987,
+      "mean_pearson_correlation": 0.75269,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.176754,
+      "mean_relative_l2_distance": 0.560923,
+      "mean_pearson_correlation": 0.787366,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.061552,
+      "mean_relative_l2_distance": 0.393833,
+      "mean_pearson_correlation": 0.834261,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.005353,
+      "mean_relative_l2_distance": 0.296909,
+      "mean_pearson_correlation": 0.927197,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.307354,
+      "mean_relative_l2_distance": 0.924539,
+      "mean_pearson_correlation": 0.901995,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (location_based)",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 1400,
+      "mean_cosine_distance": 0.00216,
+      "mean_relative_l2_distance": 0.31297,
+      "mean_pearson_correlation": 0.900067,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.150823,
+      "mean_relative_l2_distance": 0.541876,
+      "mean_pearson_correlation": 0.849214,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.170784,
+      "mean_relative_l2_distance": 0.580124,
+      "mean_pearson_correlation": 0.82917,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.165928,
+      "mean_relative_l2_distance": 0.571766,
+      "mean_pearson_correlation": 0.834034,
+      "mean_cross_attn_cosine_distance": 0.004224
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.16807,
+      "mean_relative_l2_distance": 0.575341,
+      "mean_pearson_correlation": 0.831895,
+      "mean_cross_attn_cosine_distance": 0.002398
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.17032,
+      "mean_relative_l2_distance": 0.579597,
+      "mean_pearson_correlation": 0.829652,
+      "mean_cross_attn_cosine_distance": 0.009109
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.164611,
+      "mean_relative_l2_distance": 0.570369,
+      "mean_pearson_correlation": 0.835377,
+      "mean_cross_attn_cosine_distance": 0.011943
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.163487,
+      "mean_relative_l2_distance": 0.568461,
+      "mean_pearson_correlation": 0.836515,
+      "mean_cross_attn_cosine_distance": 0.009459
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.161954,
+      "mean_relative_l2_distance": 0.565097,
+      "mean_pearson_correlation": 0.838058,
+      "mean_cross_attn_cosine_distance": 0.014439
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.161168,
+      "mean_relative_l2_distance": 0.56087,
+      "mean_pearson_correlation": 0.838832,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.081523,
+      "mean_relative_l2_distance": 0.406614,
+      "mean_pearson_correlation": 0.878189,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.023998,
+      "mean_relative_l2_distance": 0.252304,
+      "mean_pearson_correlation": 0.926128,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.003094,
+      "mean_relative_l2_distance": 0.203931,
+      "mean_pearson_correlation": 0.975998,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.512418,
+      "mean_relative_l2_distance": 0.934117,
+      "mean_pearson_correlation": 0.928766,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (paraphrase)",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 4200,
+      "mean_cosine_distance": 0.001019,
+      "mean_relative_l2_distance": 0.201235,
+      "mean_pearson_correlation": 0.956475,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 0,
+      "stage_name": "00_qwen3_frozen",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.058619,
+      "mean_relative_l2_distance": 0.327086,
+      "mean_pearson_correlation": 0.941406,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 1,
+      "stage_name": "01_project_text_embed",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.067682,
+      "mean_relative_l2_distance": 0.35381,
+      "mean_pearson_correlation": 0.932301,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 2,
+      "stage_name": "02_transformer_layer_1",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.066363,
+      "mean_relative_l2_distance": 0.349954,
+      "mean_pearson_correlation": 0.933621,
+      "mean_cross_attn_cosine_distance": 0.002614
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 3,
+      "stage_name": "03_transformer_layer_2",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.067524,
+      "mean_relative_l2_distance": 0.352481,
+      "mean_pearson_correlation": 0.932463,
+      "mean_cross_attn_cosine_distance": 0.001016
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 4,
+      "stage_name": "04_transformer_layer_3",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.068286,
+      "mean_relative_l2_distance": 0.354155,
+      "mean_pearson_correlation": 0.931709,
+      "mean_cross_attn_cosine_distance": 0.001926
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 5,
+      "stage_name": "05_transformer_layer_4",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.066157,
+      "mean_relative_l2_distance": 0.347876,
+      "mean_pearson_correlation": 0.933848,
+      "mean_cross_attn_cosine_distance": 0.003237
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 6,
+      "stage_name": "06_transformer_layer_5",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.065236,
+      "mean_relative_l2_distance": 0.345331,
+      "mean_pearson_correlation": 0.934777,
+      "mean_cross_attn_cosine_distance": 0.004685
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 7,
+      "stage_name": "07_transformer_layer_6",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.062698,
+      "mean_relative_l2_distance": 0.338352,
+      "mean_pearson_correlation": 0.937322,
+      "mean_cross_attn_cosine_distance": 0.004311
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 8,
+      "stage_name": "08_transformer_norm_mask_emb",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.06235,
+      "mean_relative_l2_distance": 0.336077,
+      "mean_pearson_correlation": 0.93765,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 9,
+      "stage_name": "09_unet_fusion_stage_0_12cubed",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.0463,
+      "mean_relative_l2_distance": 0.265878,
+      "mean_pearson_correlation": 0.940568,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 10,
+      "stage_name": "10_unet_fusion_stage_1_24cubed",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.014412,
+      "mean_relative_l2_distance": 0.182973,
+      "mean_pearson_correlation": 0.944305,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 11,
+      "stage_name": "11_unet_fusion_stage_2_48cubed",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.002026,
+      "mean_relative_l2_distance": 0.105881,
+      "mean_pearson_correlation": 0.972709,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 12,
+      "stage_name": "12_unet_fusion_stage_3_96cubed",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.10079,
+      "mean_relative_l2_distance": 0.44154,
+      "mean_pearson_correlation": 0.983288,
+      "mean_cross_attn_cosine_distance": NaN
+    },
+    {
+      "comparison_type": "synonym_vs_ref (synonym)",
+      "stage_index": 13,
+      "stage_name": "13_unet_fusion_stage_4_192cubed",
+      "n_pairs": 7000,
+      "mean_cosine_distance": 0.000679,
+      "mean_relative_l2_distance": 0.094995,
+      "mean_pearson_correlation": 0.970898,
+      "mean_cross_attn_cosine_distance": NaN
+    }
+  ]
+}

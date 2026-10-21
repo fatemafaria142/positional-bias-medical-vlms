@@ -1,0 +1,9 @@
+target,side,n_synonym_evals,canonical_epistemic_var,synonym_mean_epistemic_var,synonym_std_epistemic_var,synonym_max_min_ratio_epistemic_var,contradictory_epistemic_var,contradictory_gt_canonical_uncertainty,synonym_mean_aleatoric_entropy
+caudate,left,600,0.022437,0.033381,0.034547,36.736,0.132261,True,0.102447
+caudate,right,600,0.023388,0.033725,0.048162,50.244,0.01788,False,0.093631
+hippocampus,left,600,0.023976,0.028903,0.03069,32.753,0.155145,True,0.084744
+hippocampus,right,600,0.017257,0.018055,0.012892,21.523,0.015506,False,0.077372
+putamen,left,600,0.016764,0.011803,0.009315,25.791,0.100912,True,0.072693
+putamen,right,600,0.01252,0.013452,0.012435,28.177,0.050444,True,0.058907
+thalamus,left,600,0.055512,0.026542,0.018746,22.774,0.039887,False,0.053628
+thalamus,right,600,0.04309,0.018559,0.016655,38.6,0.096053,True,0.047582

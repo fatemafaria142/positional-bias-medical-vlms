@@ -3,3 +3,14 @@
 __pycache__/
 *.pyc
 .DS_Store
+# Axis II results: keep reports, summaries, correlation/stability tables and plots;
+# exclude bulky, duplicate, or regenerable artifacts (keep the full zips outside git)
+results/**/checkpoints/
+results/**/masks/
+results/**/results.json
+results/**/exp0_frozen_prompts/
+results/**/_parallel_jobs/
+results/**/prompt_embedding_bank.npz
+results/**/*.zip
+# exp2 per-row metrics (~178 MB incl. RLE masks) exceeds GitHub's 100 MB file limit
+results/**/exp2_synonym_shift/metrics.csv

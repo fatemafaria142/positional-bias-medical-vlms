@@ -1,0 +1,113 @@
+comparison_type,stage_index,stage_name,n_pairs,mean_cosine_distance,mean_relative_l2_distance,mean_pearson_correlation,mean_cross_attn_cosine_distance
+base_vs_left,0,00_qwen3_frozen,700,0.078774,0.395162,0.921244,nan
+base_vs_left,1,01_project_text_embed,700,0.110276,0.46718,0.889688,nan
+base_vs_left,2,02_transformer_layer_1,700,0.113287,0.473,0.886685,0.011675
+base_vs_left,3,03_transformer_layer_2,700,0.118143,0.48226,0.881856,0.002859
+base_vs_left,4,04_transformer_layer_3,700,0.122386,0.490857,0.877654,0.005087
+base_vs_left,5,05_transformer_layer_4,700,0.119139,0.485849,0.880926,0.011215
+base_vs_left,6,06_transformer_layer_5,700,0.118466,0.484329,0.881615,0.005782
+base_vs_left,7,07_transformer_layer_6,700,0.114651,0.475861,0.885437,0.003039
+base_vs_left,8,08_transformer_norm_mask_emb,700,0.114018,0.472814,0.885982,nan
+base_vs_left,9,09_unet_fusion_stage_0_12cubed,700,0.231865,0.653619,0.745434,nan
+base_vs_left,10,10_unet_fusion_stage_1_24cubed,700,0.051067,0.331607,0.794446,nan
+base_vs_left,11,11_unet_fusion_stage_2_48cubed,700,0.012648,0.213569,0.772284,nan
+base_vs_left,12,12_unet_fusion_stage_3_96cubed,700,0.14587,0.559889,0.855399,nan
+base_vs_left,13,13_unet_fusion_stage_4_192cubed,700,0.005111,0.164035,0.804915,nan
+base_vs_right,0,00_qwen3_frozen,700,0.084697,0.41064,0.915384,nan
+base_vs_right,1,01_project_text_embed,700,0.136408,0.520686,0.863613,nan
+base_vs_right,2,02_transformer_layer_1,700,0.136714,0.521426,0.863268,0.016176
+base_vs_right,3,03_transformer_layer_2,700,0.138778,0.525217,0.861175,0.00554
+base_vs_right,4,04_transformer_layer_3,700,0.138691,0.52534,0.861259,0.005992
+base_vs_right,5,05_transformer_layer_4,700,0.131452,0.511676,0.868511,0.007011
+base_vs_right,6,06_transformer_layer_5,700,0.129109,0.506967,0.870868,0.010099
+base_vs_right,7,07_transformer_layer_6,700,0.12368,0.496105,0.87631,0.006812
+base_vs_right,8,08_transformer_norm_mask_emb,700,0.123135,0.494054,0.876865,nan
+base_vs_right,9,09_unet_fusion_stage_0_12cubed,700,0.055194,0.359055,0.89927,nan
+base_vs_right,10,10_unet_fusion_stage_1_24cubed,700,0.05097,0.382078,0.792831,nan
+base_vs_right,11,11_unet_fusion_stage_2_48cubed,700,0.01408,0.261305,0.807634,nan
+base_vs_right,12,12_unet_fusion_stage_3_96cubed,700,0.321947,0.796233,0.889279,nan
+base_vs_right,13,13_unet_fusion_stage_4_192cubed,700,0.004996,0.21484,0.791331,nan
+left_vs_right,0,00_qwen3_frozen,700,0.133844,0.516616,0.866152,nan
+left_vs_right,1,01_project_text_embed,700,0.184641,0.606324,0.81534,nan
+left_vs_right,2,02_transformer_layer_1,700,0.191924,0.61787,0.808081,0.033403
+left_vs_right,3,03_transformer_layer_2,700,0.197939,0.626858,0.802096,0.011858
+left_vs_right,4,04_transformer_layer_3,700,0.200904,0.631641,0.799179,0.010048
+left_vs_right,5,05_transformer_layer_4,700,0.193748,0.621241,0.806374,0.023514
+left_vs_right,6,06_transformer_layer_5,700,0.190717,0.615934,0.80943,0.019958
+left_vs_right,7,07_transformer_layer_6,700,0.182078,0.60042,0.818081,0.009019
+left_vs_right,8,08_transformer_norm_mask_emb,700,0.180998,0.597954,0.819002,nan
+left_vs_right,9,09_unet_fusion_stage_0_12cubed,700,0.277448,0.716812,0.63517,nan
+left_vs_right,10,10_unet_fusion_stage_1_24cubed,700,0.137321,0.553441,0.455989,nan
+left_vs_right,11,11_unet_fusion_stage_2_48cubed,700,0.042787,0.30583,0.382066,nan
+left_vs_right,12,12_unet_fusion_stage_3_96cubed,700,0.189778,0.612868,0.862001,nan
+left_vs_right,13,13_unet_fusion_stage_4_192cubed,700,0.013177,0.20681,0.396211,nan
+synonym_vs_ref (contradictory),0,00_qwen3_frozen,1400,0.058216,0.340571,0.941872,nan
+synonym_vs_ref (contradictory),1,01_project_text_embed,1400,0.077134,0.393201,0.922839,nan
+synonym_vs_ref (contradictory),2,02_transformer_layer_1,1400,0.077228,0.39308,0.922746,0.005927
+synonym_vs_ref (contradictory),3,03_transformer_layer_2,1400,0.079633,0.398355,0.920344,0.002439
+synonym_vs_ref (contradictory),4,04_transformer_layer_3,1400,0.081537,0.402662,0.918447,0.003824
+synonym_vs_ref (contradictory),5,05_transformer_layer_4,1400,0.079287,0.396994,0.920705,0.008099
+synonym_vs_ref (contradictory),6,06_transformer_layer_5,1400,0.07878,0.395323,0.92122,0.004016
+synonym_vs_ref (contradictory),7,07_transformer_layer_6,1400,0.075551,0.386846,0.924453,0.003268
+synonym_vs_ref (contradictory),8,08_transformer_norm_mask_emb,1400,0.075158,0.384516,0.924842,nan
+synonym_vs_ref (contradictory),9,09_unet_fusion_stage_0_12cubed,1400,0.071224,0.357789,0.916222,nan
+synonym_vs_ref (contradictory),10,10_unet_fusion_stage_1_24cubed,1400,0.034191,0.296628,0.90558,nan
+synonym_vs_ref (contradictory),11,11_unet_fusion_stage_2_48cubed,1400,0.00388,0.143086,0.941725,nan
+synonym_vs_ref (contradictory),12,12_unet_fusion_stage_3_96cubed,1400,0.136372,0.498354,0.967604,nan
+synonym_vs_ref (contradictory),13,13_unet_fusion_stage_4_192cubed,1400,0.001445,0.120683,0.934254,nan
+synonym_vs_ref (lateralized),0,00_qwen3_frozen,1400,0.191412,0.619251,0.808613,nan
+synonym_vs_ref (lateralized),1,01_project_text_embed,1400,0.218702,0.661012,0.781271,nan
+synonym_vs_ref (lateralized),2,02_transformer_layer_1,1400,0.21271,0.651942,0.787276,0.006132
+synonym_vs_ref (lateralized),3,03_transformer_layer_2,1400,0.214828,0.655348,0.785159,0.003487
+synonym_vs_ref (lateralized),4,04_transformer_layer_3,1400,0.216836,0.659826,0.783152,0.02256
+synonym_vs_ref (lateralized),5,05_transformer_layer_4,1400,0.208597,0.649,0.791404,0.024276
+synonym_vs_ref (lateralized),6,06_transformer_layer_5,1400,0.210194,0.651399,0.789827,0.011844
+synonym_vs_ref (lateralized),7,07_transformer_layer_6,1400,0.217824,0.661841,0.782213,0.027164
+synonym_vs_ref (lateralized),8,08_transformer_norm_mask_emb,1400,0.216928,0.654999,0.783072,nan
+synonym_vs_ref (lateralized),9,09_unet_fusion_stage_0_12cubed,1400,0.100739,0.45857,0.84676,nan
+synonym_vs_ref (lateralized),10,10_unet_fusion_stage_1_24cubed,1400,0.029817,0.286603,0.898326,nan
+synonym_vs_ref (lateralized),11,11_unet_fusion_stage_2_48cubed,1400,0.00511,0.391089,0.956726,nan
+synonym_vs_ref (lateralized),12,12_unet_fusion_stage_3_96cubed,1400,1.229904,1.533164,0.807022,nan
+synonym_vs_ref (lateralized),13,13_unet_fusion_stage_4_192cubed,1400,0.002009,0.427254,0.906214,nan
+synonym_vs_ref (location_based),0,00_qwen3_frozen,1400,0.198577,0.621075,0.801435,nan
+synonym_vs_ref (location_based),1,01_project_text_embed,1400,0.240552,0.68838,0.75939,nan
+synonym_vs_ref (location_based),2,02_transformer_layer_1,1400,0.237535,0.683746,0.762445,0.004543
+synonym_vs_ref (location_based),3,03_transformer_layer_2,1400,0.24287,0.690743,0.757142,0.00221
+synonym_vs_ref (location_based),4,04_transformer_layer_3,1400,0.248912,0.697802,0.751139,0.003496
+synonym_vs_ref (location_based),5,05_transformer_layer_4,1400,0.247268,0.691411,0.752818,0.01017
+synonym_vs_ref (location_based),6,06_transformer_layer_5,1400,0.249709,0.693998,0.750391,0.027606
+synonym_vs_ref (location_based),7,07_transformer_layer_6,1400,0.248698,0.693715,0.751415,0.035062
+synonym_vs_ref (location_based),8,08_transformer_norm_mask_emb,1400,0.24731,0.686987,0.75269,nan
+synonym_vs_ref (location_based),9,09_unet_fusion_stage_0_12cubed,1400,0.176754,0.560923,0.787366,nan
+synonym_vs_ref (location_based),10,10_unet_fusion_stage_1_24cubed,1400,0.061552,0.393833,0.834261,nan
+synonym_vs_ref (location_based),11,11_unet_fusion_stage_2_48cubed,1400,0.005353,0.296909,0.927197,nan
+synonym_vs_ref (location_based),12,12_unet_fusion_stage_3_96cubed,1400,0.307354,0.924539,0.901995,nan
+synonym_vs_ref (location_based),13,13_unet_fusion_stage_4_192cubed,1400,0.00216,0.31297,0.900067,nan
+synonym_vs_ref (paraphrase),0,00_qwen3_frozen,4200,0.150823,0.541876,0.849214,nan
+synonym_vs_ref (paraphrase),1,01_project_text_embed,4200,0.170784,0.580124,0.82917,nan
+synonym_vs_ref (paraphrase),2,02_transformer_layer_1,4200,0.165928,0.571766,0.834034,0.004224
+synonym_vs_ref (paraphrase),3,03_transformer_layer_2,4200,0.16807,0.575341,0.831895,0.002398
+synonym_vs_ref (paraphrase),4,04_transformer_layer_3,4200,0.17032,0.579597,0.829652,0.009109
+synonym_vs_ref (paraphrase),5,05_transformer_layer_4,4200,0.164611,0.570369,0.835377,0.011943
+synonym_vs_ref (paraphrase),6,06_transformer_layer_5,4200,0.163487,0.568461,0.836515,0.009459
+synonym_vs_ref (paraphrase),7,07_transformer_layer_6,4200,0.161954,0.565097,0.838058,0.014439
+synonym_vs_ref (paraphrase),8,08_transformer_norm_mask_emb,4200,0.161168,0.56087,0.838832,nan
+synonym_vs_ref (paraphrase),9,09_unet_fusion_stage_0_12cubed,4200,0.081523,0.406614,0.878189,nan
+synonym_vs_ref (paraphrase),10,10_unet_fusion_stage_1_24cubed,4200,0.023998,0.252304,0.926128,nan
+synonym_vs_ref (paraphrase),11,11_unet_fusion_stage_2_48cubed,4200,0.003094,0.203931,0.975998,nan
+synonym_vs_ref (paraphrase),12,12_unet_fusion_stage_3_96cubed,4200,0.512418,0.934117,0.928766,nan
+synonym_vs_ref (paraphrase),13,13_unet_fusion_stage_4_192cubed,4200,0.001019,0.201235,0.956475,nan
+synonym_vs_ref (synonym),0,00_qwen3_frozen,7000,0.058619,0.327086,0.941406,nan
+synonym_vs_ref (synonym),1,01_project_text_embed,7000,0.067682,0.35381,0.932301,nan
+synonym_vs_ref (synonym),2,02_transformer_layer_1,7000,0.066363,0.349954,0.933621,0.002614
+synonym_vs_ref (synonym),3,03_transformer_layer_2,7000,0.067524,0.352481,0.932463,0.001016
+synonym_vs_ref (synonym),4,04_transformer_layer_3,7000,0.068286,0.354155,0.931709,0.001926
+synonym_vs_ref (synonym),5,05_transformer_layer_4,7000,0.066157,0.347876,0.933848,0.003237
+synonym_vs_ref (synonym),6,06_transformer_layer_5,7000,0.065236,0.345331,0.934777,0.004685
+synonym_vs_ref (synonym),7,07_transformer_layer_6,7000,0.062698,0.338352,0.937322,0.004311
+synonym_vs_ref (synonym),8,08_transformer_norm_mask_emb,7000,0.06235,0.336077,0.93765,nan
+synonym_vs_ref (synonym),9,09_unet_fusion_stage_0_12cubed,7000,0.0463,0.265878,0.940568,nan
+synonym_vs_ref (synonym),10,10_unet_fusion_stage_1_24cubed,7000,0.014412,0.182973,0.944305,nan
+synonym_vs_ref (synonym),11,11_unet_fusion_stage_2_48cubed,7000,0.002026,0.105881,0.972709,nan
+synonym_vs_ref (synonym),12,12_unet_fusion_stage_3_96cubed,7000,0.10079,0.44154,0.983288,nan
+synonym_vs_ref (synonym),13,13_unet_fusion_stage_4_192cubed,7000,0.000679,0.094995,0.970898,nan

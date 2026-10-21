@@ -1078,7 +1078,11 @@ def run_prompt_injection_bias(predictor, img_arr, label_vol, organ, ids, prompts
     or neither.
 
     Returns rows: organ, variant, prompt, n_pred_voxels, dice_left_organ, dice_right_organ, call,
-    dice_vs_clean_left, dice_vs_clean_right."""
+    dice_vs_clean_left, dice_vs_clean_right. return_masks=True additionally RLE-encodes the GT
+    and the two clean baseline masks, returned as (rows, gt_left_rle, gt_right_rle,
+    clean_left_rle, clean_right_rle), plus a 'pred_mask_rle' entry on each row -- so the clean
+    masks an injected output is being compared against are visualizable too, not just the Dice
+    score derived from them."""
     core = organ.split(None, 1)[1]
     right_organ = mirror(organ)
     variants = list(variants) if variants is not None else list(INJECTION_VARIANTS)
@@ -1102,5 +1106,6 @@ def run_prompt_injection_bias(predictor, img_arr, label_vol, organ, ids, prompts
             row["pred_mask_rle"] = vm.encode_mask_rle(mask)
         rows.append(row)
     if return_masks:
-        return rows, vm.encode_mask_rle(gt_left), vm.encode_mask_rle(gt_right)
+        return (rows, vm.encode_mask_rle(gt_left), vm.encode_mask_rle(gt_right),
+                vm.encode_mask_rle(clean_left), vm.encode_mask_rle(clean_right))
     return rows

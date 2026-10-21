@@ -185,9 +185,10 @@ python /kaggle/working/research_repo/scripts/run_axis2_oasis.py \
 
 When you open `voxtell-oasis-mechanistic-experiments-kaggle.ipynb` on Kaggle (with a **GPU T4 x2** or **P100** accelerator enabled and your `GITHUB_PAT` stored in **Add-ons $\rightarrow$ Secrets**):
 
-1. **Cell 0 (Environment Install & Kernel Restart):**
-   - Installs `voxtell`, `nibabel`, `pandas`, `matplotlib`, `huggingface_hub`, re-pins `torch` + `torchvision` cleanly, and pins `transformers>=4.54.0,<5` BEFORE `torch` is imported.
-   - Writes `/kaggle/working/.env_setup_done` and instructs you to **Restart Session** once. On the second run, it prints `"skipping"` immediately.
+1. **Cell 0 (Environment Install — no restart needed):**
+   - Installs `voxtell>=0.1.2` (with `--no-deps`) plus only its missing runtime deps (`nnunetv2`, `acvl-utils`, `dynamic-network-architectures`, `positional-encodings`, `einops`, ...).
+   - Writes a pip constraints file pinning every compiled package Kaggle already has (`numpy`, `scipy`, `torch`, `torchvision`, `transformers`, ...) to its current version, so nothing already loaded in the kernel is replaced on disk. This is what makes **Save Version (Save & Run All)** work without a kernel restart.
+   - If `voxtell` is already installed (e.g. via Kaggle's Dependency Manager), it skips immediately.
 2. **Cell 1–3 (GPU Check, Working Directory `/kaggle/working/results`, Import Check):**
    - Verifies CUDA GPU availability and package versions.
 3. **Cell 4 (Clone `nipu/uncertainty` Branch from GitHub):**

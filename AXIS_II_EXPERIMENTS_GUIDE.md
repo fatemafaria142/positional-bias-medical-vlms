@@ -392,3 +392,26 @@ python scripts/merge_axis2_results.py \
 Other ways to shorten Experiment IV: `STRUCTURE_SCOPE = 'hippocampus,thalamus,caudate,putamen'` (69 prompts, ≈ 11 min per subject) or `MC_DROPOUT_PASSES = 5` (half the time).
 
 **Memory:** Experiment IV processes prompts in groups of 16 and folds the passes into running sums (Σp, Σp², ΣH(p)) plus bit-packed pass masks, which is mathematically identical to keeping every pass but uses a few GB of RAM instead of 15+ GB. The Qwen3 text encoder (~8 GB RAM) is released after the prompts are embedded.
+
+---
+
+## 11. Dual-GPU Execution (Kaggle "GPU T4 x2") and Speed Settings
+
+Every Kaggle notebook now runs each experiment through `scripts/axis2_multigpu.py`:
+
+1. The notebook embeds all prompts once with Qwen3-Embedding-4B and saves them to `RESULTS_ROOT/prompt_embedding_bank.npz` (VoxTell embedding-bank format).
+2. Subjects without a checkpoint are split round-robin across the GPUs. One worker process per GPU (`CUDA_VISIBLE_DEVICES=i`) loads VoxTell **with that bank**, so the 4B text encoder is never loaded in the workers (saves ~8 GB RAM each).
+3. When both workers finish, the experiment function rebuilds the combined `metrics.csv` / `summary.csv` / `results.json` / `summary.json` / `REPORT.md` from the per-subject checkpoints. Worker logs are in `RESULTS_ROOT/_parallel_jobs/`.
+
+If a worker fails, re-running the cell resumes from the finished subjects. With one GPU the experiment runs in-process.
+
+**Speed settings (section 7 of each notebook):**
+
+| Setting | Default | Effect |
+|---|---|---|
+| `N_GPUS` | `torch.cuda.device_count()` | 2 on T4 x2 → ~2x faster for every experiment |
+| `MC_DROPOUT_PASSES` | `5` | Exp IV: half the passes of 10 |
+| `EXP4_STRUCTURE_SCOPE` | `'hippocampus,thalamus,caudate,putamen'` | Exp IV: 69 prompts instead of 117 |
+| (automatic) encoder reuse | — | Exp IV: VoxTell's image encoder has no dropout, so each tile is encoded once per prompt group and reused for all passes |
+
+Approximate wall time for 100 subjects on T4 x2 (estimates): Exp I ~0.5–1 h, Exp II+III ~1.5–2 h, Exp IV ~3 h, Exp V ~1.5 h.

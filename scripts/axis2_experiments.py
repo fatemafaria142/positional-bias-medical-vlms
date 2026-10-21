@@ -80,6 +80,7 @@ from axis2_voxtell_engine import (
     preprocess_volume,
     rows_to_markdown_table,
     run_sliding_window_custom,
+    run_sliding_window_mc_passes,
     shape_to_str,
     vector_distances,
 )
@@ -1342,28 +1343,26 @@ def run_experiment_4_mc_dropout_uncertainty(
             sum_ent = np.zeros((G, *cropped_shape), dtype=np.float32)
             packed_masks = np.zeros((G, n_passes, (n_vox + 7) // 8), dtype=np.uint8)
 
+            # All K passes for this prompt group in one sliding-window sweep; the deterministic
+            # image encoder runs once per tile and is reused for every pass.
+            logits_all = run_sliding_window_mc_passes(
+                predictor,
+                data,
+                emb_g,
+                n_passes=n_passes,
+                spatial_dropout_p=spatial_dropout_p,
+                seed=1000 + 1000 * (g_start // prompt_group_size),
+            )  # (K, G, Xc, Yc, Zc)
             for k in range(n_passes):
-                torch.manual_seed(1000 + 1000 * (g_start // prompt_group_size) + k)
-                logits_k, _ = run_sliding_window_custom(
-                    predictor,
-                    data,
-                    emb_g,
-                    image_decoder_on=True,
-                    text_decoder_on=True,
-                    enable_mc_dropout=True,
-                    spatial_dropout_p=spatial_dropout_p,
-                    capture_internals=False,
-                    prompt_chunk_size=prompt_group_size,
-                )
                 for gi in range(G):
-                    p = torch.sigmoid(logits_k[gi].float()).numpy()
+                    p = torch.sigmoid(logits_all[k, gi]).numpy()
                     sum_p[gi] += p
                     sum_p2[gi] += p.astype(np.float64) ** 2
                     sum_ent[gi] += _binary_entropy_bits(p)
                     packed_masks[gi, k] = np.packbits((p > 0.5).ravel())
                     del p
-                del logits_k
-                gc.collect()
+            del logits_all
+            gc.collect()
 
             for gi, pr in enumerate(group):
                 if pr.expected_label_id is not None:

@@ -597,6 +597,85 @@ def logits_to_full_masks(
     return full_masks
 
 
+def _prepare_sliding_window(predictor, data: torch.Tensor):
+    """Pad `data` to the patch size and return (padded data on device, revert slicer, tile slicers,
+    Gaussian tile weights on CPU) -- same padding / tiling / weighting as VoxTellPredictor."""
+    device = predictor.device
+    patch_size = tuple(int(p) for p in predictor.patch_size)
+    try:
+        from acvl_utils.cropping_and_padding.padding import pad_nd_image
+        from nnunetv2.inference.sliding_window_prediction import compute_gaussian
+        data_p, revert = pad_nd_image(data, patch_size, "constant", {"value": 0}, True, None)
+        slicers = predictor._internal_get_sliding_window_slicers(data_p.shape[1:])
+        # compute_gaussian may return float16 on accelerators; build on CPU (or CUDA) and keep float32.
+        g_dev = device if device.type == "cuda" else torch.device("cpu")
+        gaussian = compute_gaussian(
+            patch_size, sigma_scale=1.0 / 8.0, value_scaling_factor=10.0, device=g_dev
+        ).float().cpu()
+    except ImportError:
+        # Standalone fallback when acvl_utils / nnunetv2 are not installed locally
+        c, x, y, z = data.shape
+        px, py, pz = patch_size
+        pad_x, pad_y, pad_z = max(0, px - x), max(0, py - y), max(0, pz - z)
+        data_p = F.pad(data, (0, pad_z, 0, pad_y, 0, pad_x), mode="constant", value=0)
+        revert = (slice(None), slice(0, x), slice(0, y), slice(0, z))
+        slicers = [(slice(None), slice(0, px), slice(0, py), slice(0, pz))]
+        gaussian = torch.ones(patch_size, dtype=torch.float32)
+    return data_p.to(device), revert, slicers, gaussian
+
+
+@torch.inference_mode()
+def run_sliding_window_mc_passes(
+    predictor,
+    data: torch.Tensor,
+    text_embeddings: torch.Tensor,
+    n_passes: int,
+    spatial_dropout_p: float = 0.0,
+    seed: int = 1000,
+) -> torch.Tensor:
+    """
+    MC-dropout sliding-window inference for a small group of prompts, returning the logits of every
+    pass: `(n_passes, G, Xc, Yc, Zc)` float32 on CPU.
+
+    VoxTell's dropout lives only in the prompt (transformer) decoder; the 3D image encoder is
+    deterministic. Each tile is therefore encoded ONCE and the cached encoder features are reused
+    for all passes (unless `spatial_dropout_p > 0`, which adds dropout on the encoder memory and
+    forces a re-encode per pass). The RNG is re-seeded with `seed + k` on every tile, so pass `k`
+    draws the same dropout sample on every tile of the volume.
+    """
+    device = predictor.device
+    model = predictor.network.to(device)
+    data_p, revert, slicers, gaussian_cpu = _prepare_sliding_window(predictor, data)
+    G = text_embeddings.shape[1]
+    emb = text_embeddings.to(device)
+
+    logits = torch.zeros((n_passes, G, *data_p.shape[1:]), dtype=torch.float32, device="cpu")
+    n_pred = torch.zeros(data_p.shape[1:], dtype=torch.float32, device="cpu")
+    autocast_ctx = torch.autocast(device.type, enabled=True) if device.type == "cuda" else contextlib.nullcontext()
+
+    with mc_dropout_context(model, enable=True, spatial_dropout_p=spatial_dropout_p):
+        for slicer in slicers:
+            patch = torch.clone(data_p[slicer][None], memory_format=torch.contiguous_format).to(device)
+            region = (slice(None), *slicer[1:])
+            skips = memory = None
+            for k in range(n_passes):
+                torch.manual_seed(seed + k)
+                with autocast_ctx:
+                    if skips is None or spatial_dropout_p > 0.0:
+                        skips, memory = encode_patch(model, patch)
+                    traj = run_prompt_decoder_trajectory(model, emb, memory, text_decoder_on=True)
+                    pred, _ = decode_with_ablation(model, skips, traj["stage_mask_embeddings"], image_decoder_on=True)
+                logits[k][region] += pred.float().cpu() * gaussian_cpu
+                del pred, traj
+            n_pred[slicer[1:]] += gaussian_cpu
+            del skips, memory, patch
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
+
+    logits /= n_pred.clamp_min(1e-6)
+    return logits[(slice(None), slice(None), *revert[1:])]
+
+
 @torch.inference_mode()
 def run_sliding_window_custom(
     predictor,
@@ -624,37 +703,14 @@ def run_sliding_window_custom(
     """
     device = predictor.device
     model = predictor.network.to(device)
-    patch_size = tuple(int(p) for p in predictor.patch_size)
+    data_p, revert, slicers, gaussian_cpu = _prepare_sliding_window(predictor, data)
 
-    try:
-        from acvl_utils.cropping_and_padding.padding import pad_nd_image
-        from nnunetv2.inference.sliding_window_prediction import compute_gaussian
-        data_p, revert = pad_nd_image(data, patch_size, "constant", {"value": 0}, True, None)
-        slicers = predictor._internal_get_sliding_window_slicers(data_p.shape[1:])
-        # Note: nnunetv2.compute_gaussian uses float16 on non-CPU devices unless computed on CPU first,
-        # and some MPS builds do not support float16 in certain ops. Compute on CPU then cast to float32 on device.
-        g_dev = device if device.type == "cuda" else torch.device("cpu")
-        gaussian = compute_gaussian(
-            patch_size, sigma_scale=1.0 / 8.0, value_scaling_factor=10.0, device=g_dev
-        ).float().to(device)
-    except ImportError:
-        # Standalone fallback when acvl_utils / nnunetv2 are not installed locally
-        c, x, y, z = data.shape
-        px, py, pz = patch_size
-        pad_x, pad_y, pad_z = max(0, px - x), max(0, py - y), max(0, pz - z)
-        data_p = F.pad(data, (0, pad_z, 0, pad_y, 0, pad_x), mode="constant", value=0)
-        revert = (slice(None), slice(0, x), slice(0, y), slice(0, z))
-        slicers = [(slice(None), slice(0, px), slice(0, py), slice(0, pz))]
-        gaussian = torch.ones(patch_size, dtype=torch.float32, device=device)
-
-    data_p = data_p.to(device)
     N = text_embeddings.shape[1]
     # Per-prompt accumulators live in CPU RAM: N full volumes (e.g. 182 prompts x ~7.4M voxels x 4 B
     # ~ 5.4 GB for Exp II) would not fit next to the model on a 15 GB GPU. Only one prompt chunk
     # is ever held on the GPU at a time.
     logits = torch.zeros((N, *data_p.shape[1:]), dtype=torch.float32, device="cpu")
     n_pred = torch.zeros(data_p.shape[1:], dtype=torch.float32, device="cpu")
-    gaussian_cpu = gaussian.float().cpu()
 
     internals_accum: Optional[Dict[str, Any]] = None
     n_patches = len(slicers)

@@ -347,3 +347,25 @@ Every experiment writes to its own dedicated folder under `RESULTS_ROOT` (`/kagg
 | **Exp V: 4-Way Decoder Ablation** (`both_on`, `image_only`, `text_only`, `both_off`) | $4 \times 84 = 336$ | ~40–50 sec | **~7–8 min** | **~1.1–1.4 hrs** | **~4.5–6 hrs** |
 | **TOTAL (All 5 Experiments)** | **1,462 passes/subj** | **~3.8–4.8 min/subj** | **~38–48 min** | **~6.0–7.5 hours** | **~25–33 hours** |
 
+
+---
+
+## 9. Split Kaggle Notebooks (one experiment per notebook)
+
+To stay inside Kaggle's 12-hour session limit and run experiments in parallel, each experiment also has its own notebook. Sections 0–7 (install, GPU check, clone repo, download dataset, load VoxTell, frozen prompts, configuration) are **identical** in all of them; only the experiment section and the final zip cell differ.
+
+| Notebook | Runs | Output zip |
+|---|---|---|
+| `voxtell-oasis-exp1-side-words-kaggle.ipynb` | Experiment I | `results_axis2_exp1.zip` |
+| `voxtell-oasis-exp2-3-synonyms-layers-kaggle.ipynb` | Experiments II & III | `results_axis2_exp2_3.zip` |
+| `voxtell-oasis-exp4-mc-dropout-kaggle.ipynb` | Experiment IV (MC Dropout) | `results_axis2_exp4.zip` |
+| `voxtell-oasis-exp5-decoder-ablation-kaggle.ipynb` | Experiment V (Decoder Ablation) | `results_axis2_exp5.zip` |
+
+The split notebooks are generated from the main notebook — after editing `voxtell-oasis-mechanistic-experiments-kaggle.ipynb`, regenerate them with:
+
+```bash
+python scripts/build_split_kaggle_notebooks.py
+```
+
+### GPU memory note
+`run_sliding_window_custom` keeps the per-prompt logit accumulators in **CPU RAM** and only holds one prompt chunk (16 prompts) on the GPU at a time. Experiment II/III evaluates 182 prompts per subject; keeping all of them on the GPU needed ~10.5 GB on top of the model and caused `CUDA out of memory` on a 15 GB T4. Peak CPU RAM is roughly 6–10 GB per subject (Kaggle provides ~30 GB).

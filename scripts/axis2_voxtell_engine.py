@@ -649,8 +649,12 @@ def run_sliding_window_custom(
 
     data_p = data_p.to(device)
     N = text_embeddings.shape[1]
-    logits = torch.zeros((N, *data_p.shape[1:]), dtype=torch.float32, device=device)
-    n_pred = torch.zeros(data_p.shape[1:], dtype=torch.float32, device=device)
+    # Per-prompt accumulators live in CPU RAM: N full volumes (e.g. 182 prompts x ~7.4M voxels x 4 B
+    # ~ 5.4 GB for Exp II) would not fit next to the model on a 15 GB GPU. Only one prompt chunk
+    # is ever held on the GPU at a time.
+    logits = torch.zeros((N, *data_p.shape[1:]), dtype=torch.float32, device="cpu")
+    n_pred = torch.zeros(data_p.shape[1:], dtype=torch.float32, device="cpu")
+    gaussian_cpu = gaussian.float().cpu()
 
     internals_accum: Optional[Dict[str, Any]] = None
     n_patches = len(slicers)
@@ -663,12 +667,12 @@ def run_sliding_window_custom(
             with autocast_ctx:
                 skips, memory = encode_patch(model, patch)
 
-                patch_logits_chunks = []
                 qwen3_list, tgt0_list, mask_emb_list = [], [], []
                 layer_lists: List[List[torch.Tensor]] = [[] for _ in range(len(model.transformer_decoder.layers))]
                 attn_lists: List[List[torch.Tensor]] = [[] for _ in range(len(model.transformer_decoder.layers))]
                 fusion_lists: List[List[torch.Tensor]] = [[] for _ in range(len(model.decoder.stages))]
 
+                patch_region = (slice(None), *slicer[1:])
                 for start in range(0, N, prompt_chunk_size):
                     emb_chunk = text_embeddings[:, start:start + prompt_chunk_size].to(device)
                     traj = run_prompt_decoder_trajectory(
@@ -681,7 +685,12 @@ def run_sliding_window_custom(
                         image_decoder_on=image_decoder_on,
                         capture_fusion_norms=capture_internals,
                     )
-                    patch_logits_chunks.append(pred_chunk.float())
+                    # Move this chunk off the GPU right away and accumulate in CPU RAM
+                    chunk_cpu = pred_chunk.float().cpu()
+                    del pred_chunk
+                    n_chunk = chunk_cpu.shape[0]
+                    logits[start:start + n_chunk][patch_region] += chunk_cpu * gaussian_cpu
+                    del chunk_cpu
 
                     if capture_internals:
                         qwen3_list.append(traj["qwen3_embed"].detach().float().cpu())
@@ -694,12 +703,12 @@ def run_sliding_window_custom(
                         if f_summaries is not None:
                             for s_i, fs in enumerate(f_summaries):
                                 fusion_lists[s_i].append(fs.detach().float().cpu())
+                    del traj, f_summaries
 
-                patch_logits = torch.cat(patch_logits_chunks, dim=0)  # (N, px, py, pz)
-
-            gz = gaussian.float()
-            logits[(slice(None), *slicer[1:])] += patch_logits * gz
-            n_pred[slicer[1:]] += gz
+            n_pred[slicer[1:]] += gaussian_cpu
+            del skips, memory, patch
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
 
             if capture_internals:
                 cur_qwen3 = torch.cat(qwen3_list, dim=0)

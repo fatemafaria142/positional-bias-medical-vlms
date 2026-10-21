@@ -286,16 +286,15 @@ Every experiment writes to its own dedicated folder under `RESULTS_ROOT` (`/kagg
    ```
 
 2. **From `masks/*_uncertainty_maps.npz` (for Experiment IV 3D probability, epistemic variance, and aleatoric entropy maps):**
+   Each map is stored cropped to its own region of interest; `<prompt_id>_box` gives `(start, stop)` per axis in full-volume (RAS) coordinates.
    ```python
    import numpy as np
 
    bundle = np.load("results/exp4_mc_dropout_uncertainty/masks/OASIS_OAS1_0001_MR1_exp4_uncertainty_maps.npz")
-   orig_shape = tuple(bundle["orig_shape"])
-   bbox = bundle["bbox"]
-   # Reconstruct full 3D epistemic variance map in RAS space:
-   full_var = np.zeros(orig_shape, dtype=np.float32)
-   slicer = tuple(slice(int(b[0]), int(b[1])) for b in bbox)
-   full_var[slicer] = bundle["OASIS_P0003_epistemic_var_crop"].astype(np.float32)
+   pid = "OASIS_P0003"
+   full_var = np.zeros(tuple(bundle["orig_shape"]), dtype=np.float32)
+   box = tuple(slice(int(s), int(e)) for s, e in bundle[f"{pid}_box"])
+   full_var[box] = bundle[f"{pid}_epistemic_var"].astype(np.float32)   # also: _mean_prob, _aleatoric_ent
    ```
 
 ---
@@ -369,3 +368,27 @@ python scripts/build_split_kaggle_notebooks.py
 
 ### GPU memory note
 `run_sliding_window_custom` keeps the per-prompt logit accumulators in **CPU RAM** and only holds one prompt chunk (16 prompts) on the GPU at a time. Experiment II/III evaluates 182 prompts per subject; keeping all of them on the GPU needed ~10.5 GB on top of the model and caused `CUDA out of memory` on a 15 GB T4. Peak CPU RAM is roughly 6–10 GB per subject (Kaggle provides ~30 GB).
+
+---
+
+## 10. Running Long Experiments Across Several Kaggle Sessions
+
+Experiment IV (MC Dropout) takes ≈ 18 min per subject on a T4 with `core_7` and 10 passes, so 100 subjects (~30 h) do not fit in one 12 h session.
+
+1. Run the same notebook several times with different subject slices (section 7: `START_INDEX` / `END_INDEX`, e.g. `0-35`, `35-70`, `70-100`). Each run writes per-subject checkpoints and masks into its own zip.
+2. Download and unzip each run's zip into its own folder (`part1/`, `part2/`, ...).
+3. Merge them locally — no GPU or model needed; the combined `metrics.csv`, `summary.csv`, `results.json`, `summary.json`, `REPORT.md` and plots are rebuilt from the checkpoints:
+
+```bash
+python scripts/merge_axis2_results.py \
+    --inputs part1/ part2/ part3/ \
+    --output results_axis2_merged \
+    --oasis-dir data/neurite_oasis_100 \
+    --structure-scope core_7 --mc-passes 10
+```
+
+`--structure-scope` and `--mc-passes` must match the values used on Kaggle. The same merge works for every experiment (I–V).
+
+Other ways to shorten Experiment IV: `STRUCTURE_SCOPE = 'hippocampus,thalamus,caudate,putamen'` (69 prompts, ≈ 11 min per subject) or `MC_DROPOUT_PASSES = 5` (half the time).
+
+**Memory:** Experiment IV processes prompts in groups of 16 and folds the passes into running sums (Σp, Σp², ΣH(p)) plus bit-packed pass masks, which is mathematically identical to keeping every pass but uses a few GB of RAM instead of 15+ GB. The Qwen3 text encoder (~8 GB RAM) is released after the prompts are embedded.

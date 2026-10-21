@@ -210,6 +210,7 @@ def run_experiment_1_side_words(
     save_nifti_subjects: int = 3,
     save_rle_in_csv: bool = True,
     resume: bool = True,
+    subject_ids: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
     """
     Experiment I (Section 2 of Axis_II_Prompt_Sensitivity_Nipu.docx):
@@ -235,7 +236,8 @@ def run_experiment_1_side_words(
         if pr.variant_type in ("base", "lateralized", "contradictory", "absent_organ_negative")
     ]
     subjects = discover_oasis_subjects(
-        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index
+        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index,
+        subject_ids=subject_ids,
     )
 
     all_rows: List[Dict[str, Any]] = []
@@ -545,6 +547,7 @@ def run_experiment_2_and_3_synonyms_and_layers(
     save_nifti_subjects: int = 2,
     save_rle_in_csv: bool = True,
     resume: bool = True,
+    subject_ids: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
     """
     Runs Experiment II (Synonym Shift Analysis) AND Experiment III (Layer Localization)
@@ -584,7 +587,8 @@ def run_experiment_2_and_3_synonyms_and_layers(
         pr for pr in build_oasis_prompt_catalog(structures=structures, include_absent_negatives=False)
     ]
     subjects = discover_oasis_subjects(
-        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index
+        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index,
+        subject_ids=subject_ids,
     )
 
     exp2_all_rows: List[Dict[str, Any]] = []
@@ -1080,45 +1084,35 @@ def _plot_layer_localization(summary_rows: List[Dict[str, Any]], out_png: Path) 
 # ===========================================================================
 # EXPERIMENT IV: Uncertainty Estimation via MC Dropout
 # ===========================================================================
-def compute_mc_uncertainty_metrics(
-    pass_probs: np.ndarray,
+def _uncertainty_from_moments(
+    n_passes: int,
+    sum_p: np.ndarray,
+    sum_p2: np.ndarray,
+    sum_ent: np.ndarray,
+    pass_masks: np.ndarray,
     gt_mask: Optional[np.ndarray] = None,
     n_ece_bins: int = 10,
 ) -> Dict[str, Any]:
     """
-    Given `pass_probs` of shape `(K, X, Y, Z)` (probabilities in `[0, 1]` from `K`
-    stochastic MC Dropout forward passes for one prompt) and optional `gt_mask` `(X, Y, Z)`:
-
-    Computes the exact quantities specified in Section 5 of `Axis_II_Prompt_Sensitivity_Nipu.docx`:
-      - `mean_prob_map`: `p_bar = (1/K) sum_k p_k`
-      - `var_prob_map` (Epistemic Variance): `(1/K) sum_k (p_k - p_bar)^2`
-      - `predictive_entropy_map` (Total Uncertainty): `H(p_bar) = -p_bar log(p_bar) - (1-p_bar) log(1-p_bar)`
-      - `aleatoric_entropy_map` (Aleatoric Uncertainty): `(1/K) sum_k H(p_k)`
-      - `mutual_information_map` (Epistemic MI): `H(p_bar) - (1/K) sum_k H(p_k)`
-      - Voxel-wise and mask-region (union of predicted foregrounds across passes or top-prob region) averages
-      - Pass-to-pass mask stability: mean pairwise Dice across the `K` passes, volume std/CV
-      - Expected Calibration Error (ECE) if `gt_mask` is provided.
+    Shared core of the MC-dropout metrics, computed from running moments so the K per-pass
+    probability maps never need to be held in memory at once:
+      sum_p   = sum_k p_k, sum_p2 = sum_k p_k^2, sum_ent = sum_k H(p_k)  (all (X, Y, Z))
+      pass_masks = (K, X, Y, Z) bool, p_k > 0.5
     """
     eps = 1e-7
-    K = pass_probs.shape[0]
-    p = np.clip(pass_probs.astype(np.float32), eps, 1.0 - eps)
-
-    p_bar = p.mean(axis=0)                         # (X, Y, Z)
-    var_map = p.var(axis=0)                        # Epistemic variance
-
-    # Binary entropy in nats (normalized by ln(2) so max entropy = 1.0 bit)
+    K = int(n_passes)
     inv_ln2 = 1.0 / math.log(2.0)
-    pred_ent_map = -(p_bar * np.log(p_bar) + (1.0 - p_bar) * np.log(1.0 - p_bar)) * inv_ln2
-    pass_ent = -(p * np.log(p) + (1.0 - p) * np.log(1.0 - p)) * inv_ln2
-    alea_ent_map = pass_ent.mean(axis=0)
+
+    p_bar = (sum_p / K).astype(np.float32)
+    var_map = np.maximum(sum_p2 / K - p_bar.astype(np.float64) ** 2, 0.0).astype(np.float32)
+    pb = np.clip(p_bar, eps, 1.0 - eps)
+    pred_ent_map = (-(pb * np.log(pb) + (1.0 - pb) * np.log(1.0 - pb)) * inv_ln2).astype(np.float32)
+    alea_ent_map = (sum_ent / K).astype(np.float32)
     mi_map = np.maximum(0.0, pred_ent_map - alea_ent_map)
 
     mean_mask = p_bar > 0.5
-    pass_masks = p > 0.5                           # (K, X, Y, Z)
     any_fg_mask = pass_masks.any(axis=0)
 
-    # Region of interest for localized uncertainty: union of predicted foreground across passes
-    # (or if completely empty, voxels with p_bar > 0.05; or whole volume)
     if int(any_fg_mask.sum()) > 0:
         roi = any_fg_mask
     elif int((p_bar > 0.05).sum()) > 0:
@@ -1126,7 +1120,6 @@ def compute_mc_uncertainty_metrics(
     else:
         roi = np.ones_like(mean_mask, dtype=bool)
 
-    # Pass-to-pass volume and Dice consistency
     pass_vols = pass_masks.reshape(K, -1).sum(axis=1).astype(np.float64)
     vol_mean = float(pass_vols.mean())
     vol_std = float(pass_vols.std())
@@ -1138,7 +1131,6 @@ def compute_mc_uncertainty_metrics(
             pairwise_dices.append(dice_score(pass_masks[i], pass_masks[j]))
     inter_pass_dice = float(np.mean(pairwise_dices)) if pairwise_dices else 1.0
 
-    # Expected Calibration Error (ECE) on ROI + GT union
     ece = np.nan
     dice_mean_mask_gt = np.nan
     if gt_mask is not None:
@@ -1148,7 +1140,6 @@ def compute_mc_uncertainty_metrics(
         if int(eval_region.sum()) > 0:
             probs_eval = p_bar[eval_region]
             labels_eval = gt_b[eval_region].astype(np.float32)
-            # Confidence of predicted class (foreground if p >= 0.5 else background)
             conf = np.where(probs_eval >= 0.5, probs_eval, 1.0 - probs_eval)
             preds = (probs_eval >= 0.5).astype(np.float32)
             acc = (preds == labels_eval).astype(np.float32)
@@ -1170,13 +1161,11 @@ def compute_mc_uncertainty_metrics(
         "pass_volume_cv": round(vol_cv, 4),
         "inter_pass_mean_dice": round(inter_pass_dice, 4),
         "dice_mean_mask_vs_gt": round(float(dice_mean_mask_gt), 4) if not math.isnan(dice_mean_mask_gt) else np.nan,
-        # Whole-volume uncertainty averages
         "voxel_mean_prob": round(float(p_bar.mean()), 6),
         "voxel_epistemic_variance": round(float(var_map.mean()), 6),
         "voxel_epistemic_mi_bits": round(float(mi_map.mean()), 6),
         "voxel_aleatoric_entropy_bits": round(float(alea_ent_map.mean()), 6),
         "voxel_predictive_entropy_bits": round(float(pred_ent_map.mean()), 6),
-        # ROI / Mask-level uncertainty averages
         "roi_mean_prob": round(float(p_bar[roi].mean()), 6),
         "roi_epistemic_variance": round(float(var_map[roi].mean()), 6),
         "roi_max_epistemic_variance": round(float(var_map[roi].max()), 6),
@@ -1184,7 +1173,6 @@ def compute_mc_uncertainty_metrics(
         "roi_aleatoric_entropy_bits": round(float(alea_ent_map[roi].mean()), 6),
         "roi_predictive_entropy_bits": round(float(pred_ent_map[roi].mean()), 6),
         "ece_roi": ece,
-        # Maps for saving
         "_maps": {
             "mean_prob": p_bar.astype(np.float16),
             "epistemic_var": var_map.astype(np.float16),
@@ -1194,6 +1182,60 @@ def compute_mc_uncertainty_metrics(
             "mean_mask": mean_mask,
         },
     }
+
+
+def _binary_entropy_bits(p: np.ndarray) -> np.ndarray:
+    eps = 1e-7
+    pc = np.clip(p, eps, 1.0 - eps)
+    return (-(pc * np.log(pc) + (1.0 - pc) * np.log(1.0 - pc)) / math.log(2.0)).astype(np.float32)
+
+
+def compute_mc_uncertainty_metrics(
+    pass_probs: np.ndarray,
+    gt_mask: Optional[np.ndarray] = None,
+    n_ece_bins: int = 10,
+) -> Dict[str, Any]:
+    """
+    Given `pass_probs` of shape `(K, X, Y, Z)` (probabilities in `[0, 1]` from `K`
+    stochastic MC Dropout forward passes for one prompt) and optional `gt_mask` `(X, Y, Z)`:
+
+    Computes the exact quantities specified in Section 5 of `Axis_II_Prompt_Sensitivity_Nipu.docx`:
+      - `mean_prob_map`: `p_bar = (1/K) sum_k p_k`
+      - `var_prob_map` (Epistemic Variance): `(1/K) sum_k (p_k - p_bar)^2`
+      - `predictive_entropy_map` (Total Uncertainty): `H(p_bar)`
+      - `aleatoric_entropy_map` (Aleatoric Uncertainty): `(1/K) sum_k H(p_k)`
+      - `mutual_information_map` (Epistemic MI): `H(p_bar) - (1/K) sum_k H(p_k)`
+      - ROI averages, pass-to-pass Dice / volume stability, and ECE vs. `gt_mask`.
+    `run_experiment_4_mc_dropout_uncertainty` computes the same metrics in streaming form.
+    """
+    p = np.clip(pass_probs.astype(np.float32), 1e-7, 1.0 - 1e-7)
+    sum_p = p.sum(axis=0, dtype=np.float64)
+    sum_p2 = (p.astype(np.float64) ** 2).sum(axis=0)
+    sum_ent = sum(_binary_entropy_bits(p[k]) for k in range(p.shape[0]))
+    return _uncertainty_from_moments(p.shape[0], sum_p, sum_p2, sum_ent, p > 0.5, gt_mask, n_ece_bins)
+
+
+def _roi_box(mean_prob: np.ndarray, var_map: np.ndarray, gt_mask: np.ndarray, margin: int = 3) -> Tuple[slice, ...]:
+    """Tight bounding box (plus margin) around everything worth keeping in an uncertainty map."""
+    keep = (mean_prob > 1e-3) | (var_map > 1e-6) | gt_mask
+    if not keep.any():
+        return tuple(slice(0, 1) for _ in mean_prob.shape)
+    idx = np.nonzero(keep)
+    return tuple(
+        slice(max(int(c.min()) - margin, 0), min(int(c.max()) + 1 + margin, s))
+        for c, s in zip(idx, mean_prob.shape)
+    )
+
+
+def release_text_backbone(predictor) -> None:
+    """Free the ~8 GB Qwen3 text encoder from RAM once all prompts are embedded.
+    VoxTell reloads it lazily if a new (un-cached) prompt is ever embedded again."""
+    import gc
+    if getattr(predictor, "text_backbone", None) is not None:
+        predictor.text_backbone = None
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
 
 def run_experiment_4_mc_dropout_uncertainty(
@@ -1209,6 +1251,8 @@ def run_experiment_4_mc_dropout_uncertainty(
     save_nifti_subjects: int = 2,
     save_rle_in_csv: bool = True,
     resume: bool = True,
+    subject_ids: Optional[Sequence[str]] = None,
+    prompt_group_size: int = 16,
 ) -> Dict[str, Any]:
     """
     Experiment IV (Section 5 of `Axis_II_Prompt_Sensitivity_Nipu.docx`):
@@ -1219,19 +1263,21 @@ def run_experiment_4_mc_dropout_uncertainty(
           * Base prompt (no side)
           * Canonical Left & Right prompts
           * Clinical Synonyms & Paraphrases & Location descriptions
-          * Contradictory prompts (e.g., `"left X located on the right hemisphere"`, AND
-            evaluating `"left X"` uncertainty when only Right GT is considered vs. Matched GT)
+          * Contradictory prompts (e.g., `"left X located on the right hemisphere"`)
           * Absent-Organ negative prompts (`"left kidney"`, `"adrenal tumor"`, etc.)
-      - Saves voxel-wise uncertainty maps (`mean_prob`, `epistemic_var`, `aleatoric_entropy`,
-        `epistemic_mi`) and full CSV/JSON/Markdown deliverables.
+      - Saves voxel-wise uncertainty maps (`mean_prob`, `epistemic_var`, `aleatoric_entropy`)
+        and full CSV/JSON/Markdown deliverables.
+
+    Memory: prompts are processed in groups of `prompt_group_size`. For each group the K passes
+    are folded into running sums (sum p, sum p^2, sum H(p)) plus bit-packed pass masks, so peak
+    RAM is ~1-2 GB per group instead of K x M full volumes (~7 GB+ per subject).
     """
+    import gc
+
     mgr = ExperimentOutputManager(results_root, "exp4_mc_dropout_uncertainty")
     structures = resolve_structures(structure_scope)
     all_catalog = build_oasis_prompt_catalog(structures=structures, include_absent_negatives=True)
 
-    # Select representative set per structure so 10 passes run rapidly per subject:
-    # base, canonical left/right, short left/right, 2 clinical synonyms per side,
-    # 1 paraphrase per side, 1 location_based per side, contradictory per side, plus absent negatives
     wanted_subtypes = {
         "canonical_sentence",
         "short_term",
@@ -1247,13 +1293,16 @@ def run_experiment_4_mc_dropout_uncertainty(
         "lung_lobe_right_upper_absent",
     }
     mc_prompts = [pr for pr in all_catalog if pr.variant_subtype in wanted_subtypes]
+    M = len(mc_prompts)
 
     subjects = discover_oasis_subjects(
-        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index
+        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index,
+        subject_ids=subject_ids,
     )
 
     prompt_texts = [pr.prompt_text for pr in mc_prompts]
-    text_embeddings = predictor.embed_text_prompts(prompt_texts)  # (1, M, 2560)
+    text_embeddings: Optional[torch.Tensor] = None  # embedded lazily: not needed when every subject resumes
+    print(f"[Exp4-MCDropout] {M} prompts x {n_passes} passes, groups of {prompt_group_size} prompts")
 
     all_rows: List[Dict[str, Any]] = []
 
@@ -1265,101 +1314,133 @@ def run_experiment_4_mc_dropout_uncertainty(
             print(f"[Exp4-MCDropout][resume {s_idx + 1}/{len(subjects)}] {sid}")
             continue
 
+        if text_embeddings is None:
+            text_embeddings = predictor.embed_text_prompts(prompt_texts).detach().cpu()  # (1, M, 2560)
+            release_text_backbone(predictor)
+
         t0 = time.time()
         img_arr, _ = load_volume_ras(s_info["image_path"])
         lbl_arr, _ = load_seg_ras(s_info["label_path"])
         data, bbox, orig_shape = preprocess_volume(predictor, img_arr)
+        del img_arr
         shape_s = shape_to_str(orig_shape)
-
-        # Run K stochastic forward passes in cropped space to save RAM, then compute metrics
-        # Shape of cropped logits per pass: (M, Xc, Yc, Zc)
-        M = len(mc_prompts)
-        cropped_shape = data.shape[1:]
-        pass_probs_cropped = np.zeros((n_passes, M, *cropped_shape), dtype=np.float16)
-
-        for k in range(n_passes):
-            torch.manual_seed(1000 + k)
-            logits_k, _ = run_sliding_window_custom(
-                predictor,
-                data,
-                text_embeddings,
-                image_decoder_on=True,
-                text_decoder_on=True,
-                enable_mc_dropout=True,
-                spatial_dropout_p=spatial_dropout_p,
-                capture_internals=False,
-            )
-            with torch.no_grad():
-                probs_k = torch.sigmoid(logits_k.float()).cpu().numpy().astype(np.float16)
-            pass_probs_cropped[k] = probs_k
-
-        # Crop ground-truth label map to `bbox` for exact alignment with `pass_probs_cropped`
+        cropped_shape = tuple(int(s) for s in data.shape[1:])
         crop_slicer = tuple(slice(int(b[0]), int(b[1])) for b in bbox)
         lbl_cropped = lbl_arr[crop_slicer]
+        n_vox = int(np.prod(cropped_shape))
 
         subj_rows: List[Dict[str, Any]] = []
         npz_maps: Dict[str, np.ndarray] = {}
 
-        for p_i, pr in enumerate(mc_prompts):
-            p_passes = pass_probs_cropped[:, p_i]  # (K, Xc, Yc, Zc)
+        for g_start in range(0, M, prompt_group_size):
+            group = mc_prompts[g_start:g_start + prompt_group_size]
+            G = len(group)
+            emb_g = text_embeddings[:, g_start:g_start + G]
 
-            if pr.expected_label_id is not None:
-                gt_crop = (lbl_cropped == pr.expected_label_id)
-            elif pr.gt_label_id_left is not None and pr.gt_label_id_right is not None:
-                gt_crop = np.logical_or(lbl_cropped == pr.gt_label_id_left, lbl_cropped == pr.gt_label_id_right)
-            else:
-                gt_crop = np.zeros_like(lbl_cropped, dtype=bool)
+            sum_p = np.zeros((G, *cropped_shape), dtype=np.float64)
+            sum_p2 = np.zeros((G, *cropped_shape), dtype=np.float64)
+            sum_ent = np.zeros((G, *cropped_shape), dtype=np.float32)
+            packed_masks = np.zeros((G, n_passes, (n_vox + 7) // 8), dtype=np.uint8)
 
-            uq = compute_mc_uncertainty_metrics(p_passes, gt_mask=gt_crop)
-            maps = uq.pop("_maps")
-
-            # Reconstruct full-volume mean mask for RLE & optional NIfTI saving
-            full_mean_mask = np.zeros(orig_shape, dtype=bool)
-            full_mean_mask[crop_slicer] = maps["mean_mask"]
-
-            row = {
-                "subject_id": sid,
-                "target": pr.target,
-                "side": pr.side,
-                "prompt_id": pr.prompt_id,
-                "variant_type": pr.variant_type,
-                "variant_subtype": pr.variant_subtype,
-                "matches_image_side": pr.matches_image_side,
-                "prompt_text": pr.prompt_text,
-                "volume_shape_ras": shape_s,
-                **uq,
-            }
-            if save_rle_in_csv:
-                row["mean_mask_rle_b64"] = encode_mask_rle(full_mean_mask)
-            subj_rows.append(row)
-
-            # Save compressed ROI uncertainty maps (mean & variance & entropy) for all prompts in this subject
-            npz_maps[f"{pr.prompt_id}_mean_prob_crop"] = maps["mean_prob"]
-            npz_maps[f"{pr.prompt_id}_epistemic_var_crop"] = maps["epistemic_var"]
-            npz_maps[f"{pr.prompt_id}_aleatoric_ent_crop"] = maps["aleatoric_entropy"]
-
-            if s_idx < save_nifti_subjects and pr.target == "hippocampus" and pr.variant_subtype in ("canonical_sentence", "conflicting_left_on_right", "lateralized_absent"):
-                full_var = np.zeros(orig_shape, dtype=np.float32)
-                full_var[crop_slicer] = maps["epistemic_var"].astype(np.float32)
-                mgr.save_nifti(
-                    f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_epistemic_var.nii.gz",
-                    full_var,
-                    reference_nifti_path=s_info["image_path"],
+            for k in range(n_passes):
+                torch.manual_seed(1000 + 1000 * (g_start // prompt_group_size) + k)
+                logits_k, _ = run_sliding_window_custom(
+                    predictor,
+                    data,
+                    emb_g,
+                    image_decoder_on=True,
+                    text_decoder_on=True,
+                    enable_mc_dropout=True,
+                    spatial_dropout_p=spatial_dropout_p,
+                    capture_internals=False,
+                    prompt_chunk_size=prompt_group_size,
                 )
-                mgr.save_nifti(
-                    f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_mean_mask.nii.gz",
-                    full_mean_mask,
-                    reference_nifti_path=s_info["image_path"],
+                for gi in range(G):
+                    p = torch.sigmoid(logits_k[gi].float()).numpy()
+                    sum_p[gi] += p
+                    sum_p2[gi] += p.astype(np.float64) ** 2
+                    sum_ent[gi] += _binary_entropy_bits(p)
+                    packed_masks[gi, k] = np.packbits((p > 0.5).ravel())
+                    del p
+                del logits_k
+                gc.collect()
+
+            for gi, pr in enumerate(group):
+                if pr.expected_label_id is not None:
+                    gt_crop = (lbl_cropped == pr.expected_label_id)
+                elif pr.gt_label_id_left is not None and pr.gt_label_id_right is not None:
+                    gt_crop = np.logical_or(lbl_cropped == pr.gt_label_id_left, lbl_cropped == pr.gt_label_id_right)
+                else:
+                    gt_crop = np.zeros_like(lbl_cropped, dtype=bool)
+
+                pass_masks = np.unpackbits(packed_masks[gi], axis=1, count=n_vox).astype(bool).reshape(
+                    n_passes, *cropped_shape
                 )
+                uq = _uncertainty_from_moments(n_passes, sum_p[gi], sum_p2[gi], sum_ent[gi], pass_masks, gt_crop)
+                del pass_masks
+                maps = uq.pop("_maps")
+
+                full_mean_mask = np.zeros(orig_shape, dtype=bool)
+                full_mean_mask[crop_slicer] = maps["mean_mask"]
+
+                row = {
+                    "subject_id": sid,
+                    "target": pr.target,
+                    "side": pr.side,
+                    "prompt_id": pr.prompt_id,
+                    "variant_type": pr.variant_type,
+                    "variant_subtype": pr.variant_subtype,
+                    "matches_image_side": pr.matches_image_side,
+                    "prompt_text": pr.prompt_text,
+                    "volume_shape_ras": shape_s,
+                    **uq,
+                }
+                if save_rle_in_csv:
+                    row["mean_mask_rle_b64"] = encode_mask_rle(full_mean_mask)
+                subj_rows.append(row)
+
+                # Uncertainty maps cropped to their own ROI box; `{pid}_box` = (start, stop) per axis
+                # in full-volume (RAS) coordinates so they can be placed back exactly.
+                box = _roi_box(maps["mean_prob"], maps["epistemic_var"], gt_crop)
+                npz_maps[f"{pr.prompt_id}_mean_prob"] = maps["mean_prob"][box]
+                npz_maps[f"{pr.prompt_id}_epistemic_var"] = maps["epistemic_var"][box]
+                npz_maps[f"{pr.prompt_id}_aleatoric_ent"] = maps["aleatoric_entropy"][box]
+                npz_maps[f"{pr.prompt_id}_box"] = np.array(
+                    [[int(b[0]) + sl.start, int(b[0]) + sl.stop] for b, sl in zip(bbox, box)], dtype=np.int32
+                )
+
+                if s_idx < save_nifti_subjects and pr.target == "hippocampus" and pr.variant_subtype in (
+                    "canonical_sentence", "conflicting_left_on_right", "lateralized_absent"
+                ):
+                    full_var = np.zeros(orig_shape, dtype=np.float32)
+                    full_var[crop_slicer] = maps["epistemic_var"].astype(np.float32)
+                    mgr.save_nifti(
+                        f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_epistemic_var.nii.gz",
+                        full_var,
+                        reference_nifti_path=s_info["image_path"],
+                    )
+                    mgr.save_nifti(
+                        f"{sid}_{pr.prompt_id}_{pr.target}_{pr.side}_mean_mask.nii.gz",
+                        full_mean_mask,
+                        reference_nifti_path=s_info["image_path"],
+                    )
+                    del full_var
+                del maps, full_mean_mask, gt_crop
+
+            del sum_p, sum_p2, sum_ent, packed_masks
+            gc.collect()
 
         mgr.save_npz_bundle(
             f"{sid}_exp4_uncertainty_maps.npz",
             orig_shape=np.array(orig_shape),
-            bbox=np.array(bbox),
             **npz_maps,
         )
         mgr.save_subject_checkpoint(sid, subj_rows)
         all_rows.extend(subj_rows)
+        del data, lbl_arr, lbl_cropped, npz_maps
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         print(f"[Exp4-MCDropout][{s_idx + 1}/{len(subjects)}] {sid} ({n_passes} passes) done in {time.time() - t0:.1f}s")
 
     summary_rows, stability_rows = _summarize_experiment_4(all_rows)
@@ -1485,6 +1566,7 @@ def run_experiment_5_decoder_ablation(
     save_nifti_subjects: int = 2,
     save_rle_in_csv: bool = True,
     resume: bool = True,
+    subject_ids: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
     """
     Experiment V (Section 6 of `Axis_II_Prompt_Sensitivity_Nipu.docx`):
@@ -1516,10 +1598,11 @@ def run_experiment_5_decoder_ablation(
         if pr.variant_subtype in ablation_subtypes
     ]
     prompt_texts = [pr.prompt_text for pr in ablation_prompts]
-    text_embeddings = predictor.embed_text_prompts(prompt_texts)
+    text_embeddings: Optional[torch.Tensor] = None  # embedded lazily: not needed when every subject resumes
 
     subjects = discover_oasis_subjects(
-        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index
+        neurite_oasis_dir, max_subjects=max_subjects, start_index=start_index, end_index=end_index,
+        subject_ids=subject_ids,
     )
 
     all_rows: List[Dict[str, Any]] = []
@@ -1531,6 +1614,10 @@ def run_experiment_5_decoder_ablation(
             all_rows.extend(ckpt["rows"])
             print(f"[Exp5-Ablation][resume {s_idx + 1}/{len(subjects)}] {sid}")
             continue
+
+        if text_embeddings is None:
+            text_embeddings = predictor.embed_text_prompts(prompt_texts).detach().cpu()
+            release_text_backbone(predictor)
 
         t0 = time.time()
         img_arr, _ = load_volume_ras(s_info["image_path"])

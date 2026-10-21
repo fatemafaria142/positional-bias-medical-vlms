@@ -296,3 +296,53 @@ Every experiment writes to its own dedicated folder under `RESULTS_ROOT` (`/kagg
    slicer = tuple(slice(int(b[0]), int(b[1])) for b in bbox)
    full_var[slicer] = bundle["OASIS_P0003_epistemic_var_crop"].astype(np.float32)
    ```
+
+---
+
+## 6. 1-to-1 Verification Table Against `Axis_II_Prompt_Sensitivity_Nipu.docx`
+
+| Section in `Axis_II_Prompt_Sensitivity_Nipu.docx` | Requirements in `.docx` | Where It Is Implemented & Saved |
+|---|---|---|
+| **1. Prompt selection**<br>*(Deliverable 1: Final frozen prompt table for OASIS, AMOS, and the lesion/lung-lobe dataset)* | - Pull base prompts from OASIS<br>- 5–10 variants per target: `Base (no side)`, `Lateralized` (`left`/`right`), `Synonyms and paraphrases`, `Nonsense or contradictory` (wrong side / absent organ)<br>- Repeat for AMOS, Adrenal Tumor, and Lung Lobes (`"nodule in right upper lobe"` vs. `"nodule in left lower lobe"`)<br>- Record ID, dataset, target, side, variant type, and whether it matches the image side | **Notebook Cell 6 (`exp0_frozen_prompts/`)** & Git `./manifests/`:<br>- `frozen_prompts_neurite_oasis.csv` (26 variants/structure + absent negatives = 424 prompts)<br>- `manifest_neurite_oasis_100_synonyms.csv` (19,000 rows for all 100 subjects)<br>- `frozen_prompts_supplemental_amos_lesion_lung.csv` (47 prompts across AMOS, adrenal tumor, lung lobes)<br>- `frozen_prompts_all.json` & `README_frozen_prompts.md` |
+| **2. Experiment I: Does the side word change the output?**<br>*(Deliverable 2: Output-difference results for base/left/right)* | - Run `base`, `left`, `right`, and contradictory prompts on the same scans<br>- Pairwise Dice & IoU (`base_vs_left`, `base_vs_right`, `left_vs_right`)<br>- Difference in predicted volume (`vol_diff_*`)<br>- Difference in location (`centroid_shift_*`, midline side `L`/`R`)<br>- Dice against ground truth (`dice_vs_gt_left`, `dice_vs_gt_right`, `dice_vs_matched_gt`, `dice_vs_contradictory_opposite_gt`)<br>- Failure criterion (`failure_nearly_identical_flag`) & disjoint check (`left_right_disjoint_flag`) | **Notebook Cell 8 (`exp1_side_word_comparison/`)**:<br>- `metrics.csv`, `summary.csv`<br>- `results.json`, `summary.json`, `REPORT.md`<br>- `masks/*.npz` + RLE masks + `.nii.gz` |
+| **3. Experiment II: Synonym shift analysis**<br>*(Deliverable 3: Synonym analysis: embedding distance vs. prediction change)* | - **Embedding change:** Cosine distance, L2 distance, and correlation at **frozen Qwen3 output** (`qwen3_*`) AND after **Prompt Decoder** (`prompt_decoder_*`) vs. reference and base prompt<br>- **Prediction change:** Dice (`1 - Dice`) and volume/centroid shift vs. reference prompt and base prompt<br>- **Link between the two:** Correlate embedding distance with prediction change (`embedding_vs_prediction_correlations.csv`, Pearson $r$ & Spearman $\rho$)<br>- **Effect on performance:** Dice against GT (`dice_vs_gt`, `dice_drop_vs_ref_gt`)<br>- **Other angles:** Rank synonyms by distance vs. output ranking (`rank_by_qwen3_dist`, `rank_by_prompt_decoder_dist`, `rank_by_pred_change`) + compare similarity maps per synonym (`similarity_map_*` + saved $6^3$ similarity maps in `.npz`) | **Notebook Cell 9 (`exp2_synonym_shift/`)**:<br>- `metrics.csv`, `summary.csv`<br>- `embedding_vs_prediction_correlations.csv`<br>- `results.json`, `summary.json`, `REPORT.md`<br>- `masks/*_exp2_synonym_masks_packed.npz` (includes per-synonym masks & $6^3$ similarity maps) + `.nii.gz` |
+| **4. Layer localization**<br>*(Deliverable 4: Layer-wise change plot)* | - Measure difference between prompt variants (`left_vs_right`, `base_vs_left/right`, and `synonym_vs_ref`) at:<br>  1. Text encoder (`00_qwen3_frozen`)<br>  2. Prompt decoder (`01_project_text_embed` + `02..07_transformer_layer_1..6` + `08_transformer_norm_mask_emb` + cross-attention distance)<br>  3. Fusion & each decoder stage (`09..13_unet_fusion_stage_0..4`)<br>- Plot the gap against stage depth | **Notebook Cell 9 (`exp3_layer_localization/`)**:<br>- `layer_localization_plot.png` *(auto-generated plot of Cosine & Relative L2 distance across all 14 stages)*<br>- `metrics.csv`, `summary.csv`, `results.json`, `summary.json`, `REPORT.md` |
+| **5. Uncertainty estimation (MC dropout)**<br>*(Deliverable 5: Uncertainty maps with mean and variance per prompt)* | - Unfreeze only dropout layers, keep everything else fixed, run $N$ stochastic passes per prompt<br>- Compute mean and variance per voxel and per mask<br>- **Epistemic uncertainty:** variance across passes (`epistemic_variance`) & mutual information (`epistemic_mi_bits`)<br>- **Aleatoric uncertainty:** average per-pass predictive entropy (`aleatoric_entropy_bits`)<br>- Compare across prompt variants (synonyms stability vs. contradictory wrong-side prompts) | **Notebook Cell 10 (`exp4_mc_dropout_uncertainty/`)**:<br>- `metrics.csv`, `summary.csv`<br>- `synonym_uncertainty_stability.csv`<br>- `results.json`, `summary.json`, `REPORT.md`<br>- `masks/*_exp4_uncertainty_maps.npz` (saves 3D `mean_prob`, `epistemic_var`, and `aleatoric_ent` maps for every prompt) + `.nii.gz` |
+| **6. Decoder ablation (image vs. text decoder)**<br>*(Deliverable 6: Decoder on/off ablation table)* | - Run 4 settings: `Both on` (On/On), `Image only` (On/Off), `Text only` (Off/On), `Both off` (Off/Off)<br>- For each setting, repeat Experiments I and II and compare outputs and prompt sensitivity | **Notebook Cell 11 (`exp5_decoder_ablation/`)**:<br>- `metrics.csv`, `summary.csv`<br>- `results.json`, `summary.json`, `REPORT.md`<br>- `masks/*_exp5_ablation_masks_packed.npz` + `.nii.gz` |
+
+---
+
+## 7. VoxTell Model Size & Parameter Breakdown
+
+### 7.1 Disk / Download Size (from Hugging Face)
+| Component | Hugging Face Repo & File | Download Size |
+|---|---|---:|
+| **VoxTell 3D Segmentation Checkpoint** | `mrokuss/VoxTell` $\rightarrow$ `voxtell_v1.1/fold_0/checkpoint_final.pth` | **1.65 GB** (`1,692.38 MB`) |
+| **VoxTell Precomputed Embedding Bank** | `mrokuss/VoxTell` $\rightarrow$ `embeddings/voxtell_v1.1/text_embeddings.npz` | **64.19 MB** |
+| **Frozen Text Encoder (`Qwen3-Embedding-4B`)** | `Qwen/Qwen3-Embedding-4B` (`model-00001` + `model-00002.safetensors`) | **7.51 GB** (`7,686.16 MB`) |
+| **Total Combined Download Size** | Checkpoint + Embedding Bank + Qwen3-4B | **~9.22 GB** |
+
+### 7.2 Parameter Count & Memory Footprint
+| Submodule | Parameter Count | Share of `VoxTellModel` | Memory (`fp32` / `fp16`) |
+|---|---:|---:|---:|
+| **1. 3D `ResidualEncoder` (Image Backbone)** | `90,296,576` (**90.30M**) | 20.5% | ~344.5 MB (`fp32`) |
+| **2. 6-Layer `TransformerDecoder` (Prompt Decoder)** | `251,858,944` (**251.86M**) | 57.2% | ~960.8 MB (`fp32`) |
+| **3. Projections (`project_bottleneck_embed` + `project_text_embed` + `project_to_decoder_channels`)** | `85,698,592` (**85.70M**) | 19.5% | ~326.9 MB (`fp32`) |
+| **4. 3D `VoxTellDecoder` (U-Net Upsampling & Mask Fusion)** | `12,175,429` (**12.18M**) | 2.8% | ~46.4 MB (`fp32`) |
+| **Total `VoxTellModel` (3D Segmentation Network)** | **`440,029,541` (440.03M)** | **100.0%** | **~1.68 GB (`fp32`)** |
+| **Frozen `Qwen/Qwen3-Embedding-4B` (Text Backbone)** | **~4,020,000,000 (~4.02B)** | — | **~7.51 GB (`fp16`, offloaded to CPU after prompt embedding)** |
+
+---
+
+## 8. Estimated Runtime Comparison (Kaggle GPU vs. Local M5 MacBook Pro)
+
+| Experiment | Decoder Passes / Subject | **Kaggle GPU (T4 / P100)**<br>*(per subject)* | **Kaggle GPU**<br>*(10 Subjects)* | **Kaggle GPU**<br>*(All 100 Subjects)* | **Local M5 (16 GB)**<br>*(All 100 Subjects)* |
+|---|---:|---:|---:|---:|---:|
+| **One-Time Setup** (Download HF + Load Model + Embed Prompts) | — | — | **~3–4 min** | **~3–4 min** | **~8–12 min** |
+| **Exp 0: Frozen Prompt Table** | 0 | Instant | **< 2 sec** | **< 2 sec** | **< 2 sec** |
+| **Exp I: Side Word (`base`/`left`/`right`/contradictory/absent)** | 64 | ~12–15 sec | **~2.5 min** | **~20–25 min** | **~1.5–2 hrs** |
+| **Exp II + III: Synonym Shift + 14-Stage Layer Localization** *(run together)* | 182 | ~30–40 sec | **~5–7 min** | **~50–65 min** | **~3.5–5 hrs** |
+| **Exp IV: MC Dropout Uncertainty** (`N = 10` passes $\times$ 88 prompts) | 880 | ~2.2–2.8 min | **~22–28 min** | **~3.5–4.5 hrs** | **~15–20 hrs** |
+| **Exp V: 4-Way Decoder Ablation** (`both_on`, `image_only`, `text_only`, `both_off`) | $4 \times 84 = 336$ | ~40–50 sec | **~7–8 min** | **~1.1–1.4 hrs** | **~4.5–6 hrs** |
+| **TOTAL (All 5 Experiments)** | **1,462 passes/subj** | **~3.8–4.8 min/subj** | **~38–48 min** | **~6.0–7.5 hours** | **~25–33 hours** |
+

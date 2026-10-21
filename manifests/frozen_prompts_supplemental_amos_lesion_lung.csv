@@ -1,0 +1,48 @@
+prompt_id,dataset,target,side,variant_type,prompt_text,notes
+SUPP_P0001,lesion_adrenal,adrenal tumor,none,base,adrenal tumor,Reference output with no laterality
+SUPP_P0002,lesion_adrenal,adrenal tumor,left,lateralized,left adrenal tumor,Tests whether left side word changes output
+SUPP_P0003,lesion_adrenal,adrenal tumor,right,lateralized,right adrenal tumor,Tests whether right side word changes output
+SUPP_P0004,lesion_adrenal,adrenal tumor,left,synonym,left adrenal gland mass,Clinical synonym 1 (left)
+SUPP_P0005,lesion_adrenal,adrenal tumor,left,synonym,adrenal lesion on the left side,Clinical paraphrase 2 (left)
+SUPP_P0006,lesion_adrenal,adrenal tumor,left,synonym,tumor of the left suprarenal gland,Anatomical synonym 3 (left)
+SUPP_P0007,lesion_adrenal,adrenal tumor,left,synonym,left suprarenal mass lesion,Anatomical synonym 4 (left)
+SUPP_P0008,lesion_adrenal,adrenal tumor,left,synonym,neoplasm of the left adrenal gland,Clinical synonym 5 (left)
+SUPP_P0009,lesion_adrenal,adrenal tumor,right,synonym,right adrenal gland mass,Clinical synonym 1 (right)
+SUPP_P0010,lesion_adrenal,adrenal tumor,right,synonym,adrenal lesion on the right side,Clinical paraphrase 2 (right)
+SUPP_P0011,lesion_adrenal,adrenal tumor,right,synonym,tumor of the right suprarenal gland,Anatomical synonym 3 (right)
+SUPP_P0012,lesion_adrenal,adrenal tumor,right,synonym,right suprarenal mass lesion,Anatomical synonym 4 (right)
+SUPP_P0013,lesion_adrenal,adrenal tumor,right,synonym,neoplasm of the right adrenal gland,Clinical synonym 5 (right)
+SUPP_P0014,lesion_adrenal,adrenal tumor,left,contradictory,left adrenal tumor on the right side,Contradictory side mismatch
+SUPP_P0015,lesion_adrenal,adrenal tumor,right,contradictory,right adrenal tumor on the left side,Contradictory side mismatch
+SUPP_P0016,lung_lobe_lesion,lung nodule,none,base,lung nodule,Base prompt with no lobe/side
+SUPP_P0017,lung_lobe_lesion,lung nodule,right_upper,lateralized,nodule in right upper lobe,Right upper lobe canonical
+SUPP_P0018,lung_lobe_lesion,lung nodule,left_lower,lateralized,nodule in left lower lobe,Left lower lobe canonical
+SUPP_P0019,lung_lobe_lesion,lung nodule,left_upper,lateralized,nodule in left upper lobe,Left upper lobe canonical
+SUPP_P0020,lung_lobe_lesion,lung nodule,right_lower,lateralized,nodule in right lower lobe,Right lower lobe canonical
+SUPP_P0021,lung_lobe_lesion,lung nodule,right_upper,synonym,pulmonary nodule in the right superior lobe,Anatomical synonym
+SUPP_P0022,lung_lobe_lesion,lung nodule,right_upper,synonym,right upper lung lobe lesion,Clinical synonym
+SUPP_P0023,lung_lobe_lesion,lung nodule,right_upper,synonym,focal mass in the upper lobe of the right lung,Paraphrase
+SUPP_P0024,lung_lobe_lesion,lung nodule,left_lower,synonym,pulmonary nodule in the left inferior lobe,Anatomical synonym
+SUPP_P0025,lung_lobe_lesion,lung nodule,left_lower,synonym,left lower lung lobe lesion,Clinical synonym
+SUPP_P0026,lung_lobe_lesion,lung nodule,left_lower,synonym,focal mass in the lower lobe of the left lung,Paraphrase
+SUPP_P0027,lung_lobe_lesion,lung nodule,right_upper,contradictory,nodule in right upper lobe of the left lung,Contradictory lobe/side
+SUPP_P0028,amos22_mri,kidney,none,base,Segment the kidney in this image.,AMOS22-MRI base prompt for kidney
+SUPP_P0029,amos22_mri,kidney,left,lateralized,Segment the left kidney in this image.,AMOS22-MRI lateralized prompt for kidney
+SUPP_P0030,amos22_mri,kidney,right,lateralized,Segment the right kidney in this image.,AMOS22-MRI lateralized prompt for kidney
+SUPP_P0031,amos22_mri,kidney,left,synonym,Segment the left renal organ in this image.,AMOS22-MRI synonym prompt for kidney
+SUPP_P0032,amos22_mri,kidney,left,synonym,Segment the kidney on the left side in this image.,AMOS22-MRI synonym prompt for kidney
+SUPP_P0033,amos22_mri,kidney,left,paraphrase,Find the kidney that is on the left.,AMOS22-MRI paraphrase prompt for kidney
+SUPP_P0034,amos22_mri,kidney,right,synonym,Segment the right renal organ in this image.,AMOS22-MRI synonym prompt for kidney
+SUPP_P0035,amos22_mri,kidney,right,synonym,Segment the kidney on the right side in this image.,AMOS22-MRI synonym prompt for kidney
+SUPP_P0036,amos22_mri,kidney,right,paraphrase,Find the kidney that is on the right.,AMOS22-MRI paraphrase prompt for kidney
+SUPP_P0037,amos22_mri,kidney,left,contradictory,Segment the left kidney on the right side in this image.,AMOS22-MRI contradictory prompt for kidney
+SUPP_P0038,amos22_mri,adrenal gland,none,base,Segment the adrenal gland in this image.,AMOS22-MRI base prompt for adrenal gland
+SUPP_P0039,amos22_mri,adrenal gland,left,lateralized,Segment the left adrenal gland in this image.,AMOS22-MRI lateralized prompt for adrenal gland
+SUPP_P0040,amos22_mri,adrenal gland,right,lateralized,Segment the right adrenal gland in this image.,AMOS22-MRI lateralized prompt for adrenal gland
+SUPP_P0041,amos22_mri,adrenal gland,left,synonym,Segment the left suprarenal gland in this image.,AMOS22-MRI synonym prompt for adrenal gland
+SUPP_P0042,amos22_mri,adrenal gland,left,synonym,Segment the adrenal gland on the left side in this image.,AMOS22-MRI synonym prompt for adrenal gland
+SUPP_P0043,amos22_mri,adrenal gland,left,paraphrase,Find the adrenal gland that is on the left.,AMOS22-MRI paraphrase prompt for adrenal gland
+SUPP_P0044,amos22_mri,adrenal gland,right,synonym,Segment the right suprarenal gland in this image.,AMOS22-MRI synonym prompt for adrenal gland
+SUPP_P0045,amos22_mri,adrenal gland,right,synonym,Segment the adrenal gland on the right side in this image.,AMOS22-MRI synonym prompt for adrenal gland
+SUPP_P0046,amos22_mri,adrenal gland,right,paraphrase,Find the adrenal gland that is on the right.,AMOS22-MRI paraphrase prompt for adrenal gland
+SUPP_P0047,amos22_mri,adrenal gland,left,contradictory,Segment the left adrenal gland on the right side in this image.,AMOS22-MRI contradictory prompt for adrenal gland

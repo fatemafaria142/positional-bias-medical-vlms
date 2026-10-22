@@ -90,6 +90,33 @@ def shapley_values(v, roles):
     return phi
 
 
+def shapley_values_approx(value_fn, roles, n_samples=4, seed=0):
+    """Monte Carlo estimate of Shapley values -- same marginal-contribution math as `shapley_values`'s
+    exact 2**n enumeration, but for each role draws `n_samples` random subsets of the other roles
+    and averages the marginal contribution of adding that role, instead of enumerating every subset.
+    Costs len(roles) * n_samples * 2 coalition evaluations (fewer once repeats are cached) rather than
+    2**len(roles) -- worthwhile once that exponential blows the budget (e.g. RQ9's 2**8 = 256 full
+    network forward passes per organ). value_fn: frozenset(present roles) -> payoff (float)."""
+    rng = np.random.default_rng(seed)
+    roles = list(roles)
+    cache = {}
+
+    def v(s):
+        if s not in cache:
+            cache[s] = value_fn(s)
+        return cache[s]
+
+    phi = {r: 0.0 for r in roles}
+    for i in roles:
+        others = [r for r in roles if r != i]
+        for _ in range(n_samples):
+            k = int(rng.integers(0, len(others) + 1))
+            subset = frozenset(rng.choice(others, size=k, replace=False)) if k else frozenset()
+            phi[i] += v(subset | {i}) - v(subset)
+        phi[i] /= n_samples
+    return phi
+
+
 def shapley_interaction_index(v, roles, i, j):
     """Exact pairwise Shapley (Grabisch-Roubens) interaction index for players i, j, given the
     value function v over the full role set `roles` (|roles| = n >= 2). Generalizes the plain
@@ -469,13 +496,17 @@ def _bbox_str(block_slicer):
     return "x".join(f"{s.start}:{s.stop}" for s in block_slicer)
 
 
-def run_grid_occlusion(predictor, img_arr, label_vol, organ, ids, prompt, grid=2, pad=10, seed=0, return_map=False):
+def run_grid_occlusion(predictor, img_arr, label_vol, organ, ids, prompt, grid=2, pad=10, seed=0,
+                        return_map=False, n_samples=None):
     """Row 17. Tile a padded box around `organ`'s ground-truth region into `grid`**3 blocks (default
-    8 blocks -> 2**8=256 coalitions, the same affordability argument already used for row 5's exact
-    word-Shapley: 2**8 is cheap to enumerate exactly). Each block is independently noised/kept
-    (reusing `noise_region`), `f_dice_gt` is scored per coalition, and `shapley_values` (same math as
-    the word-attribution rows) turns that into one Shapley credit per block -- the image-region
-    analogue of row 5's word table. Returns rows with columns: organ, block_id, block_bbox, shapley_value."""
+    8 blocks -> 2**8=256 coalitions). Each block is independently noised/kept (reusing `noise_region`),
+    `f_dice_gt` is scored per coalition, and `shapley_values` (same math as the word-attribution rows)
+    turns that into one Shapley credit per block -- the image-region analogue of row 5's word table.
+    `n_samples`: None (default) enumerates all 2**(grid**3) coalitions exactly, like row 5's word-Shapley.
+    Set it to a small int (e.g. 4) to use `shapley_values_approx` instead -- every coalition evaluation
+    here is a full network forward pass, so for grid=2 (8 blocks, 256 coalitions) that exact enumeration
+    is the dominant cost of RQ9; n_samples trades it for len(block_ids)*n_samples*2 forward passes.
+    Returns rows with columns: organ, block_id, block_bbox, shapley_value."""
     rng = np.random.default_rng(seed)
     region = label_vol == ids[organ]
     if not region.any():
@@ -488,15 +519,19 @@ def run_grid_occlusion(predictor, img_arr, label_vol, organ, ids, prompt, grid=2
               for i in range(grid) for j in range(grid) for k in range(grid)]
     block_ids = list(range(len(blocks)))
 
-    v = {}
-    for key, present in all_role_combos(block_ids):
+    def value(key):
         img = img_arr
         for b in block_ids:
-            if not present[b]:
+            if b not in key:
                 img = noise_region(img, _block_mask(label_vol.shape, blocks[b]), rng)
         mask = predict_masks(predictor, img, [prompt])[0]
-        v[key] = vm.score_masks(mask, region, region)["dice_a"]
-    phi = shapley_values(v, block_ids)
+        return vm.score_masks(mask, region, region)["dice_a"]
+
+    if n_samples:
+        phi = shapley_values_approx(value, block_ids, n_samples=n_samples, seed=seed)
+    else:
+        v = {key: value(key) for key, _ in all_role_combos(block_ids)}
+        phi = shapley_values(v, block_ids)
     rows = [{"organ": organ, "block_id": b, "block_bbox": _bbox_str(blocks[b]), "shapley_value": round(phi[b], 6)}
             for b in block_ids]
     if not return_map:

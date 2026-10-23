@@ -185,7 +185,7 @@ def exp2_worst_prompts(s: pd.DataFrame, n: int = 16):
     S.save(fig, OUT, "exp2_05_most_disruptive_wordings.png")
 
 
-def exp2_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
+def exp2_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = "", out_dir=None, fname=None):
     npz2 = EXP2 / "masks" / f"{subject_id}_exp2_synonym_masks_packed.npz"
     npz1 = EXP1_MASKS / f"{subject_id}_exp1_masks_packed.npz"
     subj = S.load_subject(subject_id)
@@ -230,7 +230,7 @@ def exp2_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
                 ax.set_ylabel(S.short(t), fontsize=11, fontweight="bold")
     S.suptitle(fig, f"Example subject {subject_id} ({label}) - the same LEFT request, worded six ways",
                "Filled = VoxTell mask, white outline = left GT (image left = patient left). Reference mask from the identical Exp I run.")
-    S.save(fig, OUT, f"exp2_06_example_masks_rewordings_{S.subj_tag(subject_id)}.png")
+    S.save(fig, out_dir or OUT, fname or f"exp2_06_example_masks_rewordings_{S.subj_tag(subject_id)}.png")
 
 
 # ----------------------------------------------------------------------------- Experiment III

@@ -260,7 +260,7 @@ def fig_distribution(m: pd.DataFrame):
     S.save(fig, OUT, "07_per_scan_dice_distribution.png")
 
 
-def fig_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
+def fig_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = "", out_dir=None, fname=None):
     npz_p = EXP_DIR / "masks" / f"{subject_id}_exp1_masks_packed.npz"
     subj = S.load_subject(subject_id)
     if subj is None or not npz_p.exists():
@@ -300,7 +300,7 @@ def fig_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
                 ax.set_ylabel(S.short(t), fontsize=11, fontweight="bold")
     S.suptitle(fig, f"Example subject {subject_id} ({label}) - coronal slice through each structure",
                "Filled color = VoxTell mask; white outline = bilateral ground truth. Image left = patient left.")
-    S.save(fig, OUT, f"08_example_masks_side_and_contradictory_{S.subj_tag(subject_id)}.png")
+    S.save(fig, out_dir or OUT, fname or f"08_example_masks_side_and_contradictory_{S.subj_tag(subject_id)}.png")
 
 
 def main():

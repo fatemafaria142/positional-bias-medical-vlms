@@ -164,7 +164,7 @@ def fig_decomposition(m: pd.DataFrame):
     S.save(fig, OUT, "exp4_05_uncertainty_decomposition_and_calibration.png")
 
 
-def fig_maps(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
+def fig_maps(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = "", out_dir=None, fname=None):
     npz_p = EXP_DIR / "masks" / f"{subject_id}_exp4_uncertainty_maps.npz"
     subj = S.load_subject(subject_id)
     if subj is None or not npz_p.exists():
@@ -213,7 +213,7 @@ def fig_maps(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
                     ax.set_ylabel(f"{S.short(t)}\n{lab_txt}", fontsize=9.5, fontweight="bold")
     S.suptitle(fig, f"Example subject {subject_id} ({label}) - MC-dropout mean probability and epistemic variance",
                "White outline = bilateral GT. Uncertainty concentrates on boundaries for clear prompts and spreads over the whole mask for confusing ones.")
-    S.save(fig, OUT, f"exp4_06_example_uncertainty_maps_{S.subj_tag(subject_id)}.png")
+    S.save(fig, out_dir or OUT, fname or f"exp4_06_example_uncertainty_maps_{S.subj_tag(subject_id)}.png")
 
 
 def main():

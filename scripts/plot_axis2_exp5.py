@@ -220,6 +220,43 @@ def fig_examples(subject_id: str = "OASIS_OAS1_0001_MR1", label: str = ""):
         S.save(fig, OUT, f"exp5_06_example_masks_{t}_{S.subj_tag(subject_id)}.png")
 
 
+def fig_examples_combined(subject_id: str, label: str, out_dir, fname: str):
+    """One figure per subject: hippocampus (rows 1-3) and caudate (rows 4-6) under the 4 decoder settings."""
+    npz_p = EXP_DIR / "masks" / f"{subject_id}_exp5_ablation_masks_packed.npz"
+    subj = S.load_subject(subject_id)
+    if subj is None or not npz_p.exists():
+        print("  (skipping exp5 combined overlay: volume or packed masks not available locally)")
+        return
+    img, lab = subj
+    z = np.load(npz_p)
+    shape = z["shape"]
+    img_n = S.norm_img(img)
+    fig, axes = plt.subplots(6, 4, figsize=(12, 16.2), gridspec_kw=dict(wspace=0.04, hspace=0.08, top=0.975, bottom=0.01, left=0.06, right=0.99))
+    for k, t in enumerate(["hippocampus", "caudate"]):
+        lid, rid = S.LABEL_PAIRS[t]
+        both = (lab == lid) | (lab == rid)
+        a_idx = int(np.round(np.argwhere(both)[:, 1].mean()))
+        crop = S.square_crop(S.coronal(both, a_idx), margin=28)
+        for i, (side, col, rl) in enumerate([("none", S.ORGAN, f"'Segment the {t} ...'"),
+                                             ("left", S.LEFT, f"'... left {t} ...'"),
+                                             ("right", S.RIGHT, f"'... right {t} ...'")]):
+            for j, st in enumerate(SETTINGS):
+                ax = axes[3 * k + i, j]
+                mk = S.unpack(z[f"{st}_{t}_{side}"], shape)
+                S.overlay(ax, S.coronal(img_n, a_idx), [(S.coronal(mk, a_idx), col), (S.coronal(both, a_idx), "white")],
+                          crop=crop, contour_only=[False, True])
+                S.lr_tags(ax)
+                ax.text(0.98, 0.95, f"{int(mk.sum()):,} vox", transform=ax.transAxes, ha="right", va="top", fontsize=8, color="white",
+                        bbox=dict(boxstyle="round,pad=0.2", fc="black", alpha=0.6, ec="none"))
+                if 3 * k + i == 0:
+                    ax.set_title(SLABEL[st], fontsize=9.5)
+                if j == 0:
+                    ax.set_ylabel(rl, fontsize=9, fontweight="bold")
+    S.suptitle(fig, f"Subject {subject_id} ({label}) - hippocampus and caudate under the 4 decoder settings",
+               "Filled = VoxTell mask (3D voxel count top-right), white outline = bilateral GT; coronal slice.")
+    S.save(fig, out_dir, fname)
+
+
 def main():
     S.apply_style()
     m, s = load()

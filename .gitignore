@@ -16,3 +16,5 @@ results/**/*.zip
 # (exp2 ~178 MB, exp5 ~1.5 GB); slim copies without masks are kept as metrics_no_masks.csv
 results/**/exp2_synonym_shift/metrics.csv
 results/**/exp5_decoder_ablation/metrics.csv
+# Per-subject example figures (20 subjects per experiment); regenerate with scripts/plot_axis2_experimental_plots.py
+results/**/experimental_plot/

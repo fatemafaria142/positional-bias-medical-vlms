@@ -1,7 +1,7 @@
 """
 Figures for Axis II Experiment IV (`exp4_mc_dropout_uncertainty`): MC-dropout uncertainty per prompt wording.
 
-Run:  .venv/bin/python scripts/plot_axis2_exp4.py
+Run:  .venv/bin/python analysis/plot_axis2_exp4.py
 Writes PNGs to results/results_axis2_exp4/plots/.
 """
 from __future__ import annotations

@@ -1,6 +1,6 @@
 # Experiment I — Does the side word change VoxTell's output?
 
-**Folder:** `results_axis2_exp1/` · **Raw outputs:** `exp1_side_word_comparison/` · **Figures:** [`plots/`](plots/) · **Script:** `scripts/plot_axis2_exp1.py`
+**Folder:** `results_axis2_exp1/` · **Raw outputs:** `exp1_side_word_comparison/` · **Figures:** [`plots/`](plots/) · **Script:** `analysis/plot_axis2_exp1.py`
 
 ---
 

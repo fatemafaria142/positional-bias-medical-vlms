@@ -6,7 +6,7 @@ The 20 subjects are the same for every experiment: the 100 subjects are sorted b
 (canonical base / left / right prompts, 7 structures) and 20 are taken at evenly spaced ranks, from the hardest
 to the best scan.
 
-Run:  cd scripts && ../.venv/bin/python plot_axis2_experimental_plots.py
+Run:  cd analysis && ../.venv/bin/python plot_axis2_experimental_plots.py
 """
 from __future__ import annotations
 

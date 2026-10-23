@@ -1,6 +1,6 @@
 # Experiment V — Decoder ablation: which part of VoxTell does the work?
 
-**Folder:** `results_axis2_exp5/` · **Raw outputs:** `exp5_decoder_ablation/` · **Figures:** [`plots/`](plots/) · **Script:** `scripts/plot_axis2_exp5.py`
+**Folder:** `results_axis2_exp5/` · **Raw outputs:** `exp5_decoder_ablation/` · **Figures:** [`plots/`](plots/) · **Script:** `analysis/plot_axis2_exp5.py`
 
 ---
 

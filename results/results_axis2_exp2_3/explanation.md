@@ -1,6 +1,6 @@
 # Experiments II & III — Synonym sensitivity and where side information lives inside VoxTell
 
-**Folder:** `results_axis2_exp2_3/` · **Raw outputs:** `exp2_synonym_shift/`, `exp3_layer_localization/` · **Figures:** [`plots/`](plots/) · **Script:** `scripts/plot_axis2_exp2_3.py`
+**Folder:** `results_axis2_exp2_3/` · **Raw outputs:** `exp2_synonym_shift/`, `exp3_layer_localization/` · **Figures:** [`plots/`](plots/) · **Script:** `analysis/plot_axis2_exp2_3.py`
 
 Both experiments were run together in a single pass per scan (same 100 Neurite-OASIS MRIs, same 7 bilateral structures as Experiment I).
 

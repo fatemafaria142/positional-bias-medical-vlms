@@ -7,7 +7,7 @@ Settings (no retraining - components are bypassed at inference time):
   text_only  = prompt decoder ON,       U-Net image decoder bypassed (stem features x mask embedding)
   both_off   = both bypassed
 
-Run:  .venv/bin/python scripts/plot_axis2_exp5.py
+Run:  .venv/bin/python analysis/plot_axis2_exp5.py
 Writes PNGs to results/results_axis2_exp5/plots/.
 """
 from __future__ import annotations

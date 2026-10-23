@@ -4,7 +4,7 @@ Figures for Axis II Experiments II + III (`results_axis2_exp2_3`):
     and does embedding distance predict that change?
   - Experiment III (`exp3_layer_localization`): where in VoxTell (14 stages) do side and wording information live?
 
-Run:  .venv/bin/python scripts/plot_axis2_exp2_3.py
+Run:  .venv/bin/python analysis/plot_axis2_exp2_3.py
 Writes PNGs to results/results_axis2_exp2_3/plots/.
 """
 from __future__ import annotations

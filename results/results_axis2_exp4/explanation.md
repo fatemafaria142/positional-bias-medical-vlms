@@ -1,6 +1,6 @@
 # Experiment IV — MC-Dropout uncertainty: does VoxTell *know* when a prompt confuses it?
 
-**Folder:** `results_axis2_exp4/` · **Raw outputs:** `exp4_mc_dropout_uncertainty/` · **Figures:** [`plots/`](plots/) · **Script:** `scripts/plot_axis2_exp4.py`
+**Folder:** `results_axis2_exp4/` · **Raw outputs:** `exp4_mc_dropout_uncertainty/` · **Figures:** [`plots/`](plots/) · **Script:** `analysis/plot_axis2_exp4.py`
 
 ---
 

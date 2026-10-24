@@ -1,5 +1,6 @@
 data/
 neurite-oasis.v1.0/
+totalsegmentator_v2.0.1/
 __pycache__/
 *.pyc
 .env

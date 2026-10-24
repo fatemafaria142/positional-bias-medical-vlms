@@ -325,9 +325,17 @@ def gradient_saliency(model, patch, row=0, memory=None, pos=None, prompts_embed=
              i.e. the channel-mean gradient of the same logits w.r.t. the bottleneck token grid).
     """
     assert torch.is_grad_enabled(), 'gradient_saliency needs grad enabled -- do not call inside inference_mode/no_grad'
-    for p in model.parameters():  # one-time de-taint; cheap no-op on every call after the first
+    for p in model.parameters():  # one-time de-taint + freeze; cheap no-op on every call after the first
         if p.is_inference():
             p.data = p.data.clone()
+        # We only ever read patch.grad / bottleneck.grad below, never a parameter's own .grad --
+        # but nn.Module parameters default to requires_grad=True, so unless frozen here,
+        # logits.sum().backward() allocates a same-size .grad buffer for EVERY parameter in the
+        # whole encoder+decoder (roughly doubling the model's GPU footprint) AND, because nothing
+        # ever calls zero_grad(), those buffers accumulate (+=) across every subsequent call --
+        # confirmed as the cause of "CUDA out of memory" on the very first RQ8 subject on a 15 GB
+        # T4 even though a single encoder+backward pass is otherwise cheap.
+        p.requires_grad_(False)
     patch = patch.clone().detach().requires_grad_(True)
     skips, mem = encode(model, patch)
     # keep the bottleneck activation's own grad (for Grad-CAM) by not detaching it

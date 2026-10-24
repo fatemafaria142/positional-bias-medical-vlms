@@ -4,3 +4,6 @@
 *.jpg -text -diff
 *.jpeg -text -diff
 *.tif -text -diff
+results/**/*.csv filter=lfs diff=lfs merge=lfs -text
+kaggle_outputs/**/*.csv filter=lfs diff=lfs merge=lfs -text
+kaggle_outputs/**/*.log filter=lfs diff=lfs merge=lfs -text

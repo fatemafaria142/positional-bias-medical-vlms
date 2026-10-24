@@ -1,7 +1,0 @@
-Please generate a CSV file containing the actual ground-truth masks, predicted masks, and all other necessary information required for visualization and evaluation.
-
-I will be running my experiments on Kaggle, where downloading and storing image files can be challenging. Therefore, I want to save all essential results in CSV format so that I can download the CSV files and use them later for visualization, analysis, and metric calculation without needing to download the original images or mask files again.
-
-Please ensure that the CSV files include all the information required for each RQ, including the ground-truth masks, predicted masks, sample IDs, model predictions, relevant metadata, and any other necessary experimental outputs. Store the masks in a format that allows me to reconstruct and visualize them later, and ensure that the saved results are sufficient to calculate all relevant evaluation metrics for each RQ.
-
-Please also organize the CSV files clearly by RQ and experiment, where appropriate, so that I can easily access the results, visualize the masks, compare predictions against the ground truth, and calculate the required metrics without rerunning the experiments on Kaggle.

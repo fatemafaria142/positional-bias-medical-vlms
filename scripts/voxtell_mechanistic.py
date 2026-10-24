@@ -335,7 +335,7 @@ def gradient_saliency(model, patch, row=0, memory=None, pos=None, prompts_embed=
     bottleneck.retain_grad()
     tgt0 = model.project_text_embed(prompts_embed).unsqueeze(1)  # (M, 1, Q)
     states, _ = base_trajectory(model, tgt0, mem, pos if pos is not None else model.pos_embed)
-    mask_emb = model.transformer_decoder.norm(states[-1][row:row + 1])  # (1, Q)
+    mask_emb = model.transformer_decoder.norm(states[-1][row:row + 1])[:, 0]  # (1, Q)
     logits = decode(model, skips, mask_emb)  # (1, X, Y, Z)
     logits.sum().backward()
     saliency = patch.grad.detach().abs().sum(dim=1)[0].float()  # (X, Y, Z)

@@ -337,18 +337,28 @@ def gradient_saliency(model, patch, row=0, memory=None, pos=None, prompts_embed=
         # T4 even though a single encoder+backward pass is otherwise cheap.
         p.requires_grad_(False)
     patch = patch.clone().detach().requires_grad_(True)
-    skips, mem = encode(model, patch)
-    # keep the bottleneck activation's own grad (for Grad-CAM) by not detaching it
-    bottleneck = skips[model.selected_decoder_layer]
-    bottleneck.retain_grad()
-    tgt0 = model.project_text_embed(prompts_embed).unsqueeze(1)  # (M, 1, Q)
-    states, _ = base_trajectory(model, tgt0, mem, pos if pos is not None else model.pos_embed)
-    mask_emb = model.transformer_decoder.norm(states[-1][row:row + 1])[:, 0]  # (1, Q)
-    logits = decode(model, skips, mask_emb)  # (1, X, Y, Z)
-    logits.sum().backward()
+    # Forward under autocast, same as run_outputs' inference path for this SAME model -- a full
+    # fp32 forward through the whole encoder+decoder (needed here to retain activations for
+    # backward, unlike run_outputs' @torch.inference_mode()) roughly doubles the activation
+    # memory a fp16 forward needs, which is what actually OOM'd a 15 GB T4 on RQ8's very first
+    # subject even with model parameters frozen above (that only trimmed ~100 MB -- the frozen
+    # .grad buffers were never the dominant cost; the saved forward activations were).
+    autocast_ctx = torch.autocast(patch.device.type) if patch.device.type == 'cuda' else contextlib.nullcontext()
+    with autocast_ctx:
+        skips, mem = encode(model, patch)
+        # keep the bottleneck activation's own grad (for Grad-CAM) by not detaching it
+        bottleneck = skips[model.selected_decoder_layer]
+        bottleneck.retain_grad()
+        tgt0 = model.project_text_embed(prompts_embed).unsqueeze(1)  # (M, 1, Q)
+        states, _ = base_trajectory(model, tgt0, mem, pos if pos is not None else model.pos_embed)
+        mask_emb = model.transformer_decoder.norm(states[-1][row:row + 1])[:, 0]  # (1, Q)
+        logits = decode(model, skips, mask_emb)  # (1, X, Y, Z)
+    logits.float().sum().backward()
     saliency = patch.grad.detach().abs().sum(dim=1)[0].float()  # (X, Y, Z)
-    cam = bottleneck.grad.detach().mean(dim=1)[0].float()  # (d, h, w) -- channel-mean, ReLU'd below
+    cam = bottleneck.grad.detach().float().mean(dim=1)[0]  # (d, h, w) -- channel-mean, ReLU'd below
     cam = cam.clamp_min(0)
+    del skips, mem, bottleneck, tgt0, states, mask_emb, logits, patch
+    torch.cuda.empty_cache() if torch.cuda.is_available() else None
     return saliency.cpu().numpy(), cam.cpu().numpy()
 
 

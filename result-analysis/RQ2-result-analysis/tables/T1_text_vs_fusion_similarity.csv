@@ -1,0 +1,18 @@
+Organ,Raw text cosine similarity,Raw text L2 distance,Decoder Stage 0 cosine similarity,Decoder finest logit cosine similarity,Change (finest logit minus raw text)
+Vessel,0.759,95.4,0.54,0.96,0.202
+Thalamus,0.84,78.4,0.739,0.98,0.14
+Amygdala,0.85,75.0,0.656,0.984,0.134
+Cerebral cortex,0.851,75.4,0.772,0.979,0.129
+Choroid plexus,0.853,73.3,0.503,0.961,0.108
+Cerebellum cortex,0.857,73.1,0.754,0.97,0.113
+Caudate,0.858,72.2,0.766,0.988,0.13
+Cerebral white matter,0.86,72.0,0.713,0.95,0.089
+Hippocampus,0.861,72.3,0.676,0.99,0.129
+Accumbens,0.862,73.1,0.667,0.986,0.124
+Pallidum,0.88,67.3,0.766,0.988,0.108
+Cerebellum white matter,0.882,65.5,0.702,0.984,0.102
+Putamen,0.885,65.7,0.77,0.988,0.103
+Lateral ventricle,0.911,57.6,0.687,0.978,0.067
+Inferior lateral ventricle,0.912,57.4,0.657,0.981,0.069
+Ventral DC,0.92,55.8,0.756,0.992,0.072
+Mean of 16 organs,0.865,70.6,0.695,0.979,0.114

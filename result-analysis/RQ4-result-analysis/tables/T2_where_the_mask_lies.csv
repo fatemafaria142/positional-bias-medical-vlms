@@ -1,0 +1,12 @@
+﻿Layers whose update is replaced,"Left prompts, mask on the left organ","Left prompts, mask on the right organ","Left prompts, mask outside both organs","Left prompts, mask moves to the other side","Right prompts, mask on the left organ","Right prompts, mask on the right organ","Right prompts, mask outside both organs","Right prompts, mask moves to the other side"
+None (unpatched),82.2%,0.0%,17.7%,0.0%,0.0%,84.9%,15.1%,0.0%
+Layer 0 only,83.9%,0.3%,15.8%,0.0%,0.1%,84.9%,14.9%,0.0%
+Layer 1 only,83.1%,0.2%,16.7%,0.0%,0.1%,84.9%,15.0%,0.0%
+Layer 2 only,83.1%,0.2%,16.7%,0.0%,0.1%,85.2%,14.7%,0.0%
+Layer 3 only,82.8%,0.2%,17.0%,0.0%,0.1%,85.3%,14.6%,0.0%
+Layer 4 only,82.9%,0.2%,17.0%,0.0%,0.1%,84.9%,15.1%,0.0%
+Layer 5 only,82.6%,0.2%,17.2%,0.0%,0.1%,85.0%,14.9%,0.0%
+Layers 3–5 together,84.2%,2.2%,13.6%,0.0%,1.8%,85.9%,12.3%,0.0%
+Layers 0–5 together,26.5%,66.6%,6.9%,38.8%,42.2%,49.6%,8.2%,3.4%
+Whole state at Layer 0,0.0%,84.9%,15.1%,100.0%,81.9%,0.0%,18.1%,97.5%
+Whole state at Layer 5,0.0%,84.9%,15.1%,100.0%,81.9%,0.0%,18.1%,97.5%

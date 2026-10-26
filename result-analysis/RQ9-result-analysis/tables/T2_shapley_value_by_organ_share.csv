@@ -1,0 +1,6 @@
+Share of the organ inside the block,Number of blocks,Mean Shapley value,Median Shapley value,95% interval of the mean,Blocks with a negative Shapley value (%)
+No voxel of the organ,560,0.035,0.018,0.030 to 0.040,25
+Up to 5%,1848,0.053,0.039,0.050 to 0.056,16
+5% to 15%,3512,0.095,0.081,0.093 to 0.096,7
+15% to 30%,3385,0.113,0.105,0.110 to 0.116,5
+More than 30%,295,0.098,0.07,0.086 to 0.111,2

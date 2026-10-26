@@ -1,0 +1,5 @@
+Prompt type,Example prompt (X is the organ),"Mask on the LEFT organ, % of cases (95% interval)","Mask on the RIGHT organ, % of cases (95% interval)","Mask on neither side, % of cases","Lean, right minus left (percentage points)",Leans to
+"Left named first, then right","Segment the left X in this image. Ignore that, segment the right X instead.",0.0% (0.0 to 0.0),58.6% (56.1 to 61.0),41.4%,+58.6,Right
+"Right named first, then left","Segment the right X in this image. Ignore that, segment the left X instead.",36.6% (34.5 to 38.6),0.0% (0.0 to 0.0),63.4%,-36.6,Left
+"No side named, distractor sentence",Segment the X in this image. This scan was acquired under standard protocol.,10.1% (8.4 to 11.8),4.2% (3.1 to 5.4),85.6%,-5.9,Left
+Side named only in an added sentence,"Segment the X in this image. Actually, make it the right one.",0.0% (0.0 to 0.0),70.8% (69.4 to 72.1),29.2%,+70.8,Right

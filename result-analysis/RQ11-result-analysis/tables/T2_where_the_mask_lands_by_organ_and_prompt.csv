@@ -1,0 +1,17 @@
+Organ,"Left named first, then right (left organ / right organ)","Right named first, then left (left organ / right organ)","No side named, distractor sentence (left organ / right organ)",Side named only in an added sentence (left organ / right organ)
+Thalamus,0% / 72%,12% / 0%,0% / 14%,0% / 98%
+Cerebral white matter,0% / 66%,0% / 0%,0% / 0%,0% / 100%
+Hippocampus,0% / 100%,44% / 0%,0% / 0%,0% / 100%
+Amygdala,0% / 100%,52% / 0%,2% / 10%,0% / 100%
+Caudate,0% / 94%,62% / 0%,0% / 12%,0% / 98%
+Cerebellum cortex,0% / 100%,88% / 0%,0% / 20%,0% / 100%
+Cerebellum white matter,0% / 50%,34% / 0%,0% / 2%,0% / 100%
+Pallidum,0% / 100%,92% / 0%,8% / 4%,0% / 100%
+Putamen,0% / 98%,100% / 0%,22% / 4%,0% / 100%
+Inferior lateral ventricle,0% / 6%,2% / 0%,10% / 2%,0% / 76%
+Accumbens,0% / 54%,0% / 0%,86% / 0%,0% / 100%
+Ventral DC,0% / 98%,100% / 0%,34% / 0%,0% / 60%
+Choroid plexus,0% / 0%,0% / 0%,0% / 0%,0% / 0%
+Cerebral cortex,0% / 0%,0% / 0%,0% / 0%,0% / 0%
+Lateral ventricle,0% / 0%,0% / 0%,0% / 0%,0% / 0%
+Vessel,0% / 0%,0% / 0%,0% / 0%,0% / 0%

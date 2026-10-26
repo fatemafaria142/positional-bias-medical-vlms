@@ -1,0 +1,19 @@
+Organ,Shapley value of the organ block,Mean Shapley value of the 7 surrounding blocks,"Difference, organ block minus surrounding blocks",Cases where the organ block is higher (%),Sum of the 8 Shapley values
+Pallidum,0.208,0.116,0.092,73,1.018
+Cerebellum white matter,0.242,0.094,0.148,98,0.9
+Thalamus,0.145,0.108,0.037,57,0.898
+Cerebral white matter,0.122,0.107,0.015,66,0.868
+Cerebellum cortex,0.139,0.095,0.044,91,0.805
+Putamen,0.1,0.088,0.012,64,0.715
+Hippocampus,0.058,0.092,-0.034,18,0.7
+Caudate,0.076,0.087,-0.011,32,0.685
+Ventral DC,0.112,0.066,0.046,68,0.572
+Accumbens,0.078,0.062,0.016,58,0.513
+Amygdala,0.139,0.052,0.087,75,0.505
+Inferior lateral ventricle,0.094,0.049,0.045,60,0.439
+Cerebral cortex,0.009,-0.001,0.01,42,0.001
+Choroid plexus,0.0,0.0,0.0,0,0.0
+Vessel,0.0,0.0,0.0,0,0.0
+Lateral ventricle,-0.005,-0.002,-0.003,49,-0.019
+Mean of 16 organs,0.095,0.063,0.032,53,0.538
+Mean of the 12 organs with a Shapley value,0.126,0.085,0.041,63,0.718

@@ -144,36 +144,54 @@ def placeholder_page(web):
     return "\n".join(body)
 
 
+def short(q, n=64):
+    return q if len(q) <= n else q[:n].rsplit(" ", 1)[0] + "..."
+
+
 def main():
+    import json
+    import render
+    OUT = HERE / "_site"
     if DOCS.exists():
         shutil.rmtree(DOCS)
+    if OUT.exists():
+        for child in OUT.iterdir():
+            shutil.rmtree(child) if child.is_dir() else child.unlink()
     DOCS.mkdir(parents=True)
-    rows = []
+    rows, pages = [], {}
     for n in range(1, N_RQ + 1):
         web, tabs = copy_assets(n, figure_files(n))
         rp = RES / f"RQ{n}-result-analysis" / f"RQ{n}_report.md"
         if rp.exists():
             raw = rp.read_text(encoding="utf-8")
-            page = process_report(raw, web) + downloads(tabs)
-            rows.append((n, question(raw), first_finding(raw)))
+            md = process_report(raw, web) + downloads(tabs)
+            q, key, ready = question(raw), first_finding(raw), True
         else:
-            page = placeholder_page(web)
-            rows.append((n, RQ6_QUESTION, ""))
-        (DOCS / f"rq{n}.md").write_text(page, encoding="utf-8")
-    shutil.copy2(ROOT / "RQ1_to_RQ7_Methodology.md", DOCS / "methodology.md")
-    shutil.copy2(RES / "RQ_Master_Analysis.md", DOCS / "master.md")
-    home = ["# RQ Explorer", "",
-            "Seven research questions on how VoxTell, a text-promptable 3D segmentation model, handles **left and right** on brain MRI. "
-            "Pick a question in the sidebar or in the table below. Every page has the full report with its tables and figures. "
-            "Hover over a figure to see it at full size, or click it to move between the figures of the page.", "",
-            "| Question | What it asks | Key result |", "|---|---|---|"]
-    for n, q, k in rows:
-        key = k if k else '<span class="red">Report not written yet</span>'
-        home.append(f"| **[RQ{n}](rq{n}.md)** | {q} | {key} |")
-    home += ["", "Also see the [methodology](methodology.md) and the [master analysis](master.md)."]
-    (DOCS / "index.md").write_text("\n".join(home), encoding="utf-8")
-    shutil.copytree(HERE / "assets", DOCS / "assets", dirs_exist_ok=True)
-    print("built", len(rows), "RQ pages into", DOCS)
+            md = placeholder_page(web); q, key, ready = RQ6_QUESTION, "", False
+        pages[f"rq{n}"] = (f"RQ{n}", md, q)
+        rows.append((n, q, key, len(web), len(tabs), ready))
+    pages["methodology"] = ("Methodology", (ROOT / "RQ1_to_RQ7_Methodology.md").read_text(encoding="utf-8"), "")
+    pages["master"] = ("Master analysis", (RES / "RQ_Master_Analysis.md").read_text(encoding="utf-8"), "")
+    nav = [("index", "Home", "")] + [(f"rq{n}", f"RQ{n}", short(q)) for n, q, *_ in rows] +           [("methodology", "Methodology", ""), ("master", "Master analysis", "")]
+    OUT.mkdir(parents=True, exist_ok=True)
+    index = []
+    keys = [f"rq{n}" for n in range(1, N_RQ + 1)]
+    for key, (label, md, q) in pages.items():
+        body, toc = render.md_to_html(md)
+        k = keys.index(key) if key in keys else -1
+        prev = (keys[k - 1], keys[k - 1].upper()) if k > 0 else None
+        nxt = (keys[k + 1], keys[k + 1].upper()) if 0 <= k < len(keys) - 1 else None
+        (OUT / f"{key}.html").write_text(render.page(label, body, nav, key, toc, prev, nxt), encoding="utf-8")
+        plain = re.sub(r"<[^>]+>", " ", body)
+        index.append({"key": key, "title": f"{label} {q}".lower(), "text": re.sub(r"\s+", " ", plain).lower()})
+    (OUT / "index.html").write_text(render.page("Home", render.home(rows), nav, "index", wide=True), encoding="utf-8")
+    shutil.copytree(DOCS / "assets", OUT / "assets", dirs_exist_ok=True)
+    (OUT / "assets" / "extra.css").write_text(render.EXTRA_CSS, encoding="utf-8")
+    (OUT / "assets" / "site.js").write_text(render.SITE_JS, encoding="utf-8")
+    shutil.copy2(HERE / "assets" / "figures.js", OUT / "assets" / "figures.js")
+    (OUT / "assets" / "search.json").write_text(json.dumps(index), encoding="utf-8")
+    shutil.rmtree(DOCS)
+    print("built", len(pages) + 1, "pages into", OUT)
 
 
 if __name__ == "__main__":

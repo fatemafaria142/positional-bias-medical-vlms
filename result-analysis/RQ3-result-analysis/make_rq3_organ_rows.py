@@ -146,5 +146,5 @@ names = list(dict.fromkeys(d.organ))
 names = [o for o in names if "left " + o in M.index and "right " + o in M.index]
 order = d[d.layer == 1].set_index("organ")[A].reindex(names).sort_values(ascending=False).index.tolist()    # largest Layer 1 KL first
 for k in range(0, len(order), 4):
-    make(order[k:k + 4], f"RQ3_organ_pairs_group{k // 4 + 1}_subject{int(SID.split('_')[2])}.png")
+    make(order[k:k + 4], f"RQ3_organ_pairs_group{k // 4 + 1}.png")
 print("done", SID, len(order))

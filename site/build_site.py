@@ -18,7 +18,7 @@ def rq6_caption(key):
     group, letter = key
     side = "left" if group == "1" else "right"
     return (f"Shapley value of the image, the organ word, the position word and the other words "
-            f"for the {ORDINAL[letter]} four {side} organs of subject 14")
+            f"for the {ORDINAL[letter]} four {side} organs")
 
 
 def figure_files(n):

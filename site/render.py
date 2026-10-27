@@ -77,7 +77,6 @@ def page(title, body_html, nav, current, toc=(), prev=None, nxt=None, wide=False
   <main class="min-w-0 flex-1 py-8 {"" if wide else "max-w-4xl"}">
     <article class="{PROSE}">{body_html}</article>
     {pn}
-    <footer class="mt-16 border-t-4 border-black py-6 text-sm font-semibold text-black">Research Questions and Analysis</footer>
   </main>
   {toc_html}
 </div>

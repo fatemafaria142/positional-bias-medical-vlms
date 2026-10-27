@@ -147,7 +147,16 @@ EXTRA_CSS = """/* Small pieces Tailwind classes do not cover. Black text, bold b
 .prose ol > li::marker { font-weight: 800; }
 .prose h2#conclusion { color: #d00000; border-color: #d00000; }
 .rqfig { margin: 1.8rem 0 0.4rem; text-align: center; }
-.rqfig img { max-width: 100%; height: auto; border: 2px solid #000000; border-radius: 0.5rem; cursor: zoom-in; background: #ffffff; margin: 0 auto; }
+.rqfig img { max-width: 100%; height: auto; cursor: zoom-in; background: #ffffff; margin: 0 auto; display: block; transform-origin: center center; touch-action: pan-y; user-select: none; }
+.zoomframe { position: relative; overflow: hidden; border: 2px solid #000000; border-radius: 0.5rem; background: #ffffff; }
+.zoomframe.zoomed img { cursor: grab; touch-action: none; }
+.zoomframe.grabbing img { cursor: grabbing; }
+.zoomview { overflow: hidden; }
+.zbar { display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; padding: 0.4rem 0.5rem; background: #ffffff; border-bottom: 2px solid #000000; }
+.zbar::before { content: 'Zoom'; margin-right: auto; font-weight: 800; font-size: 0.85rem; color: #000000; }
+.zbar button { display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem; border: 2px solid #000000; border-radius: 0.5rem; background: #ffffff; color: #000000; cursor: pointer; }
+.zbar button:hover { background: #d00000; border-color: #d00000; color: #ffffff; }
+#fig-viewer button svg { vertical-align: -4px; margin-right: 0.3rem; }
 .cap { margin-top: 0.3rem; }
 .cap .back { font-size: 0.8em; margin-left: 0.5rem; font-weight: 600; }
 .cap:target strong { color: #d00000; }

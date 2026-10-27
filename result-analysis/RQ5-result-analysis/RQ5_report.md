@@ -4,35 +4,11 @@
 
 For one organ, such as the thalamus, we draw a box around it and cut the box into 8 blocks. We hide blocks by replacing them with noise, and the Shapley value of a block is how much the Dice score drops when that block is hidden. The question is whether the model depends more on the organ block, which is the block holding most of the organ, than on the 7 surrounding blocks. The answer is given as one number per organ, the Shapley value of the organ block minus the mean Shapley value of the surrounding blocks. A positive number means that the model relies more on the organ itself, and a negative number means that it relies more on the surroundings.
 
-## Research question
+## Hypothesis
 
-For a given organ, does the Dice score of the predicted mask depend more on the image block that contains most of the organ (the organ block) than on the blocks that surround it?
-
-**Hypothesis.** If the model finds an organ by looking at the organ itself, the Shapley value of the organ block is higher than the mean Shapley value of the 7 surrounding blocks. If the model also relies on the surrounding tissue, the difference is small or negative.
+If the model finds an organ by looking at the organ itself, the Shapley value of the organ block is higher than the mean Shapley value of the 7 surrounding blocks. If the model also relies on the surrounding tissue, the difference is small or negative.
 
 **Measure.** For each organ, the difference between the Shapley value of the organ block and the mean Shapley value of the 7 surrounding blocks, in Dice units, and the share of cases where the organ block has the higher Shapley value.
-
-## Procedure
-
-What happens in one test.
-
-1. Take one scan and one organ, for example the thalamus.
-2. Draw a box around the thalamus and cut it into 8 blocks.
-3. Hide some of the blocks by replacing them with noise, and run the model on the damaged scan.
-4. Measure the Dice score between the predicted mask and the true thalamus.
-5. Repeat for many different choices of hidden blocks, and compute from them how much each block adds to the Dice score. This is the Shapley value of the block.
-
-## Definitions
-
-- **Dice score.** The overlap between the predicted mask and the true organ, from 0 (no overlap) to 1 (perfect match).
-- **Shapley value of a block.** How much the Dice score rises when the block is visible instead of hidden, averaged over the different choices of the other blocks. It is given in Dice units. A large Shapley value means that the model needs the block, and a negative value means that showing the block makes the Dice lower. The values are Monte Carlo estimates from two randomly chosen sets of the other blocks, and not the exact values from all 256 combinations of blocks, so the 8 Shapley values of a case are close to, but do not always add up to, the Dice of the full scan.
-- **Organ block.** The block that holds the largest part of the organ.
-- **Surrounding blocks.** The other 7 blocks of the box.
-- **Layer of blocks.** The 8 blocks are arranged in two layers along the head–foot direction, with 4 blocks in each layer. The upper layer is the half of the box nearer the top of the head and the lower layer is the half nearer the neck. A layer is a part of the input image and not a layer of the neural network, because the experiment only changes the input image and runs the whole model.
-- **Slice shown in the figures.** Each figure row shows one axial slice, the slice through the centre of the organ inside that layer, so the two rows are two different slices of the same organ.
-- **Share of the organ inside a block.** The number of voxels of the organ in the block divided by the number of voxels of the whole organ.
-- **Organs with a Shapley value.** The 12 organs whose mean sum of the 8 Shapley values is above 0.1. The other 4 organs are left out of Table 2, because hiding blocks does not change their Dice.
-- **95% interval.** Obtained by resampling the subjects 2,000 times, because the 32 organs of one subject are not independent.
 
 ## Tables
 
@@ -112,3 +88,15 @@ What happens in one test.
 ## Conclusion
 
 On average, the Shapley value of the organ block is higher than that of the surrounding blocks (0.126 against 0.085 over the 12 organs with a Shapley value, higher in 63% of the cases), so the hypothesis is supported overall. It is supported strongly for cerebellum white matter and not supported for hippocampus and caudate, where the surrounding blocks matter more. Four organs have a Shapley value of about 0, so the hypothesis cannot be tested for them.
+
+## Definitions
+
+- **Dice score.** The overlap between the predicted mask and the true organ, from 0 (no overlap) to 1 (perfect match).
+- **Shapley value of a block.** How much the Dice score rises when the block is visible instead of hidden, averaged over the different choices of the other blocks. It is given in Dice units. A large Shapley value means that the model needs the block, and a negative value means that showing the block makes the Dice lower. The values are Monte Carlo estimates from two randomly chosen sets of the other blocks, and not the exact values from all 256 combinations of blocks, so the 8 Shapley values of a case are close to, but do not always add up to, the Dice of the full scan.
+- **Organ block.** The block that holds the largest part of the organ.
+- **Surrounding blocks.** The other 7 blocks of the box.
+- **Layer of blocks.** The 8 blocks are arranged in two layers along the head–foot direction, with 4 blocks in each layer. The upper layer is the half of the box nearer the top of the head and the lower layer is the half nearer the neck. A layer is a part of the input image and not a layer of the neural network, because the experiment only changes the input image and runs the whole model.
+- **Slice shown in the figures.** Each figure row shows one axial slice, the slice through the centre of the organ inside that layer, so the two rows are two different slices of the same organ.
+- **Share of the organ inside a block.** The number of voxels of the organ in the block divided by the number of voxels of the whole organ.
+- **Organs with a Shapley value.** The 12 organs whose mean sum of the 8 Shapley values is above 0.1. The other 4 organs are left out of Table 2, because hiding blocks does not change their Dice.
+- **95% interval.** Obtained by resampling the subjects 2,000 times, because the 32 organs of one subject are not independent.

@@ -8,16 +8,6 @@ When the model reads a prompt such as "Segment the left thalamus in this image."
 
 The prompt decoder is expected to reduce the difference between the left and the right prompt, so the KL divergence between their attention patterns is expected to be highest in the first layer and to fall in the later layers. A rise near the end would mean that a difference between the prompts returns.
 
-## Definitions
-
-- **Attention distribution.** In each decoder layer, the prompt gives a weight to every part of the image. The weights add up to 1, so they form a distribution that shows where the prompt is looking. For example, a prompt may give most of its weight to the region around the thalamus and little to the rest of the image.
-- **Left attention and right attention.** The left attention, written p, is the attention distribution of the "left X" prompt. The right attention, written q, is the attention distribution of the "right X" prompt. Both are taken in the same layer, for the same scan.
-- **KL divergence.** A number that compares two distributions. It is 0 when the two are identical and grows as they differ. It is not a share or a percentage, so it is not limited to 1. The values in this study range from 0.012 to 0.079 on average.
-- **Left from right.** The KL divergence of the left attention from the right attention, which is the sum over all parts of the image of p × log(p / q). It compares the two patterns and counts mostly the parts of the image where the left prompt gives a large weight.
-- **Right from left.** The KL divergence of the right attention from the left attention, which is the sum over all parts of the image of q × log(q / p). It counts mostly the parts of the image where the right prompt gives a large weight.
-- **Why both directions are reported.** The two directions are not equal in general. If both prompts look at the same parts, both values are close to 0. If one prompt looks closely at a part where the other gives little weight, the value that counts the first prompt's parts becomes large. Reporting both shows whether the result depends on which prompt is taken as the reference.
-- **Layer 1 to Layer 6.** The six layers of the prompt decoder, from first to last. Attention exists only inside these layers, so KL divergence is not defined before Layer 1.
-
 ## Table
 
 **Table 1. Attention KL divergence between the left and right prompts at each layer of the prompt decoder, in both directions (mean ± SD and median over subjects and organs).**
@@ -74,3 +64,13 @@ The prompt decoder is expected to reduce the difference between the left and the
 ## Conclusion
 
 The KL divergence between the left and right prompt attention is largest in the first decoder layer (0.079 and 0.063), falls to its lowest at Layer 3 (0.012), rises slightly at Layer 5 (0.021 and 0.023), and is small again at Layer 6 (median 0.008). The two prompts therefore look at the image most differently in the first layer and in a very similar way in the later layers, so the difference between "left" and "right" is mainly expressed early in the prompt decoder.
+
+## Definitions
+
+- **Attention distribution.** In each decoder layer, the prompt gives a weight to every part of the image. The weights add up to 1, so they form a distribution that shows where the prompt is looking. For example, a prompt may give most of its weight to the region around the thalamus and little to the rest of the image.
+- **Left attention and right attention.** The left attention, written p, is the attention distribution of the "left X" prompt. The right attention, written q, is the attention distribution of the "right X" prompt. Both are taken in the same layer, for the same scan.
+- **KL divergence.** A number that compares two distributions. It is 0 when the two are identical and grows as they differ. It is not a share or a percentage, so it is not limited to 1. The values in this study range from 0.012 to 0.079 on average.
+- **Left from right.** The KL divergence of the left attention from the right attention, which is the sum over all parts of the image of p × log(p / q). It compares the two patterns and counts mostly the parts of the image where the left prompt gives a large weight.
+- **Right from left.** The KL divergence of the right attention from the left attention, which is the sum over all parts of the image of q × log(q / p). It counts mostly the parts of the image where the right prompt gives a large weight.
+- **Why both directions are reported.** The two directions are not equal in general. If both prompts look at the same parts, both values are close to 0. If one prompt looks closely at a part where the other gives little weight, the value that counts the first prompt's parts becomes large. Reporting both shows whether the result depends on which prompt is taken as the reference.
+- **Layer 1 to Layer 6.** The six layers of the prompt decoder, from first to last. Attention exists only inside these layers, so KL divergence is not defined before Layer 1.

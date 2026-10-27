@@ -8,24 +8,6 @@ A prompt such as "Segment the left hippocampus in this image." has several parts
 
 The organ word is expected to carry most of the credit. The position word is expected to carry a smaller credit that helps only once the organ is named, and the other words are expected to carry almost none.
 
-## Procedure
-
-1. For every organ, the four parts are switched on and off in all 16 combinations, and each combination is one prompt variant that the model segments.
-2. The Dice score of each variant is measured against the true organ of the prompted side.
-3. The exact Shapley value of each part is calculated from the 16 Dice scores, and the exact interaction of each pair of parts.
-
-## Definitions
-
-- **Players.** The four parts that are switched on or off are the image, the organ word, the position word and the other words. With four players there are 16 combinations.
-- **Image off.** The voxels of the organ itself are replaced with Gaussian noise that has the mean and spread of the scan, and the rest of the scan is unchanged.
-- **Organ word off.** The organ name is replaced with the generic word "structure", for example "Segment the left structure in this image."
-- **Position word off.** The word "left" or "right" is dropped, for example "Segment the hippocampus in this image."
-- **Other words off.** The sentence is cut down to its content words, for example "Left hippocampus." instead of "Segment the left hippocampus in this image."
-- **Dice score.** The overlap between the predicted mask and the true organ, from 0 (no overlap) to 1 (perfect match).
-- **Shapley value.** The share of the Dice score that belongs to one player, calculated exactly over all 16 combinations. It is the average gain in Dice when that player is switched on, over every order in which the players can be added. It is given in Dice units. A positive value means that the player raises the Dice score, and a negative value means that it lowers the Dice score.
-- **Total credit.** The sum of the four Shapley values. It equals the Dice of the full prompt minus the Dice of the prompt with all four players off, which is practically 0, so the total credit is practically the Dice of the full prompt.
-- **Interaction.** The extra Dice that two players give when they are on together, beyond what each gives alone. A positive value means that the two players help each other, and a negative value means that they get in each other's way.
-
 ## Tables
 
 **Table 1. Shapley value of each player in Dice units.**
@@ -150,3 +132,15 @@ The organ word is expected to carry most of the credit. The position word is exp
 ## Conclusion
 
 The organ word carries most of the credit for the Dice score (72.9% of the total), the image carries 20.3% and the position word 18.1%, while the other words of the sentence lower the score slightly (−11.4%). The position word and the image each add credit mainly together with the organ word, and the other words get in the way of the organ word. The balance between the parts depends on the organ and not on the subject, and four organs get almost no total credit.
+
+## Definitions
+
+- **Players.** The four parts that are switched on or off are the image, the organ word, the position word and the other words. With four players there are 16 combinations.
+- **Image off.** The voxels of the organ itself are replaced with Gaussian noise that has the mean and spread of the scan, and the rest of the scan is unchanged.
+- **Organ word off.** The organ name is replaced with the generic word "structure", for example "Segment the left structure in this image."
+- **Position word off.** The word "left" or "right" is dropped, for example "Segment the hippocampus in this image."
+- **Other words off.** The sentence is cut down to its content words, for example "Left hippocampus." instead of "Segment the left hippocampus in this image."
+- **Dice score.** The overlap between the predicted mask and the true organ, from 0 (no overlap) to 1 (perfect match).
+- **Shapley value.** The share of the Dice score that belongs to one player, calculated exactly over all 16 combinations. It is the average gain in Dice when that player is switched on, over every order in which the players can be added. It is given in Dice units. A positive value means that the player raises the Dice score, and a negative value means that it lowers the Dice score.
+- **Total credit.** The sum of the four Shapley values. It equals the Dice of the full prompt minus the Dice of the prompt with all four players off, which is practically 0, so the total credit is practically the Dice of the full prompt.
+- **Interaction.** The extra Dice that two players give when they are on together, beyond what each gives alone. A positive value means that the two players help each other, and a negative value means that they get in each other's way.

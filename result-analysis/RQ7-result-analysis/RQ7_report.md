@@ -15,23 +15,6 @@ The prompt variants, with X standing for the organ, are the following.
 
 If the model has no side preference, masks from a prompt that contradicts itself or names no side are expected to split about evenly between the left and the right organ. A systematic bias would show as a lean to the same side across subjects and organs.
 
-## Procedure
-
-What happens in one test.
-
-1. Take one scan with, for example, a left hippocampus and a right hippocampus.
-2. Give the model a prompt that contradicts itself, such as "Segment the left hippocampus in this image. Ignore that, segment the right hippocampus instead."
-3. The model returns one mask.
-4. We check where the mask landed, which is on the true left hippocampus, on the true right one, on both, on neither, or empty.
-
-This test is repeated for every organ, every subject and every prompt variant.
-
-## Definitions
-
-- **Mask on the left organ or on the right organ.** The predicted mask is compared with the true left organ and the true right organ. It is on one side when it covers that organ best and not the other. The remaining cases, where the mask covers both organs, covers neither organ or is empty, are counted as mask on neither side.
-- **Lean.** The share of masks on the right organ minus the share of masks on the left organ, in percentage points. A positive value leans to the right and a negative value leans to the left.
-- **95% interval.** Obtained by resampling the subjects 2,000 times, because the 16 organs of one subject are not independent.
-
 ## Tables
 
 **Table 1. Where the predicted mask lands for each prompt type, over all subject-organ cases.** Read each row as one prompt type. The three share columns add up to 100%. A positive lean means the masks go more often to the right organ, and a negative lean means they go more often to the left organ.
@@ -115,3 +98,9 @@ This test is repeated for every organ, every subject and every prompt variant.
 ## Conclusion
 
 The prompt is biased to the right when it contradicts itself or adds the side in a later sentence. A final "right" is followed in 58.6% of the cases against 36.6% for a final "left", and an added "make it the right one" is followed in 70.8%. The prompt is biased slightly to the left when no side is named, with 10.1% on the left organ against 4.2% on the right organ, mainly because of accumbens, ventral DC and putamen. The size of the bias depends on the organ, from none for putamen, ventral DC and pallidum to a very strong right bias for thalamus, cerebral white matter and accumbens.
+
+## Definitions
+
+- **Mask on the left organ or on the right organ.** The predicted mask is compared with the true left organ and the true right organ. It is on one side when it covers that organ best and not the other. The remaining cases, where the mask covers both organs, covers neither organ or is empty, are counted as mask on neither side.
+- **Lean.** The share of masks on the right organ minus the share of masks on the left organ, in percentage points. A positive value leans to the right and a negative value leans to the left.
+- **95% interval.** Obtained by resampling the subjects 2,000 times, because the 16 organs of one subject are not independent.

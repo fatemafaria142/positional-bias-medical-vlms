@@ -8,12 +8,6 @@ VoxTell gets its input from two sources, the text prompt and the image. First, w
 
 The text embeddings of "left X" and "right X" are expected to differ, while the image features cannot differ, because the image encoder never receives the prompt. If the decoder output of the two prompts is more similar than their raw text, part of the side difference is lost on the way through the decoder.
 
-## Definitions
-
-- **Raw text embedding.** The prompt as encoded by the frozen Qwen3 text encoder, before any VoxTell-specific processing. The similarity between the "left X" and "right X" embeddings is measured with cosine similarity (1.0 = identical) and L2 distance (0 = identical; larger = more different). Because the embedding depends only on the prompt, each organ has a single value, the same for every subject.
-- **Image features.** The 3D U-Net encoder never receives the text prompt, so the image features for a scan are the same whichever prompt is used. This was checked directly: the image features computed twice for the same scan were identical for every subject, so the left-versus-right image-feature similarity is exactly 1.00.
-- **Final decoder output.** The cosine similarity between the left-prompt and right-prompt maps at the finest logit of the U-Net decoder, averaged over subjects. Fusion cosine at Stage 0 (the first decoder stage) is given for comparison. These are the same quantities as in RQ1.
-
 ## Table
 
 **Table 1. Left-versus-right similarity of the prompts as raw text embeddings and as U-Net decoder outputs for each organ, sorted by text cosine similarity.** The last column is the decoder finest-logit cosine similarity minus the raw text cosine similarity, so a positive value means the two prompts are more alike at the decoder output than as raw text.
@@ -59,3 +53,9 @@ The text embeddings of "left X" and "right X" are expected to differ, while the 
 ## Conclusion
 
 Text and image representations encode laterality differently. The text embeddings of "left X" and "right X" differ (cosine 0.76 to 0.92), while the image features are identical for both prompts (cosine 1.00), so the side comes from the text alone. The text difference is not kept to the end of the pipeline, since at the finest logit the two prompts are more similar than as raw text for every organ (0.979 against 0.865).
+
+## Definitions
+
+- **Raw text embedding.** The prompt as encoded by the frozen Qwen3 text encoder, before any VoxTell-specific processing. The similarity between the "left X" and "right X" embeddings is measured with cosine similarity (1.0 = identical) and L2 distance (0 = identical; larger = more different). Because the embedding depends only on the prompt, each organ has a single value, the same for every subject.
+- **Image features.** The 3D U-Net encoder never receives the text prompt, so the image features for a scan are the same whichever prompt is used. This was checked directly: the image features computed twice for the same scan were identical for every subject, so the left-versus-right image-feature similarity is exactly 1.00.
+- **Final decoder output.** The cosine similarity between the left-prompt and right-prompt maps at the finest logit of the U-Net decoder, averaged over subjects. Fusion cosine at Stage 0 (the first decoder stage) is given for comparison. These are the same quantities as in RQ1.

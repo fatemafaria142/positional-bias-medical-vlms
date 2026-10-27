@@ -8,20 +8,6 @@ VoxTell finds a brain part from a text prompt such as "left hippocampus". We run
 
 The left-prompt and right-prompt fusion channels are expected to differ, since the side word is the only change, and the difference is expected to be larger at some decoder stages than at others. Nearly identical channels at a stage would mean weak sensitivity to the side word at that stage, and would not prove that the text has no side information.
 
-## Definition of the decoder stages
-
-VoxTell first encodes the image with a 3D U-Net encoder. The text prompt is embedded separately, so the image features are identical for the left and right prompt. A 6-layer transformer decoder then fuses text and image into a *mask embedding*. Finally, a U-Net convolutional decoder rebuilds the full-resolution mask, and at each of its **5 fusion stages** the mask embedding is projected and injected into the decoder.
-
-- **Stage 0–3:** the first four fusion stages of the U-Net decoder. Each injects a **32-channel map**, which is the quantity compared between the left and right prompt. Stage 0 is the first (coarsest resolution); resolution increases through Stage 3.
-- **Finest logit:** the fifth and last stage. It has no 32-channel map; it produces the single full-resolution logit map that is thresholded into the predicted mask.
-- These stages belong to the convolutional decoder, not to the 6 layers of the transformer decoder.
-
-### What "32 channels" means
-
-The 32 channels are **inside each stage**, not spread across the stages. Stage 0, Stage 1, Stage 2 and Stage 3 each contain one feature map with 32 channels. The model produces one such map for the "left X" prompt and one for the "right X" prompt. Within a stage, channel *c* of the left map is compared with channel *c* of the right map, which gives 32 values per stage (one per channel). The table reports the average of these 32 values (and, for cosine similarity, also the lowest of them). The Finest logit has a single channel, so its average and its minimum are the same number.
-
-Similarity is computed between the left-prompt and right-prompt maps on the same image. Cosine similarity of 1.0 means identical channels; lower values mean the prompt changed the channels more. (The stage order, with Stage 0 as the coarsest, follows the decoder's processing order and was not separately verified against each stage's tensor size.)
-
 ## Table
 
 **Table 1. Left-versus-right similarity of the 32 fusion channels at each U-Net decoder stage, reported as mean ± SD over subjects and organ pairs.**
@@ -54,3 +40,17 @@ Similarity is computed between the left-prompt and right-prompt maps on the same
 ## Conclusion
 
 The 32 fusion channels carry a left/right difference, but only at the early decoder stages. The difference is largest at Stage 0 and shrinks at each later stage, until the left- and right-prompt maps are nearly identical at Stage 3 and the finest logit. This holds for all 16 organs, so the model uses the side word early and then largely stops separating the two prompts in its channels.
+
+## Definition of the decoder stages
+
+VoxTell first encodes the image with a 3D U-Net encoder. The text prompt is embedded separately, so the image features are identical for the left and right prompt. A 6-layer transformer decoder then fuses text and image into a *mask embedding*. Finally, a U-Net convolutional decoder rebuilds the full-resolution mask, and at each of its **5 fusion stages** the mask embedding is projected and injected into the decoder.
+
+- **Stage 0–3:** the first four fusion stages of the U-Net decoder. Each injects a **32-channel map**, which is the quantity compared between the left and right prompt. Stage 0 is the first (coarsest resolution); resolution increases through Stage 3.
+- **Finest logit:** the fifth and last stage. It has no 32-channel map; it produces the single full-resolution logit map that is thresholded into the predicted mask.
+- These stages belong to the convolutional decoder, not to the 6 layers of the transformer decoder.
+
+### What "32 channels" means
+
+The 32 channels are **inside each stage**, not spread across the stages. Stage 0, Stage 1, Stage 2 and Stage 3 each contain one feature map with 32 channels. The model produces one such map for the "left X" prompt and one for the "right X" prompt. Within a stage, channel *c* of the left map is compared with channel *c* of the right map, which gives 32 values per stage (one per channel). The table reports the average of these 32 values (and, for cosine similarity, also the lowest of them). The Finest logit has a single channel, so its average and its minimum are the same number.
+
+Similarity is computed between the left-prompt and right-prompt maps on the same image. Cosine similarity of 1.0 means identical channels; lower values mean the prompt changed the channels more. (The stage order, with Stage 0 as the coarsest, follows the decoder's processing order and was not separately verified against each stage's tensor size.)

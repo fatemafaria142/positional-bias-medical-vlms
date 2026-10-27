@@ -8,19 +8,6 @@ VoxTell turns the prompt, for example "Segment the left hippocampus in this imag
 
 If the side is held by particular prompt decoder layers, replacing the update of such a layer with the update of the opposite-side prompt is expected to move the mask to the other side. If no single layer moves the mask, the side is spread over several layers or held elsewhere. Replacing the whole state is expected to move almost every mask, because it only checks that the patching works.
 
-## Definitions
-
-- **Unpatched.** The model's own prediction for a prompt when nothing is replaced. It is not the ground truth, so its Dice is below 1.
-- **Ground truth.** The true organ outline from the dataset labels. In the image figures it is drawn as white outlines, solid for the prompted side and dashed for the other side. Dice and the shares below compare every predicted mask with it.
-- **Activation patching.** Replacing a piece of the model's internal values for one prompt with the values from the other prompt, and then checking how the output changes. Here the replaced piece is the update that a prompt decoder layer adds to the prompt's query vector.
-- **Update of a layer.** The change that one prompt decoder layer makes to the query vector, calculated as the vector after the layer minus the vector before it. Each prompt has its own update at each layer.
-- **Layer on and layer off.** A layer is "on" when its update for the prompt is replaced with the update that the same layer makes for the other-side prompt, and "off" when it is left unchanged. Concretely, a left prompt at an "on" layer receives its own vector before the layer plus the right prompt's update. In the main test, one layer is on and the other five are off.
-- **Layers together.** The same replacement is made at several layers at once. Layers 3 to 5 are on together in one condition, and Layers 0 to 5 are on together in the other.
-- **Whole state.** The entire query vector of the left prompt after one layer is replaced with the right prompt's vector after the same layer. The later layers see the same image, so this should reproduce the right prompt's output, and it only checks that the patching is done correctly.
-- **Where the mask ends up.** The predicted mask is assigned to a side according to how much of each side's true organ it covers. It moves to the other side when it lands on the other side's organ, it stays on the prompted side when it lands on the prompted side's organ, and otherwise it is on both sides, on neither side or empty. The share that moves to the other side is called the flip rate.
-- **Share of the predicted mask.** The part of the predicted mask that lies on the true left organ, on the true right organ, or outside both organs. These three shares add up to 100% for each mask, and they are averaged over the prompts. Empty masks have no shares and are left out of the averages.
-- **Dice of the prompted side and Dice of the other side.** How well the predicted mask overlaps the true organ on the prompted side and on the other side. A value of 1 is a perfect match and 0 means no overlap. The two Dice values are separate scores and do not add up to 1.
-
 ## Tables
 
 **Table 1. Effect of replacing the update of each prompt decoder layer, of several layers together, and of the whole state, over the prompts where the unpatched prediction is on the prompted side.**
@@ -103,3 +90,16 @@ If the side is held by particular prompt decoder layers, replacing the update of
 ## Conclusion
 
 No single decoder layer decides the side of the prediction. Replacing the update of any one layer, or of Layers 3 to 5 together, never moves the mask to the other side. The side changes only when all six layers are replaced together, and even then the mask is mostly split between the two sides or broken, with only 20.9% of the masks moving. This happens far more for left prompts (38.8%) than for right prompts (3.4%). Replacing the whole state moves 98.7% of the masks, which confirms that the patching itself is correct. The side is therefore spread across the layers of the prompt decoder and not held by one layer.
+
+## Definitions
+
+- **Unpatched.** The model's own prediction for a prompt when nothing is replaced. It is not the ground truth, so its Dice is below 1.
+- **Ground truth.** The true organ outline from the dataset labels. In the image figures it is drawn as white outlines, solid for the prompted side and dashed for the other side. Dice and the shares below compare every predicted mask with it.
+- **Activation patching.** Replacing a piece of the model's internal values for one prompt with the values from the other prompt, and then checking how the output changes. Here the replaced piece is the update that a prompt decoder layer adds to the prompt's query vector.
+- **Update of a layer.** The change that one prompt decoder layer makes to the query vector, calculated as the vector after the layer minus the vector before it. Each prompt has its own update at each layer.
+- **Layer on and layer off.** A layer is "on" when its update for the prompt is replaced with the update that the same layer makes for the other-side prompt, and "off" when it is left unchanged. Concretely, a left prompt at an "on" layer receives its own vector before the layer plus the right prompt's update. In the main test, one layer is on and the other five are off.
+- **Layers together.** The same replacement is made at several layers at once. Layers 3 to 5 are on together in one condition, and Layers 0 to 5 are on together in the other.
+- **Whole state.** The entire query vector of the left prompt after one layer is replaced with the right prompt's vector after the same layer. The later layers see the same image, so this should reproduce the right prompt's output, and it only checks that the patching is done correctly.
+- **Where the mask ends up.** The predicted mask is assigned to a side according to how much of each side's true organ it covers. It moves to the other side when it lands on the other side's organ, it stays on the prompted side when it lands on the prompted side's organ, and otherwise it is on both sides, on neither side or empty. The share that moves to the other side is called the flip rate.
+- **Share of the predicted mask.** The part of the predicted mask that lies on the true left organ, on the true right organ, or outside both organs. These three shares add up to 100% for each mask, and they are averaged over the prompts. Empty masks have no shares and are left out of the averages.
+- **Dice of the prompted side and Dice of the other side.** How well the predicted mask overlaps the true organ on the prompted side and on the other side. A value of 1 is a perfect match and 0 means no overlap. The two Dice values are separate scores and do not add up to 1.

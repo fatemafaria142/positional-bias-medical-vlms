@@ -109,9 +109,7 @@ def home(rows):
 <p class="mt-5 max-w-3xl text-lg font-semibold leading-relaxed text-black">Seven research questions on how a text-promptable 3D segmentation model handles the words left and right on brain MRI.
 Pick a question to read its full report, with tables and figures. Click a figure to see it at full size and to move between the figures of the page.</p>
 <div class="mt-10 grid gap-8 md:grid-cols-2 2xl:grid-cols-3">{"".join(cards)}</div>
-<div class="mt-12 flex flex-wrap gap-4">
-<a href="methodology.html" class="rounded-xl border-2 border-black px-5 py-3 font-extrabold text-black no-underline hover:border-brand hover:text-brand">Methodology</a>
-<a href="master.html" class="rounded-xl border-2 border-black px-5 py-3 font-extrabold text-black no-underline hover:border-brand hover:text-brand">Master analysis</a></div></section>"""
+</section>"""
 
 
 SITE_JS = """/* Sidebar search over the page text, and the mobile menu. */

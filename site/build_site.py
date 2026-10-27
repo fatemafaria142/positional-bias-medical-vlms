@@ -170,9 +170,7 @@ def main():
             md = placeholder_page(web); q, key, ready = RQ6_QUESTION, "", False
         pages[f"rq{n}"] = (f"RQ{n}", md, q)
         rows.append((n, q, key, len(web), len(tabs), ready))
-    pages["methodology"] = ("Methodology", (ROOT / "RQ1_to_RQ7_Methodology.md").read_text(encoding="utf-8"), "")
-    pages["master"] = ("Master analysis", (RES / "RQ_Master_Analysis.md").read_text(encoding="utf-8"), "")
-    nav = [("index", "Home", "")] + [(f"rq{n}", f"RQ{n}", short(q)) for n, q, *_ in rows] +           [("methodology", "Methodology", ""), ("master", "Master analysis", "")]
+    nav = [("index", "Home", "")] + [(f"rq{n}", f"RQ{n}", short(q)) for n, q, *_ in rows]
     OUT.mkdir(parents=True, exist_ok=True)
     index = []
     keys = [f"rq{n}" for n in range(1, N_RQ + 1)]

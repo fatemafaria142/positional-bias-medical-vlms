@@ -104,7 +104,7 @@ def home(rows):
     return f"""<section class="not-prose">
 <h1 class="text-4xl font-extrabold leading-tight text-black sm:text-5xl">Research Questions and Analysis</h1>
 <p class="mt-5 max-w-3xl text-lg font-semibold leading-relaxed text-black">Seven research questions on how a text-promptable 3D segmentation model handles the words left and right on brain MRI.
-Pick a question to read its full report, with tables and figures. Click a figure to see it at full size and to move between the figures of the page.</p>
+Pick a question to read its full report, with tables and figures. Click a figure to see it at full size, zoom in and out, drag it, and move between the figures of the page.</p>
 <div class="mt-10 grid gap-8 md:grid-cols-2 2xl:grid-cols-3">{"".join(cards)}</div>
 </section>"""
 
@@ -160,5 +160,9 @@ EXTRA_CSS = """/* Small pieces Tailwind classes do not cover. Black text, bold b
   padding: 0.5rem 1rem; background: #ffffff; border-bottom: 4px solid #000000; font-weight: 800; color: #000000; }
 #fig-viewer button { font: inherit; font-weight: 800; color: #000000; background: #ffffff; border: 2px solid #000000; border-radius: 0.5rem; padding: 0.2rem 0.9rem; cursor: pointer; margin-left: 0.4rem; }
 #fig-viewer button:hover { color: #ffffff; background: #d00000; border-color: #d00000; }
-#fig-viewer img { margin-top: 2.8rem; max-height: 90vh; }
+#fig-viewer { overflow: hidden; }
+#fig-viewer .bar { z-index: 10; }
+#fig-viewer img { margin-top: 2.8rem; max-height: 90vh; cursor: zoom-in; user-select: none; touch-action: none; transform-origin: center center; position: relative; z-index: 1; }
+#fig-viewer img.grabbing { cursor: grabbing; }
+#fig-viewer .zoomlabel { display: inline-block; min-width: 3.6rem; text-align: center; margin: 0 0.2rem; }
 """

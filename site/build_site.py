@@ -10,15 +10,6 @@ DOCS = HERE / "docs"
 RES = ROOT / "result-analysis"
 N_RQ = 7
 
-RQ6_QUESTION = "Which Word of the Prompt Carries the Credit, the Organ Word, the Position Word, the Other Words or the Image?"
-ORDINAL = {"a": "first", "b": "second", "c": "third", "d": "last"}
-
-
-def rq6_caption(key):
-    group, letter = key
-    side = "left" if group == "1" else "right"
-    return (f"Shapley value of the image, the organ word, the position word and the other words "
-            f"for the {ORDINAL[letter]} four {side} organs")
 
 
 def figure_files(n):
@@ -43,7 +34,7 @@ def copy_assets(n, figs):
     for key, p in figs.items():
         shutil.copy2(p, dest / p.name)
         web[key] = f"assets/rq{n}/{p.name}"
-    return web, []
+    return web
 
 
 def fig_html(src, num):
@@ -118,12 +109,6 @@ def move_definitions_last(md):
     return "".join(rest + [d.rstrip("\n") + "\n" for d in defs])
 
 
-def downloads(tabs):
-    if not tabs:
-        return ""
-    return "\n\n## Download the tables\n\n" + "\n".join(f"- [{name}]({href})" for name, href in tabs) + "\n"
-
-
 def first_finding(text):
     m = re.search(r"## Key findings\s+1\.\s+\*\*(.+?)\*\*", text, re.S)
     return m.group(1).strip() if m else ""
@@ -134,25 +119,15 @@ def question(text):
     return m.group(1).strip() if m else ""
 
 
-def placeholder_page(web):
-    body = [f"# RQ6: {RQ6_QUESTION}", "",
-            '<p><span class="red">The report for this research question is not written yet.</span> The figures below are ready. '
-            "The tables, the key findings and the conclusion will be added when the analysis is done.</p>", "",
-            "The credit of each part of the prompt is its Shapley value, in Dice units. Blue raises the Dice score and red lowers it.", ""]
-    for key, src in sorted(web.items()):
-        num = key[0] + key[1]
-        body += [fig_html(src, num), "",
-                 f'<p class="cap" id="fig{num}"><strong>Figure {num}. {rq6_caption(key)}</strong></p>', ""]
-    return "\n".join(body)
-
-
 def short(q, n=64):
     return q if len(q) <= n else q[:n].rsplit(" ", 1)[0] + "..."
 
 
 def main():
     import json
+    import hashlib
     import render
+    render.ASSET_VERSION = hashlib.md5((render.EXTRA_CSS + render.SITE_JS + (HERE / "assets" / "figures.js").read_text(encoding="utf-8")).encode("utf-8")).hexdigest()[:8]
     OUT = HERE / "_site"
     if DOCS.exists():
         shutil.rmtree(DOCS)
@@ -162,16 +137,13 @@ def main():
     DOCS.mkdir(parents=True)
     rows, pages = [], {}
     for n in range(1, N_RQ + 1):
-        web, tabs = copy_assets(n, figure_files(n))
+        web = copy_assets(n, figure_files(n))
         rp = RES / f"RQ{n}-result-analysis" / f"RQ{n}_report.md"
-        if rp.exists():
-            raw = rp.read_text(encoding="utf-8")
-            md = move_definitions_last(process_report(raw, web))
-            q, key, ready = question(raw), first_finding(raw), True
-        else:
-            md = placeholder_page(web); q, key, ready = RQ6_QUESTION, "", False
+        raw = rp.read_text(encoding="utf-8")
+        md = move_definitions_last(process_report(raw, web))
+        q, key, ready = question(raw), first_finding(raw), True
         pages[f"rq{n}"] = (f"RQ{n}", md, q)
-        rows.append((n, q, key, len(web), 0, ready))
+        rows.append((n, q, key, len(web), ready))
     nav = [("index", "Home", "")] + [(f"rq{n}", f"RQ{n}", short(q)) for n, q, *_ in rows]
     OUT.mkdir(parents=True, exist_ok=True)
     index = []

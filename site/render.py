@@ -59,7 +59,7 @@ def page(title, body_html, nav, current, toc=(), prev=None, nxt=None, wide=False
 <script>{TAILWIND_CONFIG}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27/%3E%3Ctext x=%2716%27 y=%2721%27 font-size=%2714%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27%3ERQ%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="assets/extra.css">
+<link rel="stylesheet" href="assets/extra.css?v={ASSET_VERSION}">
 </head>
 <body class="bg-white text-black font-sans antialiased">
 <header class="sticky top-0 z-40 bg-white border-b-4 border-black">
@@ -81,8 +81,8 @@ def page(title, body_html, nav, current, toc=(), prev=None, nxt=None, wide=False
   {toc_html}
 </div>
 <div id="side-backdrop" class="fixed inset-0 z-20 hidden bg-black/40 lg:hidden"></div>
-<script src="assets/figures.js"></script>
-<script src="assets/site.js"></script>
+<script src="assets/figures.js?v={ASSET_VERSION}"></script>
+<script src="assets/site.js?v={ASSET_VERSION}"></script>
 </body></html>"""
 
 
@@ -94,9 +94,12 @@ CARD = """<a href="rq{n}.html" class="group flex flex-col rounded-2xl border-2 b
 <span class="mt-5 flex flex-wrap gap-2">{badges}</span></a>"""
 
 
+ASSET_VERSION = "0"
+
+
 def home(rows):
     cards = []
-    for n, q, key, nfig, ntab, ready in rows:
+    for n, q, key, nfig, ready in rows:
         badges = [f'<span class="rounded-full border-2 border-black px-3 py-0.5 text-xs font-extrabold text-black">{nfig} figure{"s" if nfig != 1 else ""}</span>']
         if not ready: badges.append('<span class="rounded-full bg-brand px-3 py-0.5 text-xs font-extrabold text-white">Report not written yet</span>')
         cards.append(CARD.format(n=n, question=html.escape(q), key=html.escape(key) if key else '<span class="text-brand font-extrabold">Report not written yet</span>', badges="".join(badges)))

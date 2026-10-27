@@ -43,14 +43,7 @@ def copy_assets(n, figs):
     for key, p in figs.items():
         shutil.copy2(p, dest / p.name)
         web[key] = f"assets/rq{n}/{p.name}"
-    tabs = []
-    tdir = RES / f"RQ{n}-result-analysis" / "tables"
-    if tdir.exists():
-        for p in sorted(tdir.glob("*.csv")):
-            (dest / "tables").mkdir(exist_ok=True)
-            shutil.copy2(p, dest / "tables" / p.name)
-            tabs.append((p.name, f"assets/rq{n}/tables/{p.name}"))
-    return web, tabs
+    return web, []
 
 
 def fig_html(src, num):
@@ -116,6 +109,15 @@ def process_report(text, web):
     return page
 
 
+def move_definitions_last(md):
+    """Question, hypothesis, tables, figures, key findings and conclusion first, then the definitions."""
+    parts = re.split(r"(?m)^(?=## )", md)
+    defs = [p for p in parts if p.startswith("## Definition")]
+    rest = [p for p in parts if not p.startswith("## Definition")]
+    rest = [p.rstrip("\n") + "\n\n" for p in rest]
+    return "".join(rest + [d.rstrip("\n") + "\n" for d in defs])
+
+
 def downloads(tabs):
     if not tabs:
         return ""
@@ -164,22 +166,22 @@ def main():
         rp = RES / f"RQ{n}-result-analysis" / f"RQ{n}_report.md"
         if rp.exists():
             raw = rp.read_text(encoding="utf-8")
-            md = process_report(raw, web) + downloads(tabs)
+            md = move_definitions_last(process_report(raw, web))
             q, key, ready = question(raw), first_finding(raw), True
         else:
             md = placeholder_page(web); q, key, ready = RQ6_QUESTION, "", False
         pages[f"rq{n}"] = (f"RQ{n}", md, q)
-        rows.append((n, q, key, len(web), len(tabs), ready))
+        rows.append((n, q, key, len(web), 0, ready))
     nav = [("index", "Home", "")] + [(f"rq{n}", f"RQ{n}", short(q)) for n, q, *_ in rows]
     OUT.mkdir(parents=True, exist_ok=True)
     index = []
     keys = [f"rq{n}" for n in range(1, N_RQ + 1)]
     for key, (label, md, q) in pages.items():
-        body, toc = render.md_to_html(md)
+        body, _ = render.md_to_html(md)
         k = keys.index(key) if key in keys else -1
         prev = (keys[k - 1], keys[k - 1].upper()) if k > 0 else None
         nxt = (keys[k + 1], keys[k + 1].upper()) if 0 <= k < len(keys) - 1 else None
-        (OUT / f"{key}.html").write_text(render.page(label, body, nav, key, toc, prev, nxt), encoding="utf-8")
+        (OUT / f"{key}.html").write_text(render.page(label, body, nav, key, (), prev, nxt), encoding="utf-8")
         plain = re.sub(r"<[^>]+>", " ", body)
         index.append({"key": key, "title": f"{label} {q}".lower(), "text": re.sub(r"\s+", " ", plain).lower()})
     (OUT / "index.html").write_text(render.page("Home", render.home(rows), nav, "index", wide=True), encoding="utf-8")

@@ -1,4 +1,4 @@
-"""RQ6 result analysis: tables T1 to T5 and the summary figure F1 from results/neurite-oasis/RQ6.
+"""RQ6 result analysis: tables T1 to T4 and the summary figure F1 from results/neurite-oasis/RQ6.
 Four players (image, organ word, position word, other words), 2**4 = 16 prompt variants per organ, exact Shapley values on the Dice score
 against the true organ. First 50 subjects by ID, the same as the other RQs. The image is 'absent' when the organ's own region is replaced
 by Gaussian noise."""
@@ -30,24 +30,7 @@ none = c[c.roles_present == "none"].set_index(["subject_id", "organ"]).dice_gt
 assert np.allclose(ind.total, (full - none).reindex(ind.index), atol=2e-4)              # efficiency axiom
 assert len(ind) == 1600 and c.groupby(["subject_id", "organ"]).size().eq(16).all()
 
-# ---------- T1: Dice of the 16 prompt variants ----------
-def prompt(organ_word, position_word, other_words):
-    words = (["left"] if position_word else []) + ["hippocampus" if organ_word else "structure"]
-    if other_words: words = ["Segment", "the"] + words + ["in", "this", "image"]
-    t = " ".join(words); return t[0].upper() + t[1:] + "."
-rows = []
-for ow in (True, False):
-    for og in (True, False):
-        for po in (True, False):
-            for im in (True, False):
-                key = "+".join(sorted([r for r, on in (("image", im), ("organ_word", og), ("position_word", po), ("other_words", ow)) if on])) or "none"
-                x = c[c.roles_present == key].dice_gt
-                rows.append({"Image": "Intact" if im else "Organ region replaced by noise", "Example prompt": prompt(og, po, ow),
-                             "Dice, mean": round(x.mean(), 3), "Dice, SD": round(x.std(), 3), "Dice, median": round(x.median(), 3),
-                             "Cases with Dice of 0.5 or more (%)": int(round((x >= 0.5).mean() * 100))})
-pd.DataFrame(rows).to_csv(TAB / "T1_dice_of_prompt_variants.csv", index=False)
-
-# ---------- T2: Shapley credit per player ----------
+# ---------- T1: Shapley credit per player ----------
 tot = ind.total
 t2 = []
 for r in PL + ["total"]:
@@ -56,32 +39,32 @@ for r in PL + ["total"]:
                "Share of the total credit (%)": round(v.mean() / tot.mean() * 100, 1),
                "Cases with positive credit (%)": int(round((v > 0.001).mean() * 100)),
                "Cases with negative credit (%)": "" if r == "total" else int(round((v < -0.001).mean() * 100))})
-pd.DataFrame(t2).to_csv(TAB / "T2_shapley_credit_per_player.csv", index=False)
+pd.DataFrame(t2).to_csv(TAB / "T1_shapley_credit_per_player.csv", index=False)
 
-# ---------- T3: per organ ----------
+# ---------- T2: per organ ----------
 i2 = ind.reset_index(); i2["core"] = i2.organ.map(core)
 t3 = i2.groupby("core")[PL + ["total"]].mean().sort_values("total", ascending=False)
 t3.insert(0, "Organ", [pretty(o) for o in t3.index])
 t3.columns = ["Organ", "Image", "Organ word", "Position word", "Other words", "Total credit"]
 mean_row = {"Organ": "Mean of 16 organs", **{k: round(ind[v].mean(), 3) for k, v in zip(t3.columns[1:], PL + ["total"])}}
 t3 = pd.concat([t3.round(3), pd.DataFrame([mean_row])], ignore_index=True)
-t3.to_csv(TAB / "T3_shapley_credit_per_organ.csv", index=False)
+t3.to_csv(TAB / "T2_shapley_credit_per_organ.csv", index=False)
 
-# ---------- T4: pairwise interactions ----------
+# ---------- T3: pairwise interactions ----------
 it = s[s.kind == "pairwise_interaction"]
 lab = lambda k: " and ".join(NAMES[p].lower() if i else NAMES[p] for i, p in enumerate(sorted(k.split("+"), key=PL.index)))
 t4 = pd.DataFrame([{"Pair of players": lab(k), "Interaction, mean": round(v.shapley_value.mean(), 3), "Interaction, SD": round(v.shapley_value.std(), 3),
                     "Interaction, median": round(v.shapley_value.median(), 3)} for k, v in it.groupby("role")])
 t4["order"] = [sorted(k.split("+"), key=PL.index) for k in sorted(it.role.unique())]
 t4 = t4.sort_values("order", key=lambda col: col.map(lambda p: [PL.index(x) for x in p])).drop(columns="order")
-t4.to_csv(TAB / "T4_pairwise_interaction.csv", index=False)
+t4.to_csv(TAB / "T3_pairwise_interaction.csv", index=False)
 
-# ---------- T5: spread across subjects ----------
+# ---------- T4: spread across subjects ----------
 sub = ind.groupby("subject_id")[PL + ["total"]].mean()
 t5 = pd.DataFrame([{"Player": NAMES.get(r, "Total credit"), "Mean of the subject means": round(sub[r].mean(), 3), "SD over subjects": round(sub[r].std(), 3),
                     "Lowest subject": round(sub[r].min(), 3), "Highest subject": round(sub[r].max(), 3)} for r in PL + ["total"]])
-t5.to_csv(TAB / "T5_credit_spread_over_subjects.csv", index=False)
-for t in (t1 := pd.read_csv(TAB / "T1_dice_of_prompt_variants.csv"), pd.DataFrame(t2), t3, t4, t5): print(t.to_string(index=False)); print()
+t5.to_csv(TAB / "T4_credit_spread_over_subjects.csv", index=False)
+for t in (pd.DataFrame(t2), t3, t4, t5): print(t.to_string(index=False)); print()
 
 # ---------- F1: Shapley credit per organ and player, as a tile heatmap ----------
 avail = {x.name for x in font_manager.fontManager.ttflist}

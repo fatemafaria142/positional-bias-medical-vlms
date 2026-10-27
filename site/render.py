@@ -100,7 +100,6 @@ def home(rows):
     cards = []
     for n, q, key, nfig, ntab, ready in rows:
         badges = [f'<span class="rounded-full border-2 border-black px-3 py-0.5 text-xs font-extrabold text-black">{nfig} figure{"s" if nfig != 1 else ""}</span>']
-        if ntab: badges.append(f'<span class="rounded-full border-2 border-black px-3 py-0.5 text-xs font-extrabold text-black">{ntab} table file{"s" if ntab != 1 else ""}</span>')
         if not ready: badges.append('<span class="rounded-full bg-brand px-3 py-0.5 text-xs font-extrabold text-white">Report not written yet</span>')
         cards.append(CARD.format(n=n, question=html.escape(q), key=html.escape(key) if key else '<span class="text-brand font-extrabold">Report not written yet</span>', badges="".join(badges)))
     return f"""<section class="not-prose">

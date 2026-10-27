@@ -243,44 +243,34 @@ full = co[co.roles_present == "image+organ_word+other_words+position_word"].set_
 none_ = co[co.roles_present == "none"].set_index(["subject_id", "organ"]).dice_gt
 claim(6, "Efficiency, the four credits add up to the Dice of the full prompt minus the empty prompt", bool(np.allclose(ind.total, (full - none_).reindex(ind.index), atol=2e-4)), f"max abs diff {float((ind.total - (full - none_).reindex(ind.index)).abs().max()):.2e}")
 claim(6, "Dice of the empty prompt is 0 in almost every case", float((none_ > 0.001).mean()) < 0.02, f"share above 0.001: {float((none_ > 0.001).mean()):.4f}")
-# Table 1, the 16 prompt variants, in the order of the table
-def key_(im, og, po, ow): return "+".join(sorted([r for r, on in (("image", im), ("organ_word", og), ("position_word", po), ("other_words", ow)) if on])) or "none"
-order16 = [key_(im, og, po, ow) for ow in (True, False) for og in (True, False) for po in (True, False) for im in (True, False)]
 rows = md_table(6, 1)
-for r, k in zip(rows, order16):
-    x = co[co.roles_present == k].dice_gt
-    cmp_cell(6, f"Table 1 {r[1]} {r[0]} mean and SD", r[2], ms(x)); cmp_cell(6, f"Table 1 {r[1]} {r[0]} median", r[3], [x.median()], extra_tol=0.001)
-    cmp_cell(6, f"Table 1 {r[1]} {r[0]} share", r[4], [(x >= 0.5).mean() * 100], extra_tol=0.5)
-rows = md_table(6, 2)
 for r, col in zip(rows, PL + ["total"]):
-    x = ind[col]; cmp_cell(6, f"Table 2 {r[0]} mean and SD", r[1], ms(x)); cmp_cell(6, f"Table 2 {r[0]} median", r[2], [x.median()])
-    cmp_cell(6, f"Table 2 {r[0]} share", r[3], [x.mean() / ind.total.mean() * 100]); cmp_cell(6, f"Table 2 {r[0]} positive", r[4], [(x > 0.001).mean() * 100], extra_tol=0.5)
-    if col != "total": cmp_cell(6, f"Table 2 {r[0]} negative", r[5], [(x < -0.001).mean() * 100], extra_tol=0.5)
-rows = md_table(6, 3)
+    x = ind[col]; cmp_cell(6, f"Table 1 {r[0]} mean and SD", r[1], ms(x)); cmp_cell(6, f"Table 1 {r[0]} median", r[2], [x.median()])
+    cmp_cell(6, f"Table 1 {r[0]} share", r[3], [x.mean() / ind.total.mean() * 100]); cmp_cell(6, f"Table 1 {r[0]} positive", r[4], [(x > 0.001).mean() * 100], extra_tol=0.5)
+    if col != "total": cmp_cell(6, f"Table 1 {r[0]} negative", r[5], [(x < -0.001).mean() * 100], extra_tol=0.5)
+rows = md_table(6, 2)
 ind2 = ind.reset_index(); ind2["core"] = ind2.organ.str.split(" ", n=1).str[1]
 O = ind2.groupby("core")[PL + ["total"]].mean()
 for r in rows[:-1]:
     o = nmap(r[0].replace("**", ""))
-    for c, v in zip(r[1:], O.loc[o].values): cmp_cell(6, f"Table 3 {r[0]}", c, [v])
-for c, v in zip(rows[-1][1:], ind[PL + ["total"]].mean().values): cmp_cell(6, "Table 3 mean row", c, [v])
-claim(6, "Table 3 is sorted by total credit", list(O.total.sort_values(ascending=False).round(3)) == [float(r[-1]) for r in rows[:-1]], "")
-it = sm[sm.kind == "pairwise_interaction"]; rows = md_table(6, 4)
+    for c, v in zip(r[1:], O.loc[o].values): cmp_cell(6, f"Table 2 {r[0]}", c, [v])
+for c, v in zip(rows[-1][1:], ind[PL + ["total"]].mean().values): cmp_cell(6, "Table 2 mean row", c, [v])
+claim(6, "Table 2 is sorted by total credit", list(O.total.sort_values(ascending=False).round(3)) == [float(r[-1]) for r in rows[:-1]], "")
+it = sm[sm.kind == "pairwise_interaction"]; rows = md_table(6, 3)
 nm4 = {"image": "image", "organ word": "organ_word", "position word": "position_word", "other words": "other_words"}
 for r in rows:
     a_, b_ = [z.strip().lower() for z in r[0].split(" and ")]; pair = {nm4[a_], nm4[b_]}
     cand = [x for x in it.role.unique() if set(x.split("+")) == pair][0]
-    x = it[it.role == cand].shapley_value; cmp_cell(6, f"Table 4 {r[0]}", r[1], ms(x)); cmp_cell(6, f"Table 4 {r[0]} median", r[2], [x.median()])
-sub = ind.groupby("subject_id")[PL + ["total"]].mean(); rows = md_table(6, 5)
+    x = it[it.role == cand].shapley_value; cmp_cell(6, f"Table 3 {r[0]}", r[1], ms(x)); cmp_cell(6, f"Table 3 {r[0]} median", r[2], [x.median()])
+sub = ind.groupby("subject_id")[PL + ["total"]].mean(); rows = md_table(6, 4)
 for r, col in zip(rows, PL + ["total"]):
     x = sub[col]
-    for c, v in zip(r[1:], [x.mean(), x.std(), x.min(), x.max()]): cmp_cell(6, f"Table 5 {r[0]}", c, [v])
+    for c, v in zip(r[1:], [x.mean(), x.std(), x.min(), x.max()]): cmp_cell(6, f"Table 4 {r[0]}", c, [v])
 # numbers quoted in the key findings and figure descriptions
 share = lambda col: ind[col].mean() / ind.total.mean() * 100
 claim(6, "Key finding 1 shares 72.9, 20.3, 18.1, -11.4", [round(share(c), 1) for c in ["organ_word", "image", "position_word", "other_words"]] == [72.9, 20.3, 18.1, -11.4], "")
-zero = [k for k in order16 if "organ_word" not in k]
-claim(6, "Key finding 2 all eight prompts without the organ word have mean Dice 0.000 and no case at 0.5 or more", all(co[co.roles_present == k].dice_gt.mean() < 0.0005 and (co[co.roles_present == k].dice_gt >= 0.5).sum() == 0 for k in zero) and len(zero) == 8, "")
-claim(6, "Key finding 3 other words negative in 74% and positive in 13%", (round((ind.other_words < -0.001).mean() * 100) == 74) and (round((ind.other_words > 0.001).mean() * 100) == 13), "")
-claim(6, "Key finding 5 interaction image and organ word is the largest of the six pairs", it.groupby("role").shapley_value.mean().idxmax() == "image+organ_word", "")
+claim(6, "Key finding 2 other words negative in 74% and positive in 13%", (round((ind.other_words < -0.001).mean() * 100) == 74) and (round((ind.other_words > 0.001).mean() * 100) == 13), "")
+claim(6, "Key finding 4 interaction image and organ word is the largest of the six pairs", it.groupby("role").shapley_value.mean().idxmax() == "image+organ_word", "")
 org_max = O[PL].idxmax(axis=1); nz = O.total.abs() > 1e-6
 claim(6, "Figure 1 the organ word is the largest for all 14 organs with a nonzero credit", int(nz.sum()) == 14 and bool((org_max[nz] == "organ_word").all()), str(int(nz.sum())))
 r14 = ind.loc["OASIS_OAS1_0014_MR1"]

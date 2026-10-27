@@ -1,7 +1,7 @@
 # RQ Explorer
 
 A free static website for RQ1 to RQ7. The sidebar lists the research questions, and each page shows the full report with
-its tables and figures. Hover over a figure to see it at full size, or click it to move between the figures of the page
+its tables and figures. Click a figure to see it at full size and to move between the figures of the page
 (Previous and Next buttons, the left and right arrow keys, Escape to close).
 
 ## How it works

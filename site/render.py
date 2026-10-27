@@ -107,7 +107,7 @@ def home(rows):
 <p class="text-sm font-extrabold uppercase tracking-widest text-brand">Research questions</p>
 <h1 class="mt-2 text-4xl font-extrabold leading-tight text-black sm:text-5xl">Does VoxTell tell <span class="text-brand">left</span> from <span class="text-brand">right</span>?</h1>
 <p class="mt-5 max-w-3xl text-lg font-semibold leading-relaxed text-black">Seven research questions on how a text-promptable 3D segmentation model handles the words left and right on brain MRI.
-Pick a question to read its full report, with tables and figures. Hover over a figure to see it at full size, or click it to move between the figures of the page.</p>
+Pick a question to read its full report, with tables and figures. Click a figure to see it at full size and to move between the figures of the page.</p>
 <div class="mt-10 grid gap-8 md:grid-cols-2 2xl:grid-cols-3">{"".join(cards)}</div>
 <div class="mt-12 flex flex-wrap gap-4">
 <a href="methodology.html" class="rounded-xl border-2 border-black px-5 py-3 font-extrabold text-black no-underline hover:border-brand hover:text-brand">Methodology</a>
@@ -158,14 +158,12 @@ EXTRA_CSS = """/* Small pieces Tailwind classes do not cover. Black text, bold b
 .cap .back { font-size: 0.8em; margin-left: 0.5rem; font-weight: 600; }
 .cap:target strong { color: #d00000; }
 :target { scroll-margin-top: 5rem; }
-#fig-hover, #fig-viewer { position: fixed; inset: 0; z-index: 1000; display: none; background: #ffffff; }
-#fig-hover { pointer-events: none; }
-#fig-hover.on, #fig-viewer.on { display: flex; align-items: center; justify-content: center; }
-#fig-hover img, #fig-viewer img { max-width: 97vw; max-height: 94vh; object-fit: contain; border: 2px solid #000000; background: #ffffff; }
+#fig-viewer { position: fixed; inset: 0; z-index: 1000; display: none; background: #ffffff; }
+#fig-viewer.on { display: flex; align-items: center; justify-content: center; }
+#fig-viewer img { max-width: 97vw; max-height: 94vh; object-fit: contain; border: 2px solid #000000; background: #ffffff; }
 #fig-viewer .bar { position: fixed; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: center;
   padding: 0.5rem 1rem; background: #ffffff; border-bottom: 4px solid #000000; font-weight: 800; color: #000000; }
 #fig-viewer button { font: inherit; font-weight: 800; color: #000000; background: #ffffff; border: 2px solid #000000; border-radius: 0.5rem; padding: 0.2rem 0.9rem; cursor: pointer; margin-left: 0.4rem; }
 #fig-viewer button:hover { color: #ffffff; background: #d00000; border-color: #d00000; }
 #fig-viewer img { margin-top: 2.8rem; max-height: 90vh; }
-@media (hover: none) { #fig-hover { display: none !important; } }
 """

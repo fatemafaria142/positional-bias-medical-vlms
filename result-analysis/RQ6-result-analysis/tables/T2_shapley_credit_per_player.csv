@@ -1,0 +1,6 @@
+Player,"Credit, mean","Credit, SD","Credit, median",Share of the total credit (%),Cases with positive credit (%),Cases with negative credit (%)
+Image,0.118,0.118,0.079,20.3,84,3
+Organ word,0.422,0.198,0.456,72.9,88,0
+Position word,0.105,0.065,0.112,18.1,86,1
+Other words,-0.066,0.114,-0.024,-11.4,13,74
+Total credit,0.579,0.352,0.755,100.0,83,

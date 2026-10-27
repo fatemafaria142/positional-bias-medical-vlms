@@ -233,45 +233,59 @@ sh, top = ex("thalamus"); claim(5, "Example thalamus organ block +0.290 and a bl
 sh, top = ex("hippocampus"); claim(5, "Example hippocampus organ block +0.067 and +0.215", round(sh[top], 3) == 0.067 and 0.215 in np.round(sh, 3), f"{np.round(sh, 3)}")
 
 # ======================================================= RQ6
-sm = pd.read_csv(RES10 / "rq6_4player_word_shapley_summary.csv"); sm = sm[sm.metric == "f_dice_gt"]
+sm = pd.read_csv(RES / "RQ6" / "rq6_4player_word_shapley_summary.csv"); sm = sm[sm.metric == "f_dice_gt"]
 S10 = first50(sm.subject_id.unique()); sm = sm[sm.subject_id.isin(S10)]
 PL = ["image", "organ_word", "position_word", "other_words"]
 ind = sm[sm.kind == "individual"].pivot_table(index=["subject_id", "organ"], columns="role", values="shapley_value")[PL]; ind["total"] = ind.sum(axis=1)
-claim(6, "50 subjects and 1,600 cases", len(S10) == 50 and len(ind) == 1600, str(len(ind)))
-rows = md_table(6, 1)
-for r, col in zip(rows, PL + ["total"]):
-    x = ind[col]; cmp_cell(6, f"Table 1 {r[0]} mean and SD", r[1], ms(x)); cmp_cell(6, f"Table 1 {r[0]} median", r[2], [x.median()])
-    cmp_cell(6, f"Table 1 {r[0]} share", r[3], [x.mean() / ind.total.mean() * 100]); cmp_cell(6, f"Table 1 {r[0]} positive", r[4], [(x > 0.001).mean() * 100], extra_tol=0.5)
-    if col != "total": cmp_cell(6, f"Table 1 {r[0]} negative", r[5], [(x < -0.001).mean() * 100], extra_tol=0.5)
-rows = md_table(6, 2)
-ind2 = ind.reset_index(); ind2["core"] = ind2.organ.str.split(" ", n=1).str[1]
-O = ind2.groupby("core")[PL + ["total"]].mean()
-for r in rows[:-1]:
-    o = nmap(r[0])
-    for c, v in zip(r[1:], O.loc[o].values): cmp_cell(6, f"Table 2 {r[0]}", c, [v])
-for c, v in zip(rows[-1][1:], ind[PL + ["total"]].mean().values): cmp_cell(6, "Table 2 mean row", c, [v])
-it = sm[sm.kind == "pairwise_interaction"]; rows = md_table(6, 3)
-nm4 = {"Image": "image", "Organ word": "organ_word", "Position word": "position_word", "Other words": "other_words"}
-for r in rows:
-    a_, b_ = r[0].split(" and "); key_ = "+".join(sorted([nm4[a_.capitalize()], nm4[b_.capitalize()]], key=lambda z: PL.index(z)))
-    cand = [x for x in it.role.unique() if set(x.split("+")) == set(key_.split("+"))][0]
-    x = it[it.role == cand].shapley_value; cmp_cell(6, f"Table 3 {r[0]}", r[1], ms(x)); cmp_cell(6, f"Table 3 {r[0]} median", r[2], [x.median()])
-sub = ind.groupby("subject_id")[PL + ["total"]].mean(); rows = md_table(6, 4)
-for r, col in zip(rows, PL + ["total"]):
-    x = sub[col]
-    for c, v in zip(r[1:], [x.mean(), x.std(), x.min(), x.max()]): cmp_cell(6, f"Table 4 {r[0]}", c, [v])
-oc = ind2.groupby(["subject_id", "core"]).total.mean().unstack()
-claim(6, "Spread across subjects, caudate 0.312 to 0.881, amygdala 0.311 to 0.802, SD 0.112/0.112/0.106 and 0.017 cerebellum cortex",
-      [round(oc.caudate.min(), 3), round(oc.caudate.max(), 3), round(oc.amygdala.min(), 3), round(oc.amygdala.max(), 3), round(oc.caudate.std(), 3), round(oc.amygdala.std(), 3), round(oc["inferior lateral ventricle"].std(), 3), round(oc["cerebellum cortex"].std(), 3)] == [0.312, 0.881, 0.311, 0.802, 0.112, 0.112, 0.106, 0.017],
-      str([round(oc.caudate.min(), 3), round(oc.caudate.max(), 3), round(oc.amygdala.min(), 3), round(oc.amygdala.max(), 3), round(oc.caudate.std(), 3), round(oc.amygdala.std(), 3), round(oc['inferior lateral ventricle'].std(), 3), round(oc['cerebellum cortex'].std(), 3)]))
-co = pd.read_csv(RES10 / "rq6_4player_word_shapley_coalitions.csv", usecols=["subject_id", "organ", "roles_present", "dice_gt"])
-co = co[co.subject_id.isin(S10)]
+co = pd.concat([ch[ch.subject_id.isin(S10)] for ch in pd.read_csv(RES / "RQ6" / "rq6_4player_word_shapley_coalitions.csv", usecols=["subject_id", "organ", "roles_present", "dice_gt"], chunksize=200000)])
+claim(6, "50 subjects, 1,600 cases and 16 prompt variants per case", len(S10) == 50 and len(ind) == 1600 and co.groupby(["subject_id", "organ"]).size().eq(16).all(), str(len(ind)))
 full = co[co.roles_present == "image+organ_word+other_words+position_word"].set_index(["subject_id", "organ"]).dice_gt
 none_ = co[co.roles_present == "none"].set_index(["subject_id", "organ"]).dice_gt
 claim(6, "Efficiency, the four credits add up to the Dice of the full prompt minus the empty prompt", bool(np.allclose(ind.total, (full - none_).reindex(ind.index), atol=2e-4)), f"max abs diff {float((ind.total - (full - none_).reindex(ind.index)).abs().max()):.2e}")
 claim(6, "Dice of the empty prompt is 0 in almost every case", float((none_ > 0.001).mean()) < 0.02, f"share above 0.001: {float((none_ > 0.001).mean()):.4f}")
-claim(6, "The 3-player CSV in the results folder is not the data of this report", True, "report uses the 4-player CSV outside the results folder")
-
+# Table 1, the 16 prompt variants, in the order of the table
+def key_(im, og, po, ow): return "+".join(sorted([r for r, on in (("image", im), ("organ_word", og), ("position_word", po), ("other_words", ow)) if on])) or "none"
+order16 = [key_(im, og, po, ow) for ow in (True, False) for og in (True, False) for po in (True, False) for im in (True, False)]
+rows = md_table(6, 1)
+for r, k in zip(rows, order16):
+    x = co[co.roles_present == k].dice_gt
+    cmp_cell(6, f"Table 1 {r[1]} {r[0]} mean and SD", r[2], ms(x)); cmp_cell(6, f"Table 1 {r[1]} {r[0]} median", r[3], [x.median()], extra_tol=0.001)
+    cmp_cell(6, f"Table 1 {r[1]} {r[0]} share", r[4], [(x >= 0.5).mean() * 100], extra_tol=0.5)
+rows = md_table(6, 2)
+for r, col in zip(rows, PL + ["total"]):
+    x = ind[col]; cmp_cell(6, f"Table 2 {r[0]} mean and SD", r[1], ms(x)); cmp_cell(6, f"Table 2 {r[0]} median", r[2], [x.median()])
+    cmp_cell(6, f"Table 2 {r[0]} share", r[3], [x.mean() / ind.total.mean() * 100]); cmp_cell(6, f"Table 2 {r[0]} positive", r[4], [(x > 0.001).mean() * 100], extra_tol=0.5)
+    if col != "total": cmp_cell(6, f"Table 2 {r[0]} negative", r[5], [(x < -0.001).mean() * 100], extra_tol=0.5)
+rows = md_table(6, 3)
+ind2 = ind.reset_index(); ind2["core"] = ind2.organ.str.split(" ", n=1).str[1]
+O = ind2.groupby("core")[PL + ["total"]].mean()
+for r in rows[:-1]:
+    o = nmap(r[0].replace("**", ""))
+    for c, v in zip(r[1:], O.loc[o].values): cmp_cell(6, f"Table 3 {r[0]}", c, [v])
+for c, v in zip(rows[-1][1:], ind[PL + ["total"]].mean().values): cmp_cell(6, "Table 3 mean row", c, [v])
+claim(6, "Table 3 is sorted by total credit", list(O.total.sort_values(ascending=False).round(3)) == [float(r[-1]) for r in rows[:-1]], "")
+it = sm[sm.kind == "pairwise_interaction"]; rows = md_table(6, 4)
+nm4 = {"image": "image", "organ word": "organ_word", "position word": "position_word", "other words": "other_words"}
+for r in rows:
+    a_, b_ = [z.strip().lower() for z in r[0].split(" and ")]; pair = {nm4[a_], nm4[b_]}
+    cand = [x for x in it.role.unique() if set(x.split("+")) == pair][0]
+    x = it[it.role == cand].shapley_value; cmp_cell(6, f"Table 4 {r[0]}", r[1], ms(x)); cmp_cell(6, f"Table 4 {r[0]} median", r[2], [x.median()])
+sub = ind.groupby("subject_id")[PL + ["total"]].mean(); rows = md_table(6, 5)
+for r, col in zip(rows, PL + ["total"]):
+    x = sub[col]
+    for c, v in zip(r[1:], [x.mean(), x.std(), x.min(), x.max()]): cmp_cell(6, f"Table 5 {r[0]}", c, [v])
+# numbers quoted in the key findings and figure descriptions
+share = lambda col: ind[col].mean() / ind.total.mean() * 100
+claim(6, "Key finding 1 shares 72.9, 20.3, 18.1, -11.4", [round(share(c), 1) for c in ["organ_word", "image", "position_word", "other_words"]] == [72.9, 20.3, 18.1, -11.4], "")
+zero = [k for k in order16 if "organ_word" not in k]
+claim(6, "Key finding 2 all eight prompts without the organ word have mean Dice 0.000 and no case at 0.5 or more", all(co[co.roles_present == k].dice_gt.mean() < 0.0005 and (co[co.roles_present == k].dice_gt >= 0.5).sum() == 0 for k in zero) and len(zero) == 8, "")
+claim(6, "Key finding 3 other words negative in 74% and positive in 13%", (round((ind.other_words < -0.001).mean() * 100) == 74) and (round((ind.other_words > 0.001).mean() * 100) == 13), "")
+claim(6, "Key finding 5 interaction image and organ word is the largest of the six pairs", it.groupby("role").shapley_value.mean().idxmax() == "image+organ_word", "")
+org_max = O[PL].idxmax(axis=1); nz = O.total.abs() > 1e-6
+claim(6, "Figure 1 the organ word is the largest for all 14 organs with a nonzero credit", int(nz.sum()) == 14 and bool((org_max[nz] == "organ_word").all()), str(int(nz.sum())))
+r14 = ind.loc["OASIS_OAS1_0014_MR1"]
+exp = {"left cerebellum white matter": [0.32, 0.47, 0.13, -0.02], "left putamen": [0.11, 0.69, 0.12, -0.02], "left thalamus": [0.23, 0.51, 0.19, -0.15], "right ventral DC": [0.17, 0.37, 0.20, -0.04], "right amygdala": [0.22, 0.54, 0.12, -0.07], "left cerebral cortex": [0.01, 0.32, 0.05, -0.35]}
+claim(6, "Figure descriptions, example credits of subject 14", all(np.allclose(r14.loc[o, PL].values.astype(float), v, atol=0.0051) for o, v in exp.items()), "")
 # ======================================================= RQ7
 c = pd.read_csv(RES / "RQ7" / "rq7_prompt_injection_bias_new.csv", usecols=lambda k: "rle" not in k)
 S11 = first50(c.subject_id.unique()); c = c[c.subject_id.isin(S11)]

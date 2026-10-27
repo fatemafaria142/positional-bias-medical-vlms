@@ -1,0 +1,18 @@
+Organ,Image,Organ word,Position word,Other words,Total credit
+Cerebellum white matter,0.344,0.439,0.113,-0.018,0.878
+Cerebral white matter,0.361,0.434,0.101,-0.026,0.87
+Putamen,0.163,0.56,0.168,-0.027,0.864
+Cerebellum cortex,0.081,0.635,0.155,-0.039,0.832
+Pallidum,0.009,0.665,0.143,0.003,0.819
+Thalamus,0.208,0.496,0.187,-0.093,0.797
+Caudate,0.119,0.546,0.137,-0.019,0.783
+Hippocampus,0.041,0.614,0.128,-0.01,0.772
+Accumbens,0.119,0.453,0.129,0.011,0.712
+Ventral DC,0.186,0.41,0.15,-0.035,0.712
+Amygdala,0.178,0.49,0.099,-0.075,0.691
+Inferior lateral ventricle,0.038,0.431,0.077,-0.027,0.519
+Cerebral cortex,0.003,0.303,0.048,-0.34,0.014
+Lateral ventricle,0.033,0.283,0.046,-0.36,0.003
+Choroid plexus,0.0,0.0,0.0,0.0,0.0
+Vessel,0.0,0.0,0.0,0.0,0.0
+Mean of 16 organs,0.118,0.422,0.105,-0.066,0.579

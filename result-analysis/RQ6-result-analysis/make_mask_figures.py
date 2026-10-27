@@ -157,5 +157,5 @@ for side in ("left", "right"):
     order = [o for o in mean_order.sort_values(ascending=False).index if o.split(" ")[0] == side]
     rows = [(o, rows_all.loc[o]) for o in order]
     for k, g in enumerate([rows[0:4], rows[4:8], rows[8:12], rows[12:16]]):
-        make(g, side, f"F{1 if side == 'left' else 2}{'abcd'[k]}_{side}_organs_group{k + 1}_subject{int(SID.split('_')[2])}.png")
+        make(g, side, f"F{(2 if side == 'left' else 6) + k}_{side}_organs_group{k + 1}_subject{int(SID.split('_')[2])}.png")
 print("done", SID)

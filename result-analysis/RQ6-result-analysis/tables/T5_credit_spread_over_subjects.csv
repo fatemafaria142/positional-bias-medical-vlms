@@ -1,0 +1,6 @@
+Player,Mean of the subject means,SD over subjects,Lowest subject,Highest subject
+Image,0.118,0.01,0.095,0.134
+Organ word,0.422,0.023,0.336,0.454
+Position word,0.105,0.006,0.079,0.114
+Other words,-0.066,0.005,-0.081,-0.059
+Total credit,0.579,0.032,0.435,0.614

@@ -1,0 +1,7 @@
+Pair of players,"Interaction, mean","Interaction, SD","Interaction, median"
+Image and organ word,0.23,0.215,0.177
+Image and position word,0.015,0.069,0.0
+Image and other words,0.006,0.067,0.0
+Organ word and position word,0.217,0.124,0.213
+Organ word and other words,-0.122,0.207,-0.048
+Position word and other words,-0.029,0.062,-0.012

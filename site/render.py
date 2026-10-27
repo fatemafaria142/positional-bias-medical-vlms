@@ -54,7 +54,7 @@ def page(title, body_html, nav, current, toc=(), prev=None, nxt=None, wide=False
         pn = f'<nav class="mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4">{card("prev", prev)}{card("next", nxt)}</nav>'
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)} - RQ Explorer</title>
+<title>{html.escape(title)} - Research Questions and Analysis</title>
 <script src="{TAILWIND}"></script>
 <script>{TAILWIND_CONFIG}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
@@ -65,8 +65,7 @@ def page(title, body_html, nav, current, toc=(), prev=None, nxt=None, wide=False
 <header class="sticky top-0 z-40 bg-white border-b-4 border-black">
   <div class="mx-auto flex max-w-screen-2xl items-center gap-3 px-4 py-3">
     <button id="menu" class="lg:hidden rounded-lg border-2 border-black px-3 py-1 font-extrabold" aria-label="Menu">Menu</button>
-    <a href="index.html" class="flex items-center gap-2 text-xl font-extrabold text-black no-underline"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-black text-white text-sm">RQ</span><span class="hidden sm:inline">RQ Explorer</span></a>
-    <span class="hidden sm:inline text-sm font-semibold text-black">How VoxTell handles left and right on brain MRI</span>
+    <a href="index.html" class="flex items-center gap-2 text-xl font-extrabold text-black no-underline"><span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-black text-white text-sm">RQ</span><span class="hidden sm:inline">Research Questions and Analysis</span></a>
     <div class="ml-auto w-40 sm:w-72"><input id="search" type="search" placeholder="Search the reports" class="w-full rounded-lg border-2 border-black px-3 py-1.5 text-sm font-semibold text-black placeholder-black focus:outline-none focus:border-brand"></div>
   </div>
 </header>
@@ -78,7 +77,7 @@ def page(title, body_html, nav, current, toc=(), prev=None, nxt=None, wide=False
   <main class="min-w-0 flex-1 py-8 {"" if wide else "max-w-4xl"}">
     <article class="{PROSE}">{body_html}</article>
     {pn}
-    <footer class="mt-16 border-t-4 border-black py-6 text-sm font-semibold text-black">RQ Explorer. Built from the RQ reports in this repository.</footer>
+    <footer class="mt-16 border-t-4 border-black py-6 text-sm font-semibold text-black">Research Questions and Analysis</footer>
   </main>
   {toc_html}
 </div>
@@ -103,8 +102,7 @@ def home(rows):
         if not ready: badges.append('<span class="rounded-full bg-brand px-3 py-0.5 text-xs font-extrabold text-white">Report not written yet</span>')
         cards.append(CARD.format(n=n, question=html.escape(q), key=html.escape(key) if key else '<span class="text-brand font-extrabold">Report not written yet</span>', badges="".join(badges)))
     return f"""<section class="not-prose">
-<p class="text-sm font-extrabold uppercase tracking-widest text-brand">Research questions</p>
-<h1 class="mt-2 text-4xl font-extrabold leading-tight text-black sm:text-5xl">Does VoxTell tell <span class="text-brand">left</span> from <span class="text-brand">right</span>?</h1>
+<h1 class="text-4xl font-extrabold leading-tight text-black sm:text-5xl">Research Questions and Analysis</h1>
 <p class="mt-5 max-w-3xl text-lg font-semibold leading-relaxed text-black">Seven research questions on how a text-promptable 3D segmentation model handles the words left and right on brain MRI.
 Pick a question to read its full report, with tables and figures. Click a figure to see it at full size and to move between the figures of the page.</p>
 <div class="mt-10 grid gap-8 md:grid-cols-2 2xl:grid-cols-3">{"".join(cards)}</div>

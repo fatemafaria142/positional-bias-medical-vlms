@@ -4,7 +4,9 @@
 
 VoxTell gets its input from two sources, the text prompt and the image. First, we check whether the words "left X" and "right X" are different from each other as text. Then we check whether that difference is still there at the end of the model, where the mask is produced. The image is the same for both prompts, so it cannot tell the model which side to pick.
 
-**Setting.** VoxTell on the Neurite-OASIS dataset, for 16 bilateral organ pairs. For each organ, the prompts "left X" and "right X" are compared in two places: as raw text embeddings, and as the image-conditioned output of the U-Net decoder.
+## Hypothesis
+
+The text embeddings of "left X" and "right X" are expected to differ, while the image features cannot differ, because the image encoder never receives the prompt. If the decoder output of the two prompts is more similar than their raw text, part of the side difference is lost on the way through the decoder.
 
 ## Definitions
 
@@ -40,9 +42,13 @@ VoxTell gets its input from two sources, the text prompt and the image. First, w
 
 ## Figure
 
-**Figure 1. Left-versus-right cosine similarity of the raw text embedding (green) and the finest logit of the U-Net decoder (red) for each organ.** The grey line between the two circles shows the difference between them, and the exact values are written inside the circles. Organs are sorted from left to right by increasing raw text similarity, and decoder values are means over subjects.
+**Figure 1. Left-versus-right cosine similarity of the raw text and of the finest logit of the U-Net decoder for each organ.**
 
-## Results
+- **What it shows.** The red circle is above the green circle in every column, so the finest logit is more similar than the raw text for all 16 organs. The mean cosine similarity rises from 0.865 to 0.979, an increase of 0.114.
+- **What to notice.** Vessel has the lowest raw text similarity (0.759) and the largest increase (+0.202), lateral ventricle has the smallest increase (+0.067), and cerebral white matter has the lowest finest-logit value (0.950).
+- **Why it matters.** The side difference that exists in the text is partly lost by the decoder output, so the decoder narrows the gap between the two prompts.
+
+## Key findings
 
 1. **The raw text of the left and right prompts is different.** The cosine similarity between the "left X" and "right X" text embeddings ranges from 0.759 (vessel) to 0.920 (ventral DC), with a mean of 0.865, and the L2 distance ranges from 55.8 to 95.4, with a mean of 70.6. Vessel is the most different on both measures, while ventral DC, lateral ventricle and inferior lateral ventricle (0.91 to 0.92) are the most similar (Table 1, Figure 1). This means that the text encoder already separates "left" from "right" before VoxTell uses the prompt, so the side information starts in the text.
 2. **The image features carry no left/right difference.** Their similarity between the two prompts is exactly 1.00, because the image encoder never receives the prompt, and this was checked directly for every subject. The image features of a scan are therefore the same whichever side is asked for. This means that the image cannot tell the model which side to choose, and the whole left/right instruction comes from the text.

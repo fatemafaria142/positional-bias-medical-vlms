@@ -1,5 +1,0 @@
-Player,Mean,SD,Median,Share of the total credit (%),Cases with positive credit (%)
-Image,0.119,0.128,0.078,20.5,74
-Organ word,0.366,0.234,0.419,63.2,87
-Position word,0.095,0.077,0.105,16.3,80
-Total (full prompt minus empty prompt),0.579,0.352,0.755,100.0,83

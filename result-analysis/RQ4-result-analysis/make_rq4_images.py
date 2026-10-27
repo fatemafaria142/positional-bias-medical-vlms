@@ -136,3 +136,5 @@ def make(dst, organs, fname, heading):
 
 make("left", ["hippocampus", "cerebral white matter"], "F2_images_left_prompt.png", "Does Replacing the Prompt Decoder Layer Updates of a Left Prompt With Those of the Right Prompt Move the Mask to the Right Side?")
 make("right", ["hippocampus", "cerebral white matter"], "F3_images_right_prompt.png", "Does Replacing the Prompt Decoder Layer Updates of a Right Prompt With Those of the Left Prompt Move the Mask to the Left Side?")
+make("left", ["cerebellum cortex", "thalamus"], "F4_images_left_prompt_more_organs.png", "Does Replacing the Prompt Decoder Layer Updates of a Left Prompt With Those of the Right Prompt Move the Mask to the Right Side?")
+make("right", ["cerebellum cortex", "thalamus"], "F5_images_right_prompt_more_organs.png", "Does Replacing the Prompt Decoder Layer Updates of a Right Prompt With Those of the Left Prompt Move the Mask to the Left Side?")

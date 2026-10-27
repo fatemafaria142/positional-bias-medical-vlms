@@ -4,7 +4,9 @@
 
 VoxTell turns the prompt, for example "Segment the left hippocampus in this image.", into a vector and passes it through six decoder layers, numbered 0 to 5. Each layer adds its own update to this vector. We take the update of one layer for the left prompt and replace it with the update from the right prompt. Then we check whether the predicted mask moves to the other side. We repeat this for each layer alone, for several layers together and for the whole state.
 
-**Setting.** VoxTell on the Neurite-OASIS dataset, for 16 bilateral organ pairs, each with a left and a right prompt. A flip can only be judged when the unpatched model already predicts the prompted side, so only those prompts are used. The image figures show one example subject.
+## Hypothesis
+
+If the side is held by particular prompt decoder layers, replacing the update of such a layer with the update of the opposite-side prompt is expected to move the mask to the other side. If no single layer moves the mask, the side is spread over several layers or held elsewhere. Replacing the whole state is expected to move almost every mask, because it only checks that the patching works.
 
 ## Definitions
 
@@ -59,13 +61,37 @@ VoxTell turns the prompt, for example "Segment the left hippocampus in this imag
 
 ## Figures
 
-**Figure 1. Where the predicted mask lies for one example, the hippocampus of one subject, when the update of some decoder layers is replaced with the update of the other prompt.** Each row is one test. The gray squares on the left show which layers were replaced, and the other layers were left unchanged. The left panel uses the prompt "Segment the left hippocampus in this image." and the right panel uses "Segment the right hippocampus in this image." Each bar shows how the predicted mask is divided and adds up to 100%, with green for the part on the left organ, red for the part on the right organ, and gray for the part outside both organs. The gray value is written to the right of the bar. The last two rows replace Layers 3 to 5 together and Layers 0 to 5 together. The same subject and organ appear in the first rows of Figure 2 and Figure 3.
+**Figure 1. Where the predicted mask lies for the hippocampus of one example scan when the update of some decoder layers is replaced with the update of the other prompt.**
 
-**Figure 2. Predicted masks for the left prompt on two organs of one subject, when the update of decoder layers is replaced with the update of the right prompt.** The two rows are the left hippocampus and the left cerebral white matter, shown on one axial MRI slice each, and the prompts were "Segment the left hippocampus in this image." and "Segment the left cerebral white matter in this image." The first column is the ground truth, with the true left organ in green and the true right organ in red. The other columns are predictions, in green where the mask lies on the left side and in red where it lies on the right side. They show the unchanged model, then the update of each of Layers 0 to 5 replaced alone, then Layers 0 to 5 replaced together, and then the whole state replaced. The solid white outline is the true organ on the prompted side, and the dashed white outline is the true organ on the other side. The Dice and the side of the mask are written under each panel, and the side is the one that the mask covers best.
+- **What it shows.** Replacing one layer leaves 91% to 92% of the left prompt's mask on the left organ and 90% to 91% of the right prompt's mask on the right organ, as when unpatched, and Layers 3 to 5 together keep 93% on the prompted organ.
+- **What to notice.** With Layers 0 to 5 together the left prompt's mask is 23% on the left organ and 73% on the right organ, and the right prompt's mask is 10% on the left organ and 86% on the right organ.
+- **Why it matters.** No single layer holds the side, and only replacing all layers together changes where the mask lies.
 
-**Figure 3. Predicted masks for the right prompt on two organs of one subject, when the update of decoder layers is replaced with the update of the left prompt.** The two rows are the right hippocampus and the right cerebral white matter, and the prompts were "Segment the right hippocampus in this image." and "Segment the right cerebral white matter in this image." The panels, colors and outlines are the same as in Figure 2.
+**Figure 2. Predicted masks of the left prompt for the hippocampus and the cerebral white matter when the update of decoder layers is replaced with the update of the right prompt.**
 
-## Results
+- **What it shows.** For every single layer the mask stays on the left organ, with a Dice of 0.78 to 0.79 for the hippocampus and 0.86 to 0.91 for the cerebral white matter.
+- **What to notice.** Layers 0 to 5 together move both masks to the right side (Dice 0.15 and 0.02), and replacing the whole state puts them on the right side with a Dice of 0.00.
+- **Why it matters.** The images confirm the table, since every single-layer replacement keeps the left prompt on the left organ and only the full replacement moves it.
+
+**Figure 3. Predicted masks of the right prompt for the hippocampus and the cerebral white matter when the update of decoder layers is replaced with the update of the left prompt.**
+
+- **What it shows.** For every single layer the mask stays on the right organ, with a Dice of 0.81 to 0.82 for the hippocampus and 0.92 to 0.93 for the cerebral white matter.
+- **What to notice.** Layers 0 to 5 together do not move either mask to the left side, since the hippocampus mask stays on the right (Dice 0.51) and the cerebral white matter mask lands on neither side (Dice 0.00). Only replacing the whole state puts the masks on the left side, with a Dice of 0.00.
+- **Why it matters.** The right prompt resists replacement more than the left prompt, which shows that the two sides are not treated symmetrically.
+
+**Figure 4. Predicted masks of the left prompt for the cerebellum cortex and the thalamus when the update of decoder layers is replaced with the update of the right prompt.**
+
+- **What it shows.** For every single layer the mask stays on the left organ, with a Dice of 0.84 to 0.87 for the cerebellum cortex and 0.70 to 0.72 for the thalamus.
+- **What to notice.** Layers 0 to 5 together move the cerebellum cortex mask to the right side (Dice 0.03) and leave the thalamus mask on neither side (Dice 0.01), and replacing the whole state puts both on the right side with a Dice of 0.00.
+- **Why it matters.** The same result for other organs shows that the finding is not specific to one organ.
+
+**Figure 5. Predicted masks of the right prompt for the cerebellum cortex and the thalamus when the update of decoder layers is replaced with the update of the left prompt.**
+
+- **What it shows.** For every single layer the mask stays on the right organ, with a Dice of 0.82 to 0.84 for the cerebellum cortex and 0.86 to 0.87 for the thalamus.
+- **What to notice.** Layers 0 to 5 together leave the cerebellum cortex mask on neither side (Dice 0.29) and make the thalamus mask empty (Dice 0.00), and replacing the whole state puts both on the left side with a Dice of 0.00.
+- **Why it matters.** The right prompt again stays on its own side except for the full replacement, which agrees with the asymmetry in the table.
+
+## Key findings
 
 1. **One layer on its own never moves the mask to the other side.** The share that moves is 0.0% at all six layers, and at least 99.5% of the masks stay on the prompted side. The Dice of the prompted side is 0.771 to 0.780 against 0.780 unpatched, with the largest drop at Layer 0, and the Dice of the other side stays at 0.002 or below (Table 1). This means that the side is not stored in the update of any single layer, and that replacing one layer changes the accuracy only very slightly.
 2. **In the example, a single layer does not change where the mask lies.** For the left prompt 91% to 92% of the mask stays on the left organ, and for the right prompt 90% to 91% stays on the right organ, as when unpatched (Figure 1). The images show the same, with the mask staying on the prompted side for every single layer (Figure 2, Figure 3). This means that replacing one layer is not enough to change the answer, even though the replaced update comes from the prompt of the opposite side.

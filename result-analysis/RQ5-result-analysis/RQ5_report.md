@@ -71,47 +71,41 @@ What happens in one test.
 
 ## Figures
 
-**Figure 1. How the experiment works, shown on the left thalamus of one example scan.**
-
-- **What it shows.** The test hides blocks, measures the Dice of the predicted mask, and repeats this for many choices of hidden blocks. The Shapley value of a block is how much that block adds to the Dice.
-- **What to notice.** The organ block is the block that holds most of the organ, and the other 7 blocks are the surrounding blocks.
-- **Why it matters.** Because the Shapley value averages over many combinations of hidden blocks, it gives each block its fair share of the Dice and not only the effect of hiding it alone.
-
-**Figure 2. Shapley value of the organ block compared with the surrounding blocks for each organ.**
+**Figure 1. Shapley value of the organ block compared with the surrounding blocks for each organ.**
 
 - **What it shows.** The organ block is higher for 10 of the 12 organs with a Shapley value, with a mean of 0.126 against 0.085 for the surrounding blocks.
 - **What to notice.** The difference is largest for the cerebellum white matter (+0.148, higher in 98% of the cases) and negative for the hippocampus (−0.034, 18%) and the caudate (−0.011, 32%).
 - **Why it matters.** The model relies more on the block that holds the organ, but not for every organ, since the hippocampus and the caudate are exceptions.
 
-**Figure 3. Scan, true organ and Shapley values of the 8 blocks around the left cerebellum white matter of one example scan.**
+**Figure 2. Scan, true organ and Shapley values of the 8 blocks around the left cerebellum white matter of one example scan.**
 
 - **What it shows.** The organ block has the highest Shapley value (+0.242), and the 4 upper blocks, which hold almost no organ, have only +0.015 to +0.064.
 - **What to notice.** The lower layer holds the larger values, from +0.083 to +0.242.
 - **Why it matters.** The support for this organ comes mostly from the lower layer of blocks, so the useful context is not spread evenly around the organ.
 
-**Figure 4. Scan, true organ and Shapley values of the 8 blocks around the left cerebellum cortex of one example scan.**
+**Figure 3. Scan, true organ and Shapley values of the 8 blocks around the left cerebellum cortex of one example scan.**
 
 - **What it shows.** The 8 blocks have Shapley values between +0.054 and +0.182, and all of them are positive.
 - **What to notice.** No block lowers the Dice, so every block of the box helps the model a little for this organ.
 - **Why it matters.** Every block helps a little here, so the model uses the whole box around this organ and not only the organ block.
 
-**Figure 5. Scan, true organ and Shapley values of the 8 blocks around the left thalamus of one example scan.**
+**Figure 4. Scan, true organ and Shapley values of the 8 blocks around the left thalamus of one example scan.**
 
 - **What it shows.** The organ block has a Shapley value of +0.290, and two other blocks have +0.181 and +0.230.
 - **What to notice.** One block has a negative Shapley value (−0.075), shown in red, which means that showing it lowers the Dice.
 - **Why it matters.** A surrounding block can lower the Dice, so not every part of the context helps the model.
 
-**Figure 6. Scan, true organ and Shapley values of the 8 blocks around the left hippocampus of one example scan.**
+**Figure 5. Scan, true organ and Shapley values of the 8 blocks around the left hippocampus of one example scan.**
 
 - **What it shows.** The organ block has a Shapley value of +0.067, which is lower than the block below it (+0.215).
-- **What to notice.** This agrees with the negative difference of the hippocampus in Figure 2, since a surrounding block matters more than the organ block.
+- **What to notice.** This agrees with the negative difference of the hippocampus in Figure 1, since a surrounding block matters more than the organ block.
 - **Why it matters.** For the hippocampus a surrounding block matters more than the organ block, which is why this organ has a negative difference.
 
 ## Key findings
 
-1. **For most organs the organ block has a higher Shapley value than the surrounding blocks.** Over the 12 organs with a Shapley value, the organ block has a mean of 0.126 against 0.085 for the surrounding blocks, a difference of +0.041, and it has the higher value in 63% of the cases (Table 1, Figure 2). This means that the model relies more on the block that contains the organ, but it also relies on the surroundings.
-2. **The difference depends on the organ.** The organ block is higher for 10 of the 12 organs with a Shapley value (Figure 2). It is largest for cerebellum white matter (+0.148, with the organ block higher in 98% of the cases), pallidum (+0.092, 73%) and amygdala (+0.087, 75%), and small for cerebral white matter (+0.015, 66%) and putamen (+0.012, 64%). It is negative for hippocampus (−0.034, 18%) and caudate (−0.011, 32%), which means that for these two organs the surrounding blocks matter more than the organ block (Table 1, Figure 2). The examples show the same (Figures 3 to 6). In the cerebellum white matter example the organ block has the highest Shapley value (+0.242), and the upper blocks, which hold almost no organ, have only +0.015 to +0.064. In the thalamus example the organ block has +0.290, and one block has a negative Shapley value (−0.075). In the hippocampus example the organ block has +0.067, while the block below it has +0.215.
-3. **Four organs have a Shapley value of about 0.** Cerebral cortex (0.001), choroid plexus (0.000), vessel (0.000) and lateral ventricle (−0.019) have a sum of the 8 Shapley values of about 0 (Table 1, Figure 2). This means that hiding blocks does not change the Dice of these organs, so the hypothesis cannot be tested for them.
+1. **For most organs the organ block has a higher Shapley value than the surrounding blocks.** Over the 12 organs with a Shapley value, the organ block has a mean of 0.126 against 0.085 for the surrounding blocks, a difference of +0.041, and it has the higher value in 63% of the cases (Table 1, Figure 1). This means that the model relies more on the block that contains the organ, but it also relies on the surroundings.
+2. **The difference depends on the organ.** The organ block is higher for 10 of the 12 organs with a Shapley value (Figure 1). It is largest for cerebellum white matter (+0.148, with the organ block higher in 98% of the cases), pallidum (+0.092, 73%) and amygdala (+0.087, 75%), and small for cerebral white matter (+0.015, 66%) and putamen (+0.012, 64%). It is negative for hippocampus (−0.034, 18%) and caudate (−0.011, 32%), which means that for these two organs the surrounding blocks matter more than the organ block (Table 1, Figure 1). The examples show the same (Figures 2 to 5). In the cerebellum white matter example the organ block has the highest Shapley value (+0.242), and the upper blocks, which hold almost no organ, have only +0.015 to +0.064. In the thalamus example the organ block has +0.290, and one block has a negative Shapley value (−0.075). In the hippocampus example the organ block has +0.067, while the block below it has +0.215.
+3. **Four organs have a Shapley value of about 0.** Cerebral cortex (0.001), choroid plexus (0.000), vessel (0.000) and lateral ventricle (−0.019) have a sum of the 8 Shapley values of about 0 (Table 1, Figure 1). This means that hiding blocks does not change the Dice of these organs, so the hypothesis cannot be tested for them.
 4. **A block with more of the organ has a higher Shapley value, up to a limit.** The mean Shapley value is 0.035 for blocks with no voxel of the organ, 0.053 for up to 5%, 0.095 for 5% to 15% and 0.113 for 15% to 30%, and then it is 0.098 for more than 30% (Table 2). The share of blocks with a negative Shapley value falls from 25% to 2% over the same groups. This means that blocks that hold more of the organ are more useful, but blocks with no organ still have a positive Shapley value on average.
 5. **The Shapley values are estimates.** The mean sum of the 8 Shapley values of pallidum is 1.018, which is above the maximum possible Dice of 1 (Table 1). This means that a single value has some noise, and the means over many cases are more reliable than one block of one case.
 

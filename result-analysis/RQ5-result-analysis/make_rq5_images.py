@@ -21,7 +21,7 @@ FIG = OUT / "figures"; FIG.mkdir(exist_ok=True)
 TAR = Path(r"D:\Reasoning\data\raw\neurite-oasis.v1.0.tar")
 SCRATCH = Path(r"C:\Users\FATEMA~1\AppData\Local\Temp\claude\D--Reasoning\3463f333-3745-4839-9350-42eda44b4d8b\scratchpad")
 SUBJECT = "OASIS_OAS1_0001_MR1"
-ORGANS = {"cerebellum white matter": "F3_cerebellum_white_matter.png", "cerebellum cortex": "F4_cerebellum_cortex.png", "thalamus": "F5_thalamus.png", "hippocampus": "F6_hippocampus.png"}
+ORGANS = {"cerebellum white matter": "F2_cerebellum_white_matter.png", "cerebellum cortex": "F3_cerebellum_cortex.png", "thalamus": "F4_thalamus.png", "hippocampus": "F5_hippocampus.png"}
 
 b = pd.concat([pd.read_csv(ROOT / "rq5_grid_occlusion_shapley.csv"), pd.read_csv(ROOT / "rq5_grid_occlusion_shapley_part3.csv")], ignore_index=True)
 b = b[(b.subject_id == SUBJECT) & b.organ.isin(["left " + o for o in ORGANS])]
@@ -104,32 +104,7 @@ def legend_handles(extra=()):
 def panel_label(fig, txt, x, y, letter, title):
     txt(x, y, f"({letter}) {title}", ha="left", va="bottom", fontsize=11, color=INK)
 
-# ---------- Figure 1: how the experiment works ----------
-def method(o):
-    G = prepare(o); z = G["layers"][0]
-    vol2 = vol.copy(); s_ = G["bb"][G["top"]]
-    vol2[s_] = np.random.default_rng(0).normal(mu, sd, vol2[s_].shape)            # hide the block that holds most of the organ
-    PH = 2.35; PW = PH * G["HB"] / G["HA"]
-    X0, PITCH = 0.15, PW + 0.14
-    figw, figh = X0 + 4 * PITCH, 0.55 + 0.38 + PH + 0.7
-    fig = plt.figure(figsize=(figw, figh), facecolor="white")
-    txt = lambda x, y, s, **kw: fig.text(x / figw, (figh - y) / figh, s, color=INK, **kw)
-    txt(figw / 2, 0.08, "How We Test Which Part of the Image the Model Uses", ha="center", va="top", fontsize=13.5, fontweight="bold")
-    titles = ["Scan", "Ground-truth mask", "Box cut into 8 blocks", "Organ block replaced by noise"]
-    ytop = 0.55 + 0.38
-    for ci, title in enumerate(titles):
-        ax_ = fig.add_axes([(X0 + ci * PITCH) / figw, (figh - ytop - PH) / figh, PW / figw, PH / figh]); ax_.axis("off")
-        ax_.imshow(slice_view(G, z, vol2 if ci == 3 else vol), cmap="gray", vmin=vmin, vmax=vmax, interpolation="bilinear")
-        if ci == 1: overlay_mask(ax_, G, z)
-        if ci >= 2: draw_blocks(ax_, G, z)
-        if ci == 3: ax_.contour(slice_view(G, z, G["gt"]).astype(float), levels=[0.5], colors="white", linewidths=1.3)
-        txt(X0 + ci * PITCH + PW / 2, ytop - 0.08, f"({'abcd'[ci]}) {title}", ha="center", va="bottom", fontsize=11)
-    fig.legend(handles=[Patch(facecolor=GREEN, alpha=0.8, edgecolor="none", label="Ground-truth mask of the organ"), Patch(facecolor="none", edgecolor=BLOCK, linewidth=3.2, label="Organ block (holds most of the organ)"),
-                        Line2D([0], [0], color="white", lw=2, path_effects=[pe.Stroke(linewidth=4.0, foreground=INK), pe.Normal()], label="Ground-truth organ outline")],
-               loc="center", bbox_to_anchor=(0.5, 0.3 / figh), ncol=3, frameon=False, fontsize=10, handlelength=2.2, columnspacing=2.0)
-    fig.savefig(FIG / "F1_how_the_experiment_works.png", dpi=240, bbox_inches="tight", facecolor="white"); plt.close()
-
-# ---------- Figure 2: Shapley value of the organ block and of the other 7 blocks for every organ, no image ----------
+# ---------- Figure 1: Shapley value of the organ block and of the other 7 blocks for every organ, no image ----------
 def summary_chart():
     t = t1.copy()
     ok = t[t.total > 0.1].sort_values("diff", ascending=False)
@@ -171,7 +146,7 @@ def summary_chart():
     fig.legend(handles=[Line2D([0], [0], marker="o", ls="none", markersize=9.5, markerfacecolor=BLUE, markeredgecolor=INK, label="Organ block, the block that holds most of the organ (panel a), organ block higher (panel b)"),
                         Line2D([0], [0], marker="o", ls="none", markersize=9.5, markerfacecolor=RED, markeredgecolor=INK, label="Surrounding blocks, mean of the other 7 blocks (panel a), surrounding blocks higher (panel b)")],
                loc="center", bbox_to_anchor=(0.55, 0.045), ncol=1, frameon=False, fontsize=10.5, handletextpad=0.6, labelspacing=0.6)
-    fig.savefig(FIG / "F2_shapley_value_per_organ.png", dpi=250, bbox_inches="tight", facecolor="white"); plt.close()
+    fig.savefig(FIG / "F1_shapley_value_per_organ.png", dpi=250, bbox_inches="tight", facecolor="white"); plt.close()
 
 # ---------- Figures 3 to 6: one organ each ----------
 def organ_figure(o):
@@ -232,7 +207,6 @@ def organ_figure(o):
     lg.text(x1 + 0.75, R3, "Organ block, holds most of the organ", ha="left", va="center", fontsize=8.5, color=INK)
     fig.savefig(FIG / ORGANS[o], dpi=240, bbox_inches="tight", facecolor="white"); plt.close()
 
-method("thalamus")
 summary_chart()
 for o in ORGANS: organ_figure(o)
 print("done")

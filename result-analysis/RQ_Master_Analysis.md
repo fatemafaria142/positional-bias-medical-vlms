@@ -289,7 +289,7 @@ The Axis III plan asks for research questions and a dataset plan, and this study
 | **Mean of 16 organs** | 0.095 | 0.063 | +0.032 | 53% | 0.538 |
 | **Mean of the 12 organs with a Shapley value** | 0.126 | 0.085 | +0.041 | 63% | 0.718 |
 
-**Figure 2. Shapley value of the organ block compared with the surrounding blocks for each organ.**
+**Figure 1. Shapley value of the organ block compared with the surrounding blocks for each organ.**
 
 **Analysis.** The values are averaged over subjects and over the left and right organ, and a second table groups the blocks by the share of the organ inside them.
 

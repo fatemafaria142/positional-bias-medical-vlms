@@ -386,11 +386,11 @@ def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_ax
     row15_centre/attention_maps come back empty) -- that accumulator's GPU buffer is
     n_layers x len(organs) x the FULL padded-volume voxel count, float32, allocated once
     regardless of out_chunk (shrinking the chunk-size OOM retry in _run_chunked does not shrink
-    it). On small volumes (e.g. Neurite-OASIS brain MRI) that is cheap; on large ones (e.g.
-    TotalSegmentator whole-body CT, which can also have far more organs per subject) it can be
-    tens of GB by itself and OOMs even at chunk=1 ("out of GPU memory even with one output per
-    pass") no matter how small out_chunk is. Callers that only need row14 (RQ4) or row16 (RQ3)
-    -- neither of which touches attn -- should pass compute_attention=False."""
+    it). On a small volume it is cheap; on a large whole-body CT volume with many organs per
+    subject it can be tens of GB by itself and OOMs even at chunk=1 ("out of GPU memory even
+    with one output per pass") no matter how small out_chunk is. Callers that only need row14
+    (RQ4) or row16 (RQ3) -- neither of which touches attn -- should pass
+    compute_attention=False."""
     pairs = [(o, mirror(o)) for o in organs if o.startswith("left") and mirror(o) in organs]
     data, bbox, orig_shape = predictor.preprocess(img_arr)
     emb_base = predictor.embed_text_prompts([prompts[o] for o in organs])          # (1, n, D)

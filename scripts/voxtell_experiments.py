@@ -1,5 +1,5 @@
 """
-Experiments for plan rows 12-16 and 17-21 (all take a VoxTellPredictor-like object and plain numpy
+Experiments for plan rows 12-18 and 21 (all take a VoxTellPredictor-like object and plain numpy
 arrays, so they can be tested without a GPU).
 
   row 12  run_flip                image left-right flip, prompt unchanged
@@ -9,12 +9,7 @@ arrays, so they can be tested without a GPU).
   row 16  (same run)              distance between the left and right query states at every decoder layer
   row 17  run_grid_occlusion      voxel-grid occlusion Shapley/SHAP map around one organ
   row 18  run_attention_kl        per-layer KL divergence between cross-attention and the GT organ mask
-  row 19  run_gradient_saliency   vanilla-gradient + Grad-CAM saliency, one patch around the organ
-  row 20  run_activation_overlap  fused spatial feature map overlap, matched vs. mismatched prompt
   row 21  run_joint_image_word_shapley   image (intact/noised) x organ-word x position-word, 3-role Shapley
-  row 22  run_laterality_probing  linear probe per decoder layer: is left/right linearly decodable, not just different?
-  row 23  run_embedding_geometry  is there one consistent "left -> right" direction across organs, or a different one per organ?
-  row 24  run_attention_head_ablation   zero-ablate one cross-attention head at a time -- which head, not just which layer
 
 Arrays: `img_arr` is (1, X, Y, Z) in the RAS-reoriented grid used by the notebooks, `label_vol` is (X, Y, Z).
 `rl_axis` is the right-left axis of the spatial arrays (2 in the notebooks).
@@ -95,7 +90,7 @@ def shapley_values_approx(value_fn, roles, n_samples=4, seed=0):
     exact 2**n enumeration, but for each role draws `n_samples` random subsets of the other roles
     and averages the marginal contribution of adding that role, instead of enumerating every subset.
     Costs len(roles) * n_samples * 2 coalition evaluations (fewer once repeats are cached) rather than
-    2**len(roles) -- worthwhile once that exponential blows the budget (e.g. RQ9's 2**8 = 256 full
+    2**len(roles) -- worthwhile once that exponential blows the budget (e.g. RQ5's 2**8 = 256 full
     network forward passes per organ). value_fn: frozenset(present roles) -> payoff (float)."""
     rng = np.random.default_rng(seed)
     roles = list(roles)
@@ -120,8 +115,8 @@ def shapley_values_approx(value_fn, roles, n_samples=4, seed=0):
 def shapley_interaction_index(v, roles, i, j):
     """Exact pairwise Shapley (Grabisch-Roubens) interaction index for players i, j, given the
     value function v over the full role set `roles` (|roles| = n >= 2). Generalizes the plain
-    2-player "v(both) - v(i alone) - v(j alone) + v(neither)" formula used for row 5/RQ5's
-    interaction term to n > 2 players -- verified to reduce to EXACTLY that formula when n == 2
+    2-player "v(both) - v(i alone) - v(j alone) + v(neither)" formula used for the earlier
+    two-player interaction term to n > 2 players -- verified to reduce to EXACTLY that formula when n == 2
     (the n-2=0 "others" case collapses the weighted sum below to a single term with weight 1).
 
     Positive value: i and j reinforce each other beyond what their individual Shapley
@@ -505,7 +500,7 @@ def run_grid_occlusion(predictor, img_arr, label_vol, organ, ids, prompt, grid=2
     `n_samples`: None (default) enumerates all 2**(grid**3) coalitions exactly, like row 5's word-Shapley.
     Set it to a small int (e.g. 4) to use `shapley_values_approx` instead -- every coalition evaluation
     here is a full network forward pass, so for grid=2 (8 blocks, 256 coalitions) that exact enumeration
-    is the dominant cost of RQ9; n_samples trades it for len(block_ids)*n_samples*2 forward passes.
+    is the dominant cost of RQ5; n_samples trades it for len(block_ids)*n_samples*2 forward passes.
     Returns rows with columns: organ, block_id, block_bbox, shapley_value."""
     rng = np.random.default_rng(seed)
     region = label_vol == ids[organ]
@@ -669,108 +664,6 @@ def _crop_patch_around(data, centre_vox, patch_size):
 
 
 # ------------------------------------------------------------------------------------------------
-# row 19 -- gradient-based saliency (vanilla gradient + Grad-CAM), one patch around the organ
-# ------------------------------------------------------------------------------------------------
-def run_gradient_saliency(predictor, img_arr, label_vol, organ, ids, prompt, return_maps=False):
-    """Row 19. Crops one patch_size window of the preprocessed image centred on the organ's GT
-    centroid (cheap: one encoder + one backward pass, vs. row 17's full sliding-window Shapley
-    enumeration -- the same LIME-to-Shapley relationship, just for images), computes vanilla-gradient
-    and Grad-CAM saliency (`vm.gradient_saliency`), and summarizes it against the GT mask inside that
-    same patch. MUST be called outside any `torch.no_grad()`/`inference_mode()` context.
-    Returns a single-row dict: organ, mean_saliency_in_organ, mean_saliency_outside_organ,
-    saliency_enrichment, cam_mean_in_organ, cam_mean_outside_organ."""
-    data, bbox, orig_shape = predictor.preprocess(img_arr)
-    crop_sl = tuple(slice(int(b[0]), int(b[1])) for b in bbox)
-    label_crop = label_vol[crop_sl]
-    region = label_crop == ids[organ]
-    c = centroid(region)
-    if c is None:
-        return None
-    patch, offset = _crop_patch_around(data, c, predictor.patch_size)
-    patch_t = (patch if torch.is_tensor(patch) else torch.from_numpy(patch)).to(predictor.device)
-    emb = predictor.embed_text_prompts([prompt])[0].to(predictor.device)  # (1, D)
-    saliency, cam = vm.gradient_saliency(predictor.network, patch_t, row=0, prompts_embed=emb)
-    end = offset + np.array(predictor.patch_size)
-    region_in_patch = np.zeros_like(saliency, dtype=bool)
-    rs = tuple(slice(max(int(o), 0), min(int(e), int(l))) for o, e, l in zip(offset, end, label_crop.shape))
-    ps = tuple(slice(0, s.stop - s.start) for s in rs)
-    region_in_patch[ps] = region[rs]
-    if not region_in_patch.any():
-        return None
-    cam_up = vm.grad_cam_upsample(cam, predictor.patch_size)
-    out_sal_in, out_sal_out = float(saliency[region_in_patch].mean()), float(saliency[~region_in_patch].mean())
-    cam_in, cam_out = float(cam_up[region_in_patch].mean()), float(cam_up[~region_in_patch].mean())
-    row = {"organ": organ, "mean_saliency_in_organ": round(out_sal_in, 6),
-           "mean_saliency_outside_organ": round(out_sal_out, 6),
-           "saliency_enrichment": round(out_sal_in / max(out_sal_out, 1e-8), 4),
-           "cam_mean_in_organ": round(cam_in, 6), "cam_mean_outside_organ": round(cam_out, 6),
-           "cam_enrichment": round(cam_in / max(cam_out, 1e-8), 4)}
-    if not return_maps:
-        return row
-    # place the patch's saliency/CAM back into the crop's own coordinate frame, for plotting
-    # against the same image/GT the rest of this module works in
-    full_saliency = np.zeros(label_crop.shape, dtype=np.float32)
-    full_cam = np.zeros(label_crop.shape, dtype=np.float32)
-    full_saliency[rs] = saliency[ps]
-    full_cam[rs] = cam_up[ps]
-    return row, full_saliency, full_cam
-
-
-# ------------------------------------------------------------------------------------------------
-# row 20 -- fused spatial feature map, matched vs. mismatched prompt (resolves plan row 1)
-# ------------------------------------------------------------------------------------------------
-def run_activation_overlap(predictor, img_arr, label_vol, organ, ids, prompts, stage=-1,
-                            return_maps=False, map_downsample=4):
-    """Row 20 -- a deeper repeat of plan row 1 (already run using the final pre-sigmoid logits as
-    its "internal representation") at a genuine intermediate layer. For `organ`'s matched prompt
-    and two mismatches (wrong side via `mirror`, wrong organ via a different organ in `ids`),
-    captures VoxTellDecoder's spatial `fusion_features` (`vm.FusedSpatialCapture`) and measures IoU
-    between its highest-activation region and the GT bbox mask (`vm.activation_overlap_iou`).
-    `stage`: which captured stage to read (-1 = highest resolution / last stage). Returns up to 3
-    rows: organ, condition, stage, iou_with_gt.
-
-    return_maps=True also returns a dict {condition: array}, the fused-feature map itself, upsampled
-    to the crop's coordinate frame (same frame as row 0's masks) and then downsampled by
-    `map_downsample` for storage -- an actual spatial map to overlay, not just the scalar IoU."""
-    gt = label_vol == ids[organ]
-    if not gt.any():
-        return ([], {}) if return_maps else []
-    other_organ = next((o for o in ids if o != organ and o != mirror(organ)), None)
-    conditions = [("matched", prompts[organ])]
-    if mirror(organ) in prompts:
-        conditions.append(("mismatched_side", prompts[mirror(organ)]))
-    if other_organ is not None:
-        conditions.append(("mismatched_organ", prompts[other_organ]))
-
-    rows, maps = [], {}
-    pool = torch.nn.AvgPool3d(map_downsample, ceil_mode=True)
-    for cond, prompt in conditions:
-        cap = vm.FusedSpatialCapture(predictor.network.decoder)
-        cap.attach()
-        try:
-            data, bbox, orig_shape = predictor.preprocess(img_arr)
-            emb = predictor.embed_text_prompts([prompt])
-            with torch.no_grad():
-                predictor.predict_sliding_window_return_logits(data, emb)
-        finally:
-            cap.detach()
-        if not cap.maps:
-            continue
-        stage_idx = sorted(cap.maps)[stage]
-        crop_sl = tuple(slice(int(b[0]), int(b[1])) for b in bbox)
-        gt_crop = gt[crop_sl]
-        iou = vm.activation_overlap_iou(cap.maps[stage_idx][0], gt_crop)
-        rows.append({"organ": organ, "condition": cond, "stage": stage_idx, "iou_with_gt": round(iou, 4)})
-        if return_maps:
-            m = cap.maps[stage_idx][0].float()
-            if m.ndim == 4:
-                m = m.abs().mean(dim=0)
-            up = torch.nn.functional.interpolate(m[None, None], size=tuple(gt_crop.shape), mode='trilinear', align_corners=False)
-            maps[f"{organ}__{cond}"] = pool(up)[0, 0].half().cpu().numpy()
-    return (rows, maps) if return_maps else rows
-
-
-# ------------------------------------------------------------------------------------------------
 # row 0 -- baseline prediction + GT export, for plotting (image + GT + predicted mask overlays)
 # ------------------------------------------------------------------------------------------------
 def export_baseline_masks(predictor, img_arr, label_vol, organs, ids, prompts, image_path=None, label_path=None):
@@ -888,229 +781,6 @@ def run_joint_image_word_shapley(predictor, img_arr, label_vol, organ, ids, seed
         gt_mask_rle = vm.encode_mask_rle(gt)
         return rows, coalition_rows, gt_mask_rle
     return rows, coalition_rows
-
-
-# ------------------------------------------------------------------------------------------------
-# row 22 -- linear probing: is left/right linearly DECODABLE at each decoder layer, not just different?
-# ------------------------------------------------------------------------------------------------
-def _home_patch_indices(predictor, data, bbox, label_vol, organs, ids):
-    """For every organ, the sliding-window patch index (into the SAME slicer list `run_outputs`
-    builds internally, in the same order -- both are pure functions of `data.shape` and
-    `predictor.patch_size`, so the index computed here lines up with `on_patch`'s call order)
-    whose block contains that organ's own ground-truth centroid, or is nearest to it if no single
-    block contains it. This is "the patch that actually produces the final mask there" -- the
-    representative sliding-window pass for that organ, as opposed to averaging over the whole,
-    mostly-irrelevant, volume."""
-    from acvl_utils.cropping_and_padding.padding import pad_nd_image
-    data_p, revert = pad_nd_image(data, predictor.patch_size, 'constant', {'value': 0}, True, None)
-    slicers = predictor._internal_get_sliding_window_slicers(data_p.shape[1:])
-    crop_sl = tuple(slice(int(b[0]), int(b[1])) for b in bbox)
-    label_crop = label_vol[crop_sl]
-    pad_before = [s.start for s in revert[1:]]
-    home = {}
-    for organ in organs:
-        c = centroid(label_crop == ids[organ])
-        if c is None:
-            continue
-        pt = [float(c[a]) + pad_before[a] for a in range(3)]
-        best_i, best_score = None, None
-        for i, slicer in enumerate(slicers):
-            sl = slicer[1:]
-            inside = all(sl[a].start <= pt[a] < sl[a].stop for a in range(3))
-            centre = [(sl[a].start + sl[a].stop) / 2 for a in range(3)]
-            dist2 = sum((pt[a] - centre[a]) ** 2 for a in range(3))
-            score = (0 if inside else 1, dist2)
-            if best_score is None or score < best_score:
-                best_i, best_score = i, score
-        home[organ] = best_i
-    return home
-
-
-def run_laterality_probing(predictor, img_arr, label_vol, organs, ids, prompts):
-    """Row 22. Trains a linear probe (logistic regression) at every decoder layer -- state 0 is the
-    projected text embedding itself (`tgt0`, before any cross-attention), states 1-6 are after each
-    decoder layer -- to predict left vs. right from the hidden state ALONE, independent of what mask
-    the model actually outputs. This is a stricter question than row 16's cosine distance: distance
-    can stay small while a linear probe still finds a perfectly usable separating direction (distance
-    measures "how different two specific states are", the probe measures "is side actually recoverable
-    from this representation by a simple linear read-out"). If a layer's probe is near-perfect but the
-    final mask still gets the side wrong, that is direct evidence the DECODER discards information
-    that was already there, not that the information was never computed (an alignment failure would
-    instead show a probe that stays near-chance at every layer).
-
-    The hidden state for each organ is read from its own "home patch" (`_home_patch_indices` above) --
-    the one sliding-window patch that actually contains that organ's ground-truth centroid -- not
-    averaged across the whole volume, most of which is irrelevant to that organ's prediction.
-
-    Small-n caveat (stated explicitly in the returned rows via `n_pairs`): with a single subject and
-    typically single-digit bilateral organ pairs, cross-validation here is leave-one-ORGAN-pair-out
-    (both the left and right instance of a pair are held out together, so the probe is never trained
-    and tested on the same organ identity) -- indicative, not a robust estimate. Returns rows: layer,
-    cv_accuracy, train_accuracy, n_pairs."""
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.model_selection import LeaveOneGroupOut
-
-    data, bbox, orig_shape = predictor.preprocess(img_arr)
-    home = _home_patch_indices(predictor, data, bbox, label_vol, organs, ids)
-    cores = sorted({o.split(None, 1)[1] for o in organs if o.split(None, 1)[0] in ("left", "right")})
-    pairs = [c for c in cores if f"left {c}" in home and f"right {c}" in home]
-    if len(pairs) < 2:
-        return []
-
-    wanted = {}
-    for i, c in enumerate(pairs):
-        wanted[f"left {c}"] = 2 * i
-        wanted[f"right {c}"] = 2 * i + 1
-    ordered_organs = sorted(wanted, key=wanted.get)
-    emb = predictor.embed_text_prompts([prompts[o] for o in ordered_organs])
-    target_patches = {home[o]: o for o in wanted}
-
-    captured = {}
-    counter = {"i": 0}
-
-    def on_patch(slicer, states, attns, ctx):
-        organ = target_patches.get(counter["i"])
-        counter["i"] += 1
-        if organ is not None:
-            r = wanted[organ]
-            captured[organ] = [s[r, 0].float().cpu().numpy() for s in states]
-
-    vm.run_outputs(predictor, data, emb, [{"name": o, "row": wanted[o], "ops": []} for o in ordered_organs],
-                    on_patch=on_patch)
-
-    organs_order = [o for o in ordered_organs if o in captured]
-    if len(organs_order) < 4:  # need at least 2 complete pairs to do leave-one-pair-out at all
-        return []
-    n_layers = len(captured[organs_order[0]])
-    y = np.array([1 if o.startswith("right") else 0 for o in organs_order])
-    groups = np.array([o.split(None, 1)[1] for o in organs_order])
-
-    rows = []
-    for layer in range(n_layers):
-        X = np.stack([captured[o][layer] for o in organs_order])
-        logo = LeaveOneGroupOut()
-        correct, total = 0, 0
-        for tr, te in logo.split(X, y, groups=groups):
-            if len(set(y[tr])) < 2:
-                continue
-            clf = LogisticRegression(max_iter=2000).fit(X[tr], y[tr])
-            correct += int((clf.predict(X[te]) == y[te]).sum())
-            total += len(te)
-        cv_acc = correct / total if total else float("nan")
-        clf_full = LogisticRegression(max_iter=2000).fit(X, y)
-        train_acc = float((clf_full.predict(X) == y).mean())
-        rows.append({"layer": layer, "cv_accuracy": round(cv_acc, 4) if total else None,
-                     "train_accuracy": round(train_acc, 4), "n_pairs": len(pairs)})
-    return rows
-
-
-# ------------------------------------------------------------------------------------------------
-# row 23 -- embedding geometry: one consistent "left -> right" direction, or a different one per organ?
-# ------------------------------------------------------------------------------------------------
-def run_embedding_geometry(predictor, organs, prompts):
-    """Row 23. Does the model use ONE consistent "left -> right" direction across every organ, the
-    way a genuinely spatial/relational representation would (the classic word-vector-arithmetic
-    test, e.g. "king - man + woman"), or does each organ get its own, unrelated left/right
-    direction (meaning "left" is re-derived per organ, not a shared, composable concept)? For
-    every bilateral pair, computes `embed("right X") - embed("left X")` in the raw text-encoder
-    embedding space (the same embedding rows 2-4 and row 22's layer-0 state are built from, before
-    `project_text_embed`). Pure text-embedding arithmetic -- no image, no sliding window, no model
-    forward pass beyond the text encoder: the cheapest row in this whole module.
-
-    Returns one schema for every row (fields not applicable to a row's `kind` are None), two kinds:
-      kind='pair'    -- organ_a, organ_b, cosine_similarity between their two diff vectors
-      kind='summary' -- mean_cosine_similarity (mean of all pairwise similarities), coherence_ratio
-                        = ||mean(diff vectors)|| / mean(||diff vector||): 1.0 means every organ's
-                        "left->right" step points the same way (one reusable direction), 0.0 means
-                        the directions are unrelated/random per organ, n_organs."""
-    cores = sorted({o.split(None, 1)[1] for o in organs if o.split(None, 1)[0] in ("left", "right")})
-    cores = [c for c in cores if f"left {c}" in prompts and f"right {c}" in prompts]
-    if len(cores) < 2:
-        return []
-    left_emb = predictor.embed_text_prompts([prompts[f"left {c}"] for c in cores])[0]
-    right_emb = predictor.embed_text_prompts([prompts[f"right {c}"] for c in cores])[0]
-    diffs = (right_emb - left_emb).float().cpu().numpy()
-    norms = np.linalg.norm(diffs, axis=1)
-    unit = diffs / np.clip(norms, 1e-8, None)[:, None]
-    sim = unit @ unit.T
-
-    rows = []
-    for i in range(len(cores)):
-        for j in range(i + 1, len(cores)):
-            rows.append({"kind": "pair", "organ_a": cores[i], "organ_b": cores[j],
-                         "cosine_similarity": round(float(sim[i, j]), 4),
-                         "mean_cosine_similarity": None, "coherence_ratio": None, "n_organs": None})
-    mean_cos = float(sim[np.triu_indices(len(cores), k=1)].mean())
-    coherence = float(np.linalg.norm(diffs.mean(axis=0)) / max(float(norms.mean()), 1e-8))
-    rows.append({"kind": "summary", "organ_a": None, "organ_b": None, "cosine_similarity": None,
-                 "mean_cosine_similarity": round(mean_cos, 4), "coherence_ratio": round(coherence, 4),
-                 "n_organs": len(cores)})
-    return rows
-
-
-# ------------------------------------------------------------------------------------------------
-# row 24 -- cross-attention head ablation: which specific head, not just which layer
-# ------------------------------------------------------------------------------------------------
-def run_attention_head_ablation(predictor, img_arr, label_vol, organs, ids, prompts, layers=None,
-                                 return_masks=False):
-    """Row 24. Zero-ablates each cross-attention HEAD, one at a time (`vm.HeadAblation`), at each
-    layer in `layers` (default: the LAST layer only -- cheapest, and closest to the final decision;
-    pass e.g. `layers=range(6)` for every layer, at 6x the cost: n_organs x n_layers x n_heads full
-    sliding-window predictions, the same affordability trade-off as row 17's block count), and
-    re-predicts the FULL mask through the predictor's own public API. The ablation hook operates at
-    the `nn.Module` level, so it affects the public `predict_sliding_window_return_logits` path
-    identically to the custom loop -- no custom inference loop needed here, unlike rows 14-16.
-
-    MUST call `vm.validate_head_ablation_noop` first and confirm it returns 1.0 (up to floating-point
-    rounding) -- see this module's own validation cell in the notebook.
-
-    For every organ, layer and head: re-predicts the mask with that head zeroed, scores Dice against
-    GT and against the organ's own UNABLATED baseline mask (f_dice_self -- did ablating this head
-    change the answer AT ALL), and the same `call` classification rows 12/13 use (does the mask still
-    land on this organ, on its mirror, on both, or neither) against {this organ, its mirror}. A head
-    whose ablation collapses dice_vs_gt or flips `call` toward the mirror organ is doing real
-    laterality work; a head whose ablation changes nothing (dice_vs_baseline ~= 1) is not involved in
-    this decision at all. Returns rows: organ, layer, head, n_heads, dice_vs_gt, dice_vs_baseline, call.
-
-    return_masks=True (RQ7's CSV export): each row also gets 'pred_mask_rle' (that ablated
-    condition's predicted mask, full-volume space, RLE-encoded -- no extra forward passes, already
-    computed above), and a second returned dict `baselines_rle` gives the UNABLATED baseline mask
-    and the ground-truth mask per organ, once each, so RQ7's CSV is self-contained."""
-    num_layers = len(predictor.network.transformer_decoder.layers)
-    layers = list(layers) if layers is not None else [num_layers - 1]
-    n_heads = vm.num_cross_attn_heads(predictor.network.transformer_decoder.layers)
-
-    baselines = {o: predict_masks(predictor, img_arr, [prompts[o]])[0] for o in organs}
-    rows = []
-    baselines_rle = {}
-    for organ in organs:
-        gt = label_vol == ids[organ]
-        gt_mirror = label_vol == ids[mirror(organ)] if mirror(organ) in ids else np.zeros_like(gt)
-        base_mask = baselines[organ]
-        if return_masks:
-            baselines_rle[organ] = {"baseline_mask_rle": vm.encode_mask_rle(base_mask),
-                                     "gt_mask_rle": vm.encode_mask_rle(gt)}
-        for layer in layers:
-            for head in range(n_heads):
-                ablation = vm.HeadAblation(predictor.network.transformer_decoder.layers, [layer], [head])
-                ablation.attach()
-                try:
-                    mask = predict_masks(predictor, img_arr, [prompts[organ]])[0]
-                finally:
-                    ablation.detach()
-                scored = vm.score_masks(mask, gt, gt_mirror)
-                row = {
-                    "organ": organ, "layer": layer, "head": head, "n_heads": n_heads,
-                    "dice_vs_gt": scored["dice_a"],
-                    "dice_vs_baseline": vm.score_masks(mask, base_mask, base_mask)["dice_a"],
-                    "call": scored["call"],
-                }
-                if return_masks:
-                    row["pred_mask_rle"] = vm.encode_mask_rle(mask)
-                rows.append(row)
-    if return_masks:
-        return rows, baselines_rle
-    return rows
 
 
 # ------------------------------------------------------------------------------------------------

@@ -372,14 +372,25 @@ def _run_chunked(predictor, data, emb_all, outputs, bbox, orig_shape, attn_facto
 
 def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_axis=2,
                       alphas=(-0.5, 0.25, 0.5, 0.75, 1.5), single_layers=range(6), from_layers=(0, 3),
-                      state_layers=(0, 5), map_downsample=4, out_chunk=12, return_masks=False):
+                      state_layers=(0, 5), map_downsample=4, out_chunk=12, return_masks=False,
+                      compute_attention=True):
     """Returns dict(row14=[...], row15=[...], row15_centre=[...], row16=[...], attention_maps={name: float16 array}).
 
     return_masks=True (RQ4's CSV export): each row14 dict also gets a 'pred_mask_rle' entry
     (vm.encode_mask_rle of that condition's predicted mask, in `label_vol`'s full-volume space --
     no extra forward passes, these masks are already computed below), and the returned dict also
     gets 'gt_masks_rle': {organ_core: {'left': rle, 'right': rle}}, one entry per bilateral pair,
-    so RQ4's CSV is self-contained without re-running anything on Kaggle."""
+    so RQ4's CSV is self-contained without re-running anything on Kaggle.
+
+    compute_attention=False skips building the cross-attention accumulator entirely (row15/
+    row15_centre/attention_maps come back empty) -- that accumulator's GPU buffer is
+    n_layers x len(organs) x the FULL padded-volume voxel count, float32, allocated once
+    regardless of out_chunk (shrinking the chunk-size OOM retry in _run_chunked does not shrink
+    it). On small volumes (e.g. Neurite-OASIS brain MRI) that is cheap; on large ones (e.g.
+    TotalSegmentator whole-body CT, which can also have far more organs per subject) it can be
+    tens of GB by itself and OOMs even at chunk=1 ("out of GPU memory even with one output per
+    pass") no matter how small out_chunk is. Callers that only need row14 (RQ4) or row16 (RQ3)
+    -- neither of which touches attn -- should pass compute_attention=False."""
     pairs = [(o, mirror(o)) for o in organs if o.startswith("left") and mirror(o) in organs]
     data, bbox, orig_shape = predictor.preprocess(img_arr)
     emb_base = predictor.embed_text_prompts([prompts[o] for o in organs])          # (1, n, D)
@@ -433,7 +444,8 @@ def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_ax
 
     masks, attn = _run_chunked(
         predictor, data, emb_all, outputs, bbox, orig_shape,
-        attn_factory=lambda shape, n_layers, n_rows: vm.AttnAccumulator(shape, n_layers, n_rows, predictor.patch_size, predictor.device),
+        attn_factory=(lambda shape, n_layers, n_rows: vm.AttnAccumulator(
+            shape, n_layers, n_rows, predictor.patch_size, predictor.device)) if compute_attention else None,
         attn_rows=len(organs), on_patch=recorder.on_patch, reset=recorder.reset, chunk=out_chunk)
     base_idx = {(m["pair"], m["dst"]): k for k, m in enumerate(meta) if m["variant"] == "baseline"}
     rows14 = []
@@ -456,15 +468,16 @@ def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_ax
             core = L.split(None, 1)[1]
             gt_masks_rle[core] = {"left": vm.encode_mask_rle(label_vol == ids[L]),
                                    "right": vm.encode_mask_rle(label_vol == ids[R])}
-    rows15, com15 = _attention_rows(attn, organs, regions_crop, rl_axis)
-    maps = {}
-    if map_downsample:
-        pool = torch.nn.AvgPool3d(map_downsample, ceil_mode=True)
-        for p, o in enumerate(organs):
-            last = pool(attn[-1, p][None, None].float())[0, 0]
-            mean = pool(attn[:, p].float().mean(0)[None, None])[0, 0]
-            maps[f"{o}__last_layer"] = last.half().cpu().numpy()
-            maps[f"{o}__mean_of_layers"] = mean.half().cpu().numpy()
+    rows15, com15, maps = [], [], {}
+    if attn is not None:
+        rows15, com15 = _attention_rows(attn, organs, regions_crop, rl_axis)
+        if map_downsample:
+            pool = torch.nn.AvgPool3d(map_downsample, ceil_mode=True)
+            for p, o in enumerate(organs):
+                last = pool(attn[-1, p][None, None].float())[0, 0]
+                mean = pool(attn[:, p].float().mean(0)[None, None])[0, 0]
+                maps[f"{o}__last_layer"] = last.half().cpu().numpy()
+                maps[f"{o}__mean_of_layers"] = mean.half().cpu().numpy()
     return {"row14": rows14, "row15": rows15, "row15_centre": com15, "row16": recorder.rows(), "attention_maps": maps,
             "gt_masks_rle": gt_masks_rle}
 

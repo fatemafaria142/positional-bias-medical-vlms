@@ -338,10 +338,15 @@ def _attention_rows(attn, organs, regions_crop, rl_axis):
 _OOM = getattr(torch, "OutOfMemoryError", torch.cuda.OutOfMemoryError)      # older torch only has the cuda one
 
 
-def _run_chunked(predictor, data, emb_all, outputs, bbox, orig_shape, attn_factory, attn_rows, on_patch, reset, chunk=12):
+def _run_chunked(predictor, data, emb_all, outputs, bbox, orig_shape, attn_factory, attn_rows, on_patch, reset, chunk=12,
+                 consume=None):
     """Run the (many) outputs in chunks so the logits / decoder activations fit on the GPU. The attention and the layer
     recorder only need one pass, so they ride on the first chunk. A chunk that runs out of memory is retried with half the
-    size. Returns (bool masks (n_out, X, Y, Z) in the original grid, attention or None)."""
+    size. Returns (bool masks (n_out, X, Y, Z) in the original grid, attention or None).
+
+    consume=callable(start_index, bool_masks_chunk): if given, each chunk of full-volume masks is handed to it and then
+    DROPPED instead of being accumulated, and the returned masks are None. Holding every output's full-volume mask at once
+    (hundreds per whole-body CT subject, tens of MB each, doubled again by np.concatenate) is what exhausts host RAM."""
     import gc
     masks, attn, i = [], None, 0
     while i < len(outputs):
@@ -361,13 +366,18 @@ def _run_chunked(predictor, data, emb_all, outputs, bbox, orig_shape, attn_facto
             if first:
                 reset()
             continue
-        masks.append(_to_full_masks(logits, bbox, orig_shape))
+        m = _to_full_masks(logits, bbox, orig_shape)
         del logits
+        if consume is not None:
+            consume(i, m)
+            del m
+        else:
+            masks.append(m)
         if first:
             attn = a.cpu() if a is not None else None
         i += len(part)
         gc.collect(); torch.cuda.empty_cache()
-    return np.concatenate(masks), attn
+    return (np.concatenate(masks) if consume is None else None), attn
 
 
 def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_axis=2,
@@ -442,26 +452,44 @@ def run_interventions(predictor, img_arr, label_vol, organs, ids, prompts, rl_ax
             ref_pairs.append((f"{L.split(None, 1)[1]}: {L} vs {others[0]} (reference)", row_of[L], row_of[others[0]]))
     recorder = LayerDistanceRecorder(ref_pairs, union_crop)
 
-    masks, attn = _run_chunked(
+    # Score each chunk of masks as it is produced and keep only the numbers (+ RLE), never all full-volume masks.
+    base_idx = {(m["pair"], m["dst"]): k for k, m in enumerate(meta) if m["variant"] == "baseline"}
+    baseline_packed = {}          # (pair, side) -> np.packbits of the baseline mask, for agreement_with_source_baseline
+    gt_cache = {}                 # pair core -> (gt_left, gt_right); outputs are grouped by pair so this stays at one pair
+    rows14 = [None] * len(meta)
+
+    def consume(start, chunk_masks):
+        for j in range(chunk_masks.shape[0]):
+            k = start + j
+            m, mask = meta[k], chunk_masks[j]
+            core = m["pair"]
+            if core not in gt_cache:
+                gt_cache.clear()
+                gt_cache[core] = (label_vol == ids[f"left {core}"], label_vol == ids[f"right {core}"])
+            sc = vm.score_masks(mask, *gt_cache[core])
+            call = {"a": "left", "b": "right"}.get(sc["call"], sc["call"])
+            moved = bool((m["dst"] == "left" and call == "right") or (m["dst"] == "right" and call == "left")) if m["variant"] != "blend" else np.nan
+            if m["variant"] == "baseline":
+                baseline_packed[(core, m["dst"])] = np.packbits(mask.ravel())
+            agree = np.nan
+            if m["variant"] == "whole_state_control":
+                ref = np.unpackbits(baseline_packed[(core, m["src"])], count=mask.size).astype(bool)
+                agree = float((mask.ravel() == ref).mean())
+                del ref
+            row = {**m, "agreement_with_source_baseline": round(agree, 6) if agree == agree else agree,
+                   "n_pred_voxels": sc["n_pred_voxels"], "cov_left_organ": sc["cov_a"], "cov_right_organ": sc["cov_b"],
+                   "dice_left_organ": sc["dice_a"], "dice_right_organ": sc["dice_b"], "call": call, "moved_to_source_side": moved}
+            if return_masks:
+                row["pred_mask_rle"] = vm.encode_mask_rle(mask)
+            rows14[k] = row
+
+    _, attn = _run_chunked(
         predictor, data, emb_all, outputs, bbox, orig_shape,
         attn_factory=(lambda shape, n_layers, n_rows: vm.AttnAccumulator(
             shape, n_layers, n_rows, predictor.patch_size, predictor.device)) if compute_attention else None,
-        attn_rows=len(organs), on_patch=recorder.on_patch, reset=recorder.reset, chunk=out_chunk)
-    base_idx = {(m["pair"], m["dst"]): k for k, m in enumerate(meta) if m["variant"] == "baseline"}
-    rows14 = []
-    for k, m in enumerate(meta):
-        L = f"left {m['pair']}"
-        R = f"right {m['pair']}"
-        sc = vm.score_masks(masks[k], label_vol == ids[L], label_vol == ids[R])
-        call = {"a": "left", "b": "right"}.get(sc["call"], sc["call"])
-        moved = bool((m["dst"] == "left" and call == "right") or (m["dst"] == "right" and call == "left")) if m["variant"] != "blend" else np.nan
-        agree = float((masks[k] == masks[base_idx[(m["pair"], m["src"])]]).mean()) if m["variant"] == "whole_state_control" else np.nan
-        row = {**m, "agreement_with_source_baseline": round(agree, 6) if agree == agree else agree,
-               "n_pred_voxels": sc["n_pred_voxels"], "cov_left_organ": sc["cov_a"], "cov_right_organ": sc["cov_b"],
-               "dice_left_organ": sc["dice_a"], "dice_right_organ": sc["dice_b"], "call": call, "moved_to_source_side": moved}
-        if return_masks:
-            row["pred_mask_rle"] = vm.encode_mask_rle(masks[k])
-        rows14.append(row)
+        attn_rows=len(organs), on_patch=recorder.on_patch, reset=recorder.reset, chunk=out_chunk, consume=consume)
+    gt_cache.clear()
+    baseline_packed.clear()
     gt_masks_rle = {}
     if return_masks:
         for L, R in pairs:
